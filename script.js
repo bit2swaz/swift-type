@@ -118,3 +118,40 @@ function generateTestContent(count = 50) {
     return generatedContent;
 }
 
+function renderContent() {
+    wordsDisplay.innerHTML = '';
+    currentTestWords.forEach((word, wordIndex) => {
+        const wordSpan = document.createElement('span');
+        wordSpan.classList.add('word');
+        wordSpan.setAttribute('data-word-index', wordIndex);
+
+        if (wordIndex === 0) {
+            wordSpan.classList.add('active');
+        }
+
+        word.split('').forEach(char => {
+            const charSpan = document.createElement('span');
+            charSpan.classList.add('letter');
+            charSpan.textContent = char;
+            wordSpan.appendChild(charSpan);
+        });
+
+        if (wordIndex < currentTestWords.length - 1) {
+            const spaceSpan = document.createElement('span');
+            spaceSpan.classList.add('letter', 'space');
+            spaceSpan.textContent = ' ';
+            wordSpan.appendChild(spaceSpan);
+        }
+        wordsDisplay.appendChild(wordSpan);
+    });
+
+    if (wordsDisplay.children.length > 0) {
+        const firstWordElement = wordsDisplay.children[0];
+        if (firstWordElement.children.length > 0) {
+            firstWordElement.children[0].classList.add('current');
+        }
+    }
+
+    textInput.focus();
+}
+
