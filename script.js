@@ -240,3 +240,13 @@ function calculateAccuracy() {
     return Math.round((correctChars / totalTypedChars) * 100);
 }
 
+function updateLiveStats() {
+    if (testActive) {
+        liveWPM.textContent = `WPM: ${calculateWPM()}`;
+        liveAccuracy.textContent = `Accuracy: ${calculateAccuracy()}%`;
+        liveStats.classList.add('visible');
+    } else {
+        liveStats.classList.remove('visible');
+    }
+}
+
