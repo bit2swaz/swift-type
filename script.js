@@ -470,3 +470,28 @@ function saveTestToHistory(wpm, accuracy, time) {
     renderHistory(history);
 }
 
+function renderHistory(history) {
+    historyList.innerHTML = '';
+    if (history.length === 0) {
+        historyList.innerHTML = '<p>No tests yet.</p>';
+        return;
+    }
+    history.forEach((entry, index) => {
+        const item = document.createElement('div');
+        item.classList.add('history-item');
+        item.innerHTML = `
+            <span>WPM: ${entry.wpm}</span>
+            <span>Acc: ${entry.accuracy}%</span>
+            <span>Time: ${entry.time}s</span>
+            <span>${entry.date}</span>
+        `;
+        historyList.appendChild(item);
+    });
+}
+
+toggleHistoryButton.addEventListener('click', () => {
+    historyList.classList.toggle('hidden');
+});
+
+loadAllWords();
+
