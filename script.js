@@ -250,3 +250,21 @@ function updateLiveStats() {
     }
 }
 
+textInput.addEventListener('keydown', (e) => {
+    if (e.key === ' ') {
+        e.preventDefault();
+    }
+    if (e.key === 'Tab') {
+        e.preventDefault();
+    }
+
+    if (!testActive && !testFinished) {
+        textInput.focus();
+    }
+
+    if (!testActive && !testFinished && e.key.length === 1 && e.key !== ' ') {
+        testActive = true;
+        startTimer();
+    }
+});
+
