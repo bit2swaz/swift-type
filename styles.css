@@ -81,3 +81,14 @@ body {
     border-radius: 50%;
     transition: background-color 0.2s ease;
 }
+
+.theme-toggle:hover {
+    background-color: var(--button-bg);
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
