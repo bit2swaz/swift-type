@@ -92,6 +92,14 @@ body.test-in-progress .footer {
     pointer-events: none; /* Disable interaction when hidden */
 }
 
+/* Use display: none for elements that should truly disappear from layout */
+#controls-section.hidden,
+#info-sections.hidden,
+#results-screen.hidden,
+#typing-test-area.hidden {
+    display: none;
+}
+
 /* Header - Top Right Theme Toggle */
 .app-header {
     width: 100%;
@@ -267,7 +275,20 @@ body.test-in-progress .footer {
     z-index: -1; /* Place behind the letter text */
 }
 
-/* No special styling for .letter.space.current::after as spaces are not separate `letter` spans anymore */
+/* Ensure the space character also has a cursor-like highlight */
+/* This is for the actual space span */
+.word .letter:last-child.space.current::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0.5em; /* A narrower cursor for spaces */
+    height: 100%;
+    background-color: var(--current-char-color);
+    opacity: 0.5;
+    animation: blink-cursor 1s infinite alternate;
+    z-index: -1;
+}
 
 @keyframes blink-cursor {
     from { opacity: 0.5; }
@@ -320,15 +341,11 @@ body.test-in-progress .footer {
     width: 100%;
     box-sizing: border-box;
     margin-top: 20px;
-    opacity: 1; /* Initially visible for smooth fade-in */
+    opacity: 1; /* Should start visible (when not hidden) */
+    display: block; /* Ensure it's a block when visible */
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-#results-screen.hidden {
-    opacity: 0;
-    transform: translateY(20px);
-    pointer-events: none; /* Disable interaction when hidden */
-}
 
 #results-screen h2 {
     color: var(--text-color);
@@ -438,15 +455,15 @@ body.test-in-progress .footer {
     border-bottom: none;
 }
 
-/* Footer - Revert to simpler, "signature" style */
+/* Footer - Reverted to simpler, "signature" style */
 .footer {
     width: 100%;
     text-align: center;
-    padding: 20px 0;
+    padding: 15px 0; /* Slightly reduced padding */
     margin-top: auto; /* Pushes footer to the bottom */
     font-size: 0.9em;
     color: rgba(255, 255, 255, 0.6); /* Use a softer white/grey for text */
-    border-top: none; /* Remove border top */
+    border-top: none; /* Removed border top */
     padding-bottom: 10px; /* Add some space from bottom */
 }
 
