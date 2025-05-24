@@ -12,6 +12,10 @@
             <div class="header-left">
                 <span class="logo">SwiftType</span>
                 <div class="timer" id="timer">60</div>
+                <div class="live-stats">
+                    <span id="live-wpm">WPM: 0</span>
+                    <span id="live-accuracy">Acc: 0%</span>
+                </div>
             </div>
             <div class="header-right">
                 <div class="theme-switch">
@@ -32,13 +36,13 @@
                 <div class="word-types">
                     <label class="toggle-switch">
                         <input type="checkbox" id="include-numbers">
-                        <span class="slider"></span>
-                        Numbers
+                        <span class="slider round"></span>
+                        <span class="toggle-text">Numbers</span>
                     </label>
                     <label class="toggle-switch">
                         <input type="checkbox" id="include-punctuation">
-                        <span class="slider"></span>
-                        Punctuation
+                        <span class="slider round"></span>
+                        <span class="toggle-text">Punctuation</span>
                     </label>
                 </div>
             </div>
@@ -72,7 +76,7 @@
         <footer class="footer">
             <a href="#" target="_blank">About</a>
             <a href="#" target="_blank">Contact</a>
-            <a href="https://github.com/bit2swaz" target="_blank">GitHub</a>
+            <a href="https://github.com/bit2swaz/" target="_blank">GitHub</a>
             <span>&copy; 2025 SwiftType</span>
         </footer>
     </div>
