@@ -17,6 +17,7 @@
     --border-color: #ccc;
     --app-container-bg: #ffffff;
     --footer-bg: #d8dee9;
+    --accent-color-rgb: 0, 123, 255;
 
     --correct-char-color: #28a745;
     --incorrect-char-color: #dc3545;
@@ -35,6 +36,7 @@ body.dark-mode {
     --border-color: #555555;
     --app-container-bg: #2c2c2c;
     --footer-bg: #111111;
+    --accent-color-rgb: 255, 215, 0;
 
     --correct-char-color: #6aff6a;
     --incorrect-char-color: #ff6a6a;
@@ -63,17 +65,17 @@ body {
     padding: 8px;
     border-radius: 50%;
     color: var(--accent-color);
-    background-color: transparent; /* Changed to transparent */
-    border: 1px solid transparent; /* Changed to transparent border */
+    background-color: transparent;
+    border: 1px solid transparent;
     transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
     z-index: 1000;
 }
 
 #theme-toggle:hover {
-    background-color: rgba(var(--accent-color-rgb, 255, 215, 0), 0.1); /* Subtle hover effect */
+    background-color: rgba(var(--accent-color-rgb), 0.1);
     color: var(--accent-color);
     transform: scale(1.1);
-    border-color: var(--accent-color); /* Border appears on hover */
+    border-color: var(--accent-color);
 }
 
 #theme-toggle:active {
@@ -351,8 +353,8 @@ body {
 .footer {
     width: 100%;
     text-align: center;
-    padding: 20px 0;
-    font-size: 0.95rem;
+    padding: 25px 0;
+    font-size: 1.05rem;
     color: var(--text-color);
     background-color: var(--footer-bg);
     margin-top: auto;
@@ -383,7 +385,7 @@ body {
 }
 
 .footer a:hover {
-    color: var(--accent-color); /* Ensure color stays accent on hover */
+    color: var(--accent-color);
 }
 
 .footer a:hover::after {
@@ -439,8 +441,8 @@ body {
     }
 
     .footer {
-        padding: 15px 0;
-        font-size: 0.8rem;
+        padding: 20px 0;
+        font-size: 0.9rem;
     }
 }
 
