@@ -268,3 +268,95 @@ textInput.addEventListener('keydown', (e) => {
     }
 });
 
+textInput.addEventListener('input', (e) => {
+    if (testFinished) return;
+
+    const typedText = textInput.value;
+    const currentWordElement = wordsDisplay.children[currentWordIndex];
+    const targetWordWithSpace = currentTestWords[currentWordIndex] + (currentWordIndex < currentTestWords.length - 1 ? ' ' : '');
+    const currentLetters = currentWordElement.querySelectorAll('.letter');
+
+    totalTypedChars++;
+
+    currentLetters.forEach(charSpan => {
+        charSpan.classList.remove('correct', 'incorrect', 'current', 'extra', 'missing-char-placeholder');
+    });
+
+    for (let i = 0; i < targetWordWithSpace.length; i++) {
+        const charSpan = currentLetters[i];
+        if (!charSpan) continue;
+
+        if (i < typedText.length) {
+            if (typedText[i] === targetWordWithSpace[i]) {
+                charSpan.classList.add('correct');
+            } else {
+                charSpan.classList.add('incorrect');
+            }
+        }
+    }
+
+    if (typedText.length > targetWordWithSpace.length) {
+        for (let i = targetWordWithSpace.length; i < typedText.length; i++) {
+            // This is where you'd add extra spans for `extra` characters
+            // For now, we'll mark them implicitly as incorrect via counts
+        }
+    }
+
+    currentCharIndex = typedText.length;
+
+    if (currentCharIndex < currentLetters.length) {
+        currentLetters[currentCharIndex].classList.add('current');
+    } else if (currentLetters.length > 0) {
+        currentLetters[currentLetters.length - 1].classList.add('current');
+    }
+
+
+    if (e.data === ' ') {
+        const typedWordWithoutSpace = typedText.trim();
+        const actualTargetWord = currentTestWords[currentWordIndex];
+
+        for (let i = 0; i < typedWordWithoutSpace.length; i++) {
+            if (i < actualTargetWord.length && typedWordWithoutSpace[i] === actualTargetWord[i]) {
+                correctChars++;
+            } else {
+                incorrectChars++;
+            }
+        }
+        if (typedWordWithoutSpace.length < actualTargetWord.length) {
+            incorrectChars += (actualTargetWord.length - typedWordWithoutSpace.length);
+            for (let i = typedWordWithoutSpace.length; i < actualTargetWord.length; i++) {
+                if(currentLetters[i]) {
+                    currentLetters[i].classList.add('missing');
+                    currentLetters[i].textContent = '_';
+                }
+            }
+        }
+        if (typedWordWithoutSpace.length > actualTargetWord.length) {
+            incorrectChars += (typedWordWithoutSpace.length - actualTargetWord.length);
+        }
+
+        if (typedWordWithoutSpace === actualTargetWord) {
+            typedCorrectlyOnce += actualTargetWord.length + 1; // +1 for the space
+        } else {
+            typedCorrectlyOnce += correctChars; // Add correct chars up to this point
+        }
+
+
+        textInput.value = '';
+        currentWordElement.classList.remove('active');
+        currentWordIndex++;
+        currentCharIndex = 0;
+
+        if (currentWordIndex < currentTestWords.length) {
+            const nextWordElement = wordsDisplay.children[currentWordIndex];
+            nextWordElement.classList.add('active');
+            if (nextWordElement.children.length > 0) {
+                nextWordElement.querySelector('.letter').classList.add('current');
+            }
+            scrollWordsDisplay();
+        } else {
+            endTest();
+        }
+    }
+});
+
