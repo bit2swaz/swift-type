@@ -5,26 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SwiftType (MonkeyType Clone)</title>
     <link rel="stylesheet" href="./styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="container">
+<body class="dark-theme"> <div class="container">
         <header class="header">
-            <div class="settings">
+            <div class="header-left">
                 <span class="logo">SwiftType</span>
-                <div id="timer" class="timer">60s</div>
+                <div class="timer" id="timer">60</div>
+            </div>
+            <div class="header-right">
+                <div class="theme-switch">
+                    <input type="checkbox" id="theme-toggle" class="theme-toggle-checkbox">
+                    <label for="theme-toggle" class="theme-toggle-label"></label>
+                </div>
             </div>
         </header>
 
         <main class="typing-test">
+            <div class="test-controls">
+                <div class="time-modes">
+                    <button class="time-btn active" data-time="15">15</button>
+                    <button class="time-btn" data-time="30">30</button>
+                    <button class="time-btn" data-time="60">60</button>
+                    <button class="time-btn" data-time="120">120</button>
+                </div>
+                <div class="word-types">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="include-numbers">
+                        <span class="slider"></span>
+                        Numbers
+                    </label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="include-punctuation">
+                        <span class="slider"></span>
+                        Punctuation
+                    </label>
+                </div>
+            </div>
+
             <div id="words-container" class="words-container">
                 <div id="words-display" class="words-display">
                     </div>
             </div>
             <input type="text" id="text-input" class="text-input" autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+
+            <div id="results-screen" class="results-screen hidden">
+                <h2>Test Results</h2>
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">WPM</span>
+                        <span class="stat-value" id="wpm-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Accuracy</span>
+                        <span class="stat-value" id="accuracy-value">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Raw WPM</span>
+                        <span class="stat-value" id="raw-wpm-value">0</span>
+                    </div>
+                </div>
+                <button id="restart-btn" class="restart-btn">Restart</button>
+            </div>
         </main>
 
         <footer class="footer">
-            <p>&copy; 2025 SwiftType</p>
+            <a href="#" target="_blank">About</a>
+            <a href="#" target="_blank">Contact</a>
+            <a href="https://github.com/bit2swaz" target="_blank">GitHub</a>
+            <span>&copy; 2025 SwiftType</span>
         </footer>
     </div>
 
