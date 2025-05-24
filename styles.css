@@ -152,3 +152,8 @@ body {
 .words-display .correct {
     color: var(--correct-char-color);
 }
+
+.words-display .incorrect {
+    color: var(--incorrect-char-color);
+}
+
