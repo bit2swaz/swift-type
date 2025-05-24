@@ -280,4 +280,8 @@ body {
     transition: transform 0.2s ease;
 }
 
+.history-list:not(.hidden) + h3 #toggle-history {
+    transform: rotate(180deg);
+}
+
 
