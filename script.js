@@ -6,7 +6,7 @@ const punctuations = [
     '*', '^', '%', '$', '#', '@', '~', '`'
 ];
 
-let currentTestContent = []; // Changed from currentTestWords for clarity
+let currentTestContent = [];
 let currentWordIndex = 0;
 let currentCharIndex = 0;
 
@@ -15,11 +15,13 @@ let testFinished = false;
 let timerId = null;
 let timeLeft = 60;
 let initialTestTime = 60;
+// >>>>>>>>>>>>> THE CRUCIAL LINE WAS MISSING HERE <<<<<<<<<<<<<
+let currentTime = 60; // <--- ADD THIS LINE HERE!
 
 let correctChars = 0;
 let incorrectChars = 0;
-let totalTypedChars = 0; // All characters user tried to type
-let typedCorrectlyOnce = 0; // Characters typed correctly *on the first attempt* for WPM
+let totalTypedChars = 0;
+let typedCorrectlyOnce = 0;
 let startTime = 0;
 
 const themeToggle = document.getElementById('theme-toggle');
@@ -45,10 +47,10 @@ const typingHistorySection = document.getElementById('typing-history');
 const toggleHistoryButton = document.getElementById('toggle-history');
 const historyList = document.getElementById('history-list');
 
-const appHeader = document.querySelector('.app-header'); // New
-const controlsSection = document.getElementById('controls-section'); // New
-const infoSections = document.getElementById('info-sections'); // New
-const footer = document.querySelector('.footer'); // New
+const appHeader = document.querySelector('.app-header');
+const controlsSection = document.getElementById('controls-section');
+const infoSections = document.getElementById('info-sections');
+const footer = document.querySelector('.footer');
 
 // Updated for flexible modes
 let activeModes = {
@@ -61,7 +63,7 @@ const LOCAL_STORAGE_THEME_KEY = 'monkeytypeCloneTheme';
 const LOCAL_STORAGE_MAX_WPM_KEY = 'monkeytypeCloneMaxWPM';
 const LOCAL_STORAGE_BEST_ACCURACY_KEY = 'monkeytypeCloneBestAccuracy';
 const LOCAL_STORAGE_HISTORY_KEY = 'monkeytypeCloneHistory';
-const LOCAL_STORAGE_ACTIVE_MODES_KEY = 'monkeytypeCloneActiveModes'; // New
+const LOCAL_STORAGE_ACTIVE_MODES_KEY = 'monkeytypeCloneActiveModes';
 
 for (let i = 1; i <= 1000; i++) {
     numbers.push(i.toString());
@@ -78,7 +80,7 @@ async function loadAllWords() {
         console.log("All words loaded. Count:", allWords.length);
 
         applySavedTheme();
-        loadActiveModes(); // Load saved modes
+        loadActiveModes();
         loadHighScores();
         loadTypingHistory();
         initializeTest();
@@ -137,7 +139,7 @@ function generateTestContent(count = 50) {
 function renderContent() {
     wordsDisplay.innerHTML = '';
     currentTestContent.forEach((word, wordIndex) => {
-        const wordWrapper = document.createElement('span'); // Wrapper for word + space
+        const wordWrapper = document.createElement('span');
         wordWrapper.classList.add('word-wrapper');
 
         const wordSpan = document.createElement('span');
@@ -184,9 +186,9 @@ function initializeTest() {
     currentCharIndex = 0;
     testActive = false;
     testFinished = false;
-    timeLeft = currentTime;
+    timeLeft = currentTime; // Now `currentTime` is correctly defined globally
     timerDisplay.textContent = timeLeft;
-    timerDisplay.style.setProperty('--timer-progress', '100%'); // Reset timer bar
+    timerDisplay.style.setProperty('--timer-progress', '100%');
     textInput.value = '';
     textInput.disabled = false;
     wordsDisplay.classList.remove('blur-on-finish');
@@ -205,7 +207,7 @@ function initializeTest() {
     document.getElementById('typing-test-area').classList.remove('hidden');
 
     // Show initial UI elements
-    body.classList.remove('test-in-progress'); // Show everything
+    document.body.classList.remove('test-in-progress');
     appHeader.classList.remove('hidden');
     controlsSection.classList.remove('hidden');
     infoSections.classList.remove('hidden');
@@ -221,14 +223,14 @@ function startTimer() {
     startTime = Date.now();
 
     // Hide unnecessary UI elements
-    body.classList.add('test-in-progress'); // Trigger CSS transition
-    liveStats.classList.add('visible'); // Show live stats
+    document.body.classList.add('test-in-progress');
+    liveStats.classList.add('visible');
 
     timerId = setInterval(() => {
         timeLeft--;
         timerDisplay.textContent = timeLeft;
         const progress = (timeLeft / initialTestTime) * 100;
-        timerDisplay.style.setProperty('--timer-progress', `${progress}%`); // Update CSS variable for bar
+        timerDisplay.style.setProperty('--timer-progress', `${progress}%`);
 
         updateTabTitle();
         updateLiveStats();
@@ -260,7 +262,7 @@ function endTest() {
     document.getElementById('typing-test-area').classList.add('hidden');
 
     // Show all UI elements for results screen
-    body.classList.remove('test-in-progress');
+    document.body.classList.remove('test-in-progress');
     appHeader.classList.remove('hidden');
     controlsSection.classList.remove('hidden');
     infoSections.classList.remove('hidden');
@@ -315,26 +317,22 @@ textInput.addEventListener('input', (e) => {
 
     const typedText = textInput.value;
     const currentWordWrapper = wordsDisplay.children[currentWordIndex];
-    if (!currentWordWrapper) return; // Guard against out of bounds
+    if (!currentWordWrapper) return;
 
     const currentWordSpan = currentWordWrapper.querySelector('.word');
     if (!currentWordSpan) return;
 
     const targetWord = currentTestContent[currentWordIndex];
-    // Include the space character for the target if it's not the last word
     const targetSequence = targetWord + (currentWordIndex < currentTestContent.length - 1 ? ' ' : '');
 
-    // Get all letters within the current word wrapper (word letters + potential space)
     const allCurrentLetters = currentWordWrapper.querySelectorAll('.letter');
 
-    // Reset all letter classes for the current word to handle backspaces
     allCurrentLetters.forEach(charSpan => {
         charSpan.classList.remove('correct', 'incorrect', 'current', 'extra', 'missing');
     });
 
-    let currentWordTypedChars = 0; // Chars typed for this specific word/sequence
+    let currentWordTypedChars = 0;
 
-    // Compare typed characters with target sequence
     for (let i = 0; i < allCurrentLetters.length; i++) {
         const charSpan = allCurrentLetters[i];
         if (i < typedText.length) {
@@ -347,84 +345,66 @@ textInput.addEventListener('input', (e) => {
         }
     }
 
-    // Handle "extra" characters
-    // Create new spans for characters typed beyond the target sequence length
     if (typedText.length > targetSequence.length) {
-        // Remove any previous extra spans before adding new ones
         currentWordWrapper.querySelectorAll('.extra').forEach(el => el.remove());
 
         for (let i = targetSequence.length; i < typedText.length; i++) {
             const extraCharSpan = document.createElement('span');
             extraCharSpan.classList.add('letter', 'extra');
             extraCharSpan.textContent = typedText[i];
-            currentWordWrapper.appendChild(extraCharSpan); // Append outside the wordSpan but inside wrapper
+            currentWordWrapper.appendChild(extraCharSpan);
         }
     } else {
-         // If backspacing and typedText length is <= targetSequence length, remove all extra spans
         currentWordWrapper.querySelectorAll('.extra').forEach(el => el.remove());
     }
 
-    // Update currentCharIndex based on typedText length
     currentCharIndex = typedText.length;
 
-    // Apply current-char highlight
     if (currentCharIndex < allCurrentLetters.length) {
         allCurrentLetters[currentCharIndex].classList.add('current');
     } else {
-        // If typing beyond target, highlight the last character of the word (or the last extra char)
         const lastChar = allCurrentLetters[allCurrentLetters.length - 1];
         if (lastChar) {
             lastChar.classList.add('current');
-        } else {
-            // Edge case: empty word or first word has no letters
-            // This case might need a blinking bar at the start of the current word wrapper.
         }
     }
 
-
-    // Logic for advancing to the next word (on space)
     if (e.data === ' ') {
         const typedWordWithTrailingSpace = typedText;
         const actualTargetWord = currentTestContent[currentWordIndex];
         const actualTargetSequence = actualTargetWord + (currentWordIndex < currentTestContent.length - 1 ? ' ' : '');
 
-        // Calculate correct/incorrect chars for this word
         let wordCorrectCount = 0;
         let wordIncorrectCount = 0;
         let wordTypedCorrectlyOnceFlag = true;
 
-        for(let i = 0; i < typedWordWithTrailingSpace.length; i++) {
-            totalTypedChars++; // Total characters typed in the test
-            if(i < actualTargetSequence.length && typedWordWithTrailingSpace[i] === actualTargetSequence[i]) {
+        for (let i = 0; i < typedWordWithTrailingSpace.length; i++) {
+            totalTypedChars++;
+            if (i < actualTargetSequence.length && typedWordWithTrailingSpace[i] === actualTargetSequence[i]) {
                 correctChars++;
                 wordCorrectCount++;
             } else {
                 incorrectChars++;
                 wordIncorrectCount++;
-                wordTypedCorrectlyOnceFlag = false; // Mark word as incorrect
+                wordTypedCorrectlyOnceFlag = false;
             }
         }
 
-        // Account for missing characters
         if (typedWordWithTrailingSpace.length < actualTargetSequence.length) {
             incorrectChars += (actualTargetSequence.length - typedWordWithTrailingSpace.length);
-            wordTypedCorrectlyOnceFlag = false; // Mark word as incorrect
+            wordTypedCorrectlyOnceFlag = false;
         }
 
-        // If the word was typed perfectly until the space (and no extra chars)
         if (wordTypedCorrectlyOnceFlag && typedWordWithTrailingSpace.length === actualTargetSequence.length) {
             typedCorrectlyOnce += actualTargetSequence.length;
         }
 
-        // Clear input for next word
         textInput.value = '';
 
-        // Deactivate current word, move to next
         currentWordSpan.classList.remove('active');
         currentWordIndex++;
         currentCharIndex = 0;
 
-        // Move to the next word or end test
         if (currentWordIndex < currentTestContent.length) {
             const nextWordWrapper = wordsDisplay.children[currentWordIndex];
             const nextWordSpan = nextWordWrapper.querySelector('.word');
@@ -447,28 +427,20 @@ function scrollWordsDisplay() {
     const displayRect = wordsDisplay.getBoundingClientRect();
     const activeWordRect = activeWordWrapper.getBoundingClientRect();
 
-    // Check if the current word's bottom is below the display's bottom
-    // Or if the current word's top is above the display's top (e.g., after a restart and we want to align)
     if (activeWordRect.bottom > displayRect.bottom || activeWordRect.top < displayRect.top) {
-        // Calculate the target scroll position: try to put the active word at the top of the display area,
-        // or a bit higher to reveal the next line fully.
-        wordsDisplay.scrollTop = activeWordRect.top - wordsDisplay.getBoundingClientRect().top + wordsDisplay.scrollTop - (wordsDisplay.offsetHeight / 4); // Adjust this offset as needed
+        wordsDisplay.scrollTop = activeWordRect.top - wordsDisplay.getBoundingClientRect().top + wordsDisplay.scrollTop - (wordsDisplay.offsetHeight / 4);
     }
 }
 
-// Event listeners for flexible mode selection
 modeSelector.addEventListener('click', (e) => {
     if (e.target.classList.contains('mode-button')) {
         const mode = e.target.dataset.mode;
-        // Toggle the mode state
         activeModes[mode] = !activeModes[mode];
 
-        // Ensure at least one mode is always active. If all are deactivating, re-activate 'words'.
         if (!activeModes.words && !activeModes.numbers && !activeModes.punctuation) {
-            activeModes.words = true; // Default to words if all are deselected
+            activeModes.words = true;
         }
 
-        // Apply active classes based on current state
         modeSelector.querySelectorAll('.mode-button').forEach(btn => {
             if (activeModes[btn.dataset.mode]) {
                 btn.classList.add('active');
@@ -477,22 +449,19 @@ modeSelector.addEventListener('click', (e) => {
             }
         });
 
-        localStorage.setItem(LOCAL_STORAGE_ACTIVE_MODES_KEY, JSON.stringify(activeModes)); // Save modes
-        initializeTest(); // Restart test with new modes
+        localStorage.setItem(LOCAL_STORAGE_ACTIVE_MODES_KEY, JSON.stringify(activeModes));
+        initializeTest();
     }
 });
 
-// Load active modes from local storage
 function loadActiveModes() {
     const savedModes = localStorage.getItem(LOCAL_STORAGE_ACTIVE_MODES_KEY);
     if (savedModes) {
         activeModes = JSON.parse(savedModes);
     } else {
-        // Default modes if nothing saved
         activeModes = { words: true, numbers: false, punctuation: false };
     }
 
-    // Apply active classes to buttons on load
     modeSelector.querySelectorAll('.mode-button').forEach(btn => {
         if (activeModes[btn.dataset.mode]) {
             btn.classList.add('active');
@@ -501,7 +470,6 @@ function loadActiveModes() {
         }
     });
 }
-
 
 timeSelector.addEventListener('click', (e) => {
     if (e.target.classList.contains('time-button')) {
@@ -518,18 +486,16 @@ retryButton.addEventListener('click', () => {
 });
 
 restartButton.addEventListener('click', () => {
-    // Reset modes to default 'words' and time to '60'
     activeModes = { words: true, numbers: false, punctuation: false };
     currentTime = 60;
     initialTestTime = 60;
 
-    // Update button active states
     modeSelector.querySelector('[data-mode="words"]').classList.add('active');
     modeSelector.querySelectorAll('.mode-button:not([data-mode="words"])').forEach(btn => btn.classList.remove('active'));
     timeSelector.querySelector('[data-time="60"]').classList.add('active');
     timeSelector.querySelectorAll('.time-button:not([data-time="60"])').forEach(btn => btn.classList.remove('active'));
 
-    localStorage.setItem(LOCAL_STORAGE_ACTIVE_MODES_KEY, JSON.stringify(activeModes)); // Save default modes
+    localStorage.setItem(LOCAL_STORAGE_ACTIVE_MODES_KEY, JSON.stringify(activeModes));
     initializeTest();
 });
 
@@ -567,7 +533,6 @@ function updateHighScores(wpm, accuracy) {
         localStorage.setItem(LOCAL_STORAGE_MAX_WPM_KEY, wpm);
         maxWPM.textContent = wpm;
     }
-    // Only update accuracy if WPM is equal or higher AND accuracy is better OR if it's the first test
     if (wpm >= currentMaxWPM && accuracy > currentBestAccuracy || (currentMaxWPM === 0 && wpm > 0)) {
         localStorage.setItem(LOCAL_STORAGE_BEST_ACCURACY_KEY, accuracy);
         bestAccuracy.textContent = `${accuracy}%`;
