@@ -297,8 +297,6 @@ textInput.addEventListener('input', (e) => {
 
     if (typedText.length > targetWordWithSpace.length) {
         for (let i = targetWordWithSpace.length; i < typedText.length; i++) {
-            // This is where you'd add extra spans for `extra` characters
-            // For now, we'll mark them implicitly as incorrect via counts
         }
     }
 
@@ -336,9 +334,9 @@ textInput.addEventListener('input', (e) => {
         }
 
         if (typedWordWithoutSpace === actualTargetWord) {
-            typedCorrectlyOnce += actualTargetWord.length + 1; // +1 for the space
+            typedCorrectlyOnce += actualTargetWord.length + 1;
         } else {
-            typedCorrectlyOnce += correctChars; // Add correct chars up to this point
+            typedCorrectlyOnce += correctChars;
         }
 
 
