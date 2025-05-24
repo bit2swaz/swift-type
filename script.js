@@ -22,3 +22,26 @@ let totalTypedChars = 0;
 let typedCorrectlyOnce = 0;
 let startTime = 0;
 
+const themeToggle = document.getElementById('theme-toggle');
+const timerDisplay = document.getElementById('timer');
+const modeSelector = document.getElementById('mode-selector');
+const timeSelector = document.getElementById('time-selector');
+const wordsDisplay = document.getElementById('words-display');
+const textInput = document.getElementById('text-input');
+const liveStats = document.getElementById('live-stats');
+const liveWPM = document.getElementById('live-wpm');
+const liveAccuracy = document.getElementById('live-accuracy');
+const resultsScreen = document.getElementById('results-screen');
+const finalWPM = document.getElementById('final-wpm');
+const finalAccuracy = document.getElementById('final-accuracy');
+const charsTyped = document.getElementById('chars-typed');
+const timeTaken = document.getElementById('time-taken');
+const retryButton = document.getElementById('retry-button');
+const restartButton = document.getElementById('restart-button');
+const highScoreTracker = document.getElementById('high-score-tracker');
+const maxWPM = document.getElementById('max-wpm');
+const bestAccuracy = document.getElementById('best-accuracy');
+const typingHistorySection = document.getElementById('typing-history');
+const toggleHistoryButton = document.getElementById('toggle-history');
+const historyList = document.getElementById('history-list');
+
