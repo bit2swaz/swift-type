@@ -148,3 +148,7 @@ body {
     user-select: none;
     cursor: text;
 }
+
+.words-display .correct {
+    color: var(--correct-char-color);
+}
