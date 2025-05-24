@@ -43,7 +43,6 @@ body.dark-theme {
     justify-content: center; /* Center the container horizontally */
     align-items: center; /* Center the container vertically */
     min-height: 100vh; /* Using min-height here is fine for dark mode */
-    /* overflow: hidden; Removed from here as it's on html, body now */
 }
 
 /* Light Theme Variables - REVISED for proper contrast and visibility */
@@ -67,7 +66,7 @@ body.light-theme {
     display: flex; /* Ensure flex is applied for centering */
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* Keep this for consistency, maybe remove if it causes issues with large content */
+    min-height: 100vh;
 }
 
 /* Main Container - Ensure it centers correctly in both themes */
@@ -76,14 +75,12 @@ body.light-theme {
     flex-direction: column;
     width: 90%;
     max-width: 1000px;
-    /* Changed min-height from 80vh to a flexible value if content grows */
-    /* Keeping it for now, but if content overflows and shifts, this might be a culprit */
     min-height: 80vh;
     padding: 20px;
-    /* No direct width/margin here, let body's flexbox handle centering */
-    /* Add a subtle shadow to distinguish from background in light mode */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
+    background-color: var(--bg-color-primary); /* Ensure container has its own background */
+    transition: background-color 0.3s ease;
 }
 
 .header {
@@ -181,8 +178,7 @@ body.light-theme {
 /* Test Controls */
 .test-controls {
     display: flex;
-    /* Changed to row for time-modes and word-types to be side-by-side */
-    flex-direction: row; /* WAS: column */
+    flex-direction: row; /* Changed to row for side-by-side arrangement */
     gap: 15px;
     margin-bottom: 30px;
     justify-content: center; /* Center the groups within controls */
@@ -196,7 +192,6 @@ body.light-theme {
     border-radius: 5px;
     background-color: var(--bg-color-secondary);
     padding: 5px 10px;
-    /* Ensure consistent styling for the button groups */
 }
 
 .time-btn, .type-btn { /* Apply same button style to both sets of buttons */
@@ -220,21 +215,18 @@ body.light-theme {
     color: var(--btn-active-text);
 }
 
-/* Removed old .toggle-switch styles */
-
 .words-container {
     width: 100%;
-    /* Adjusted max-height to explicitly show 3 lines based on calculated line-height */
-    max-height: calc(var(--calculated-line-height) * 3);
+    max-height: calc(var(--calculated-line-height) * 3); /* Show 3 full lines */
     overflow: hidden;
-    position: relative;
+    position: relative; /* Needed for absolute positioning of caret */
     margin-bottom: 30px;
-    line-height: var(--line-height-factor); /* Use the factor directly for content */
+    line-height: var(--line-height-factor);
 }
 
 .words-display {
     font-size: var(--font-size-words);
-    line-height: var(--line-height-factor); /* Use the factor directly for content */
+    line-height: var(--line-height-factor);
     word-spacing: 8px;
     text-align: center;
     white-space: normal;
@@ -245,11 +237,32 @@ body.light-theme {
     transition: transform 0.2s ease-out;
 }
 
+/* ADDED: Custom caret styling */
+.caret {
+    position: absolute; /* Position relative to words-container */
+    width: 2px; /* Standard caret width */
+    height: var(--font-size-words); /* Height of the character */
+    background-color: var(--accent-color); /* Caret color */
+    left: 0; /* Initial left position */
+    top: 0; /* Initial top position */
+    transform: translateY(0); /* For smooth animation */
+    transition: left 0.05s ease-out, top 0.05s ease-out; /* Smooth movement */
+    animation: blink 1s infinite; /* Blinking animation */
+    z-index: 5; /* Ensure it's above the text */
+    pointer-events: none; /* Make sure it doesn't block clicks */
+    display: none; /* Hidden by default, shown when typing starts */
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
 .word {
     display: inline-block;
     margin-right: 8px;
     white-space: pre;
-    transition: opacity 0.3s ease, color 0.3s ease; /* Ensure color transition for typed words */
+    transition: opacity 0.3s ease, color 0.3s ease, background-color 0.2s ease; /* Added background-color transition */
 }
 
 .word.typed {
@@ -257,16 +270,24 @@ body.light-theme {
     color: var(--completed-word-fade);
 }
 
+/* ADDED: Highlight for the current word */
+.word.current-word-highlight {
+    background-color: rgba(97, 175, 239, 0.1); /* Subtle highlight */
+    border-radius: 3px;
+    padding: 0 2px; /* Small padding to make highlight visible */
+}
+
 .char {
     display: inline-block;
     opacity: 0.7;
-    transition: opacity 0.1s ease, color 0.1s ease, background-color 0.1s ease, border-bottom 0.1s ease;
+    transition: opacity 0.1s ease, color 0.1s ease, background-color 0.1s ease; /* Removed border-bottom transition */
 }
 
 .char.current {
-    color: var(--current-char-underline);
+    /* Removed border-bottom; caret will handle the cursor */
+    color: var(--text-color-primary); /* Ensure current char has primary text color */
     opacity: 1;
-    border-bottom: 1px solid var(--current-char-underline);
+    /* We will use the custom caret for the blinking cursor */
 }
 
 .char.correct {
@@ -297,7 +318,7 @@ body.light-theme {
     border-radius: 8px;
     width: 70%;
     text-align: center;
-    caret-color: var(--accent-color);
+    /* REMOVED: caret-color as we have a custom caret */
     transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 
