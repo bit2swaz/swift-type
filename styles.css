@@ -1,4 +1,4 @@
-/* Basic Reset (Keep this) */
+/* Basic Reset */
 * {
     margin: 0;
     padding: 0;
@@ -6,23 +6,22 @@
 }
 
 :root {
-    --line-height: 1.5em;
+    --line-height-factor: 1.5; /* Factor for line-height in em */
     --font-size-words: 1.8em;
+    --calculated-line-height: calc(var(--font-size-words) * var(--line-height-factor)); /* Calculate line height explicitly */
 
-    /* Dark Theme Variables (Keep these) */
-    --bg-color-primary: #282c34;
-    --bg-color-secondary: #3e4451;
-    --text-color-primary: #abb2bf;
-    --text-color-secondary: #5c6370;
-    --accent-color: #61afef;
-    --correct-char: #98c379;
-    --incorrect-char: #e06c75;
-    --current-char-underline: #e06c75;
+    /* Dark Theme Variables */
+    --bg-color-primary: #282c34; /* Main background */
+    --bg-color-secondary: #3e4451; /* Elements background (input, buttons) */
+    --text-color-primary: #abb2bf; /* Main text color */
+    --text-color-secondary: #5c6370; /* Muted text (footer, unhighlighted) */
+    --accent-color: #61afef; /* Blue accent */
+    --correct-char: #98c379; /* Green for correct */
+    --incorrect-char: #e06c75; /* Red for incorrect */
+    --current-char-underline: #e06c75; /* Red underline for current */
     --input-focus-shadow: #61afef;
     --btn-active-text: #fff;
-    --toggle-slider-bg: #7f8c8d;
-    --toggle-slider-checked-bg: #61afef;
-    --completed-word-fade: rgba(153, 153, 153, 0.2);
+    --completed-word-fade: rgba(153, 153, 153, 0.2); /* Faded color for typed words */
     --results-bg-overlay: rgba(40, 44, 52, 0.95);
 }
 
@@ -31,32 +30,30 @@ body.dark-theme {
     background-color: var(--bg-color-primary);
     color: var(--text-color-primary);
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: center; /* Center the container horizontally */
+    align-items: center; /* Center the container vertically */
     min-height: 100vh;
-    overflow: hidden;
+    overflow: hidden; /* Prevent body scroll */
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Light Theme Variables (Keep these, but I might have a fix below) */
+/* Light Theme Variables - REVISED for proper contrast and visibility */
 body.light-theme {
-    --bg-color-primary: #f0f2f5;
-    --bg-color-secondary: #e9ecef;
-    --text-color-primary: #333;
+    --bg-color-primary: #f0f2f5; /* Light background */
+    --bg-color-secondary: #e9ecef; /* Lighter elements background */
+    --text-color-primary: #333; /* Dark text for contrast */
     --text-color-secondary: #6c757d;
-    --accent-color: #007bff;
-    --correct-char: #28a745;
-    --incorrect-char: #dc3545;
-    --current-char-underline: #dc3545;
+    --accent-color: #007bff; /* Blue accent */
+    --correct-char: #28a745; /* Green */
+    --incorrect-char: #dc3545; /* Red */
+    --current-char-underline: #dc3545; /* Red */
     --input-focus-shadow: #007bff;
     --btn-active-text: #fff;
-    --toggle-slider-bg: #ccc;
-    --toggle-slider-checked-bg: #007bff;
-    --completed-word-fade: rgba(51, 51, 51, 0.1);
+    --completed-word-fade: rgba(51, 51, 51, 0.1); /* Faded color for typed words */
     --results-bg-overlay: rgba(240, 242, 245, 0.95);
 }
 
-
+/* Main Container - Ensure it centers correctly in both themes */
 .container {
     display: flex;
     flex-direction: column;
@@ -64,6 +61,7 @@ body.light-theme {
     max-width: 1000px;
     min-height: 80vh;
     padding: 20px;
+    /* No direct width/margin here, let body's flexbox handle centering */
 }
 
 .header {
@@ -123,7 +121,7 @@ body.light-theme {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: var(--toggle-slider-bg);
+    background-color: var(--text-color-secondary); /* Adjusted to match light/dark theme toggle background */
     transition: .4s;
     border-radius: 34px;
 }
@@ -141,7 +139,7 @@ body.light-theme {
 }
 
 .theme-toggle-checkbox:checked + .theme-toggle-label {
-    background-color: var(--toggle-slider-checked-bg);
+    background-color: var(--accent-color); /* Matches accent for checked state */
 }
 
 .theme-toggle-checkbox:checked + .theme-toggle-label:before {
@@ -155,6 +153,7 @@ body.light-theme {
     flex-direction: column;
     align-items: center; /* Center items in the typing test container */
     position: relative;
+    width: 100%; /* Ensure this takes full width of its parent */
 }
 
 /* Test Controls */
@@ -164,18 +163,19 @@ body.light-theme {
     gap: 15px;
     margin-bottom: 30px;
     align-items: center; /* Center items within test controls */
-    width: 100%; /* Make test controls take full width */
+    width: 100%;
 }
 
-.time-modes {
+.time-modes, .word-types {
     display: flex;
     gap: 10px;
     border-radius: 5px;
     background-color: var(--bg-color-secondary);
     padding: 5px 10px;
+    /* Ensure consistent styling for the button groups */
 }
 
-.time-btn {
+.time-btn, .type-btn { /* Apply same button style to both sets of buttons */
     background-color: transparent;
     color: var(--text-color-primary);
     border: none;
@@ -184,103 +184,33 @@ body.light-theme {
     font-size: 1em;
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap; /* Prevent text wrapping inside buttons */
 }
 
-.time-btn:hover {
+.time-btn:hover, .type-btn:hover {
     background-color: rgba(97, 175, 239, 0.1);
 }
 
-.time-btn.active {
+.time-btn.active, .type-btn.active { /* Both time and type buttons will use this */
     background-color: var(--accent-color);
     color: var(--btn-active-text);
 }
 
-/* Toggle Switch (for Numbers/Punctuation) - FIXES START HERE */
-.word-types {
-    display: flex;
-    gap: 20px; /* Space between the two toggles */
-    align-items: center;
-    background-color: var(--bg-color-secondary);
-    padding: 5px 15px;
-    border-radius: 5px;
-}
-
-.toggle-switch {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    height: 34px;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.toggle-switch .slider {
-    background-color: var(--toggle-slider-bg);
-    border-radius: 34px;
-    width: 45px;
-    height: 25px;
-    transition: .4s;
-}
-
-.toggle-switch .slider.round {
-    border-radius: 34px;
-}
-
-.toggle-switch .slider.round:before {
-    border-radius: 50%;
-}
-
-.toggle-switch .slider:before {
-    position: absolute;
-    content: "";
-    height: 19px;
-    width: 19px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: .4s;
-}
-
-.toggle-switch input:checked + .slider {
-    background-color: var(--toggle-slider-checked-bg);
-}
-
-.toggle-switch input:focus + .slider {
-    box-shadow: 0 0 1px var(--toggle-slider-checked-bg);
-}
-
-.toggle-switch input:checked + .slider:before {
-    transform: translateX(20px);
-}
-
-.toggle-switch .toggle-text {
-    font-size: 1em;
-    color: var(--text-color-primary);
-    white-space: nowrap;
-}
-/* FIXES END HERE */
-
+/* Removed old .toggle-switch styles */
 
 .words-container {
     width: 100%;
-    /* Increased max-height to show more lines */
-    max-height: calc(var(--font-size-words) * 4.5); /* Adjust as needed, around 3-4 lines */
+    /* Adjusted max-height to explicitly show 3 lines based on calculated line-height */
+    max-height: calc(var(--calculated-line-height) * 3);
     overflow: hidden;
     position: relative;
     margin-bottom: 30px;
-    line-height: var(--line-height);
+    line-height: var(--line-height-factor); /* Use the factor directly for content */
 }
 
 .words-display {
     font-size: var(--font-size-words);
-    line-height: var(--line-height);
+    line-height: var(--line-height-factor); /* Use the factor directly for content */
     word-spacing: 8px;
     text-align: center;
     white-space: normal;
@@ -295,7 +225,7 @@ body.light-theme {
     display: inline-block;
     margin-right: 8px;
     white-space: pre;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, color 0.3s ease; /* Ensure color transition for typed words */
 }
 
 .word.typed {
@@ -341,7 +271,7 @@ body.light-theme {
     font-size: var(--font-size-words);
     padding: 15px 20px;
     border-radius: 8px;
-    width: 70%; /* Slightly wider input field */
+    width: 70%;
     text-align: center;
     caret-color: var(--accent-color);
     transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
