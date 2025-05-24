@@ -1,7 +1,5 @@
-/* Import Google Fonts - Roboto as per spec */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Fira+Code:wght@400&display=swap');
 
-/* Basic Reset & Box Sizing */
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -9,7 +7,6 @@
 }
 
 :root {
-    /* --- Light Theme Colors (Default) --- */
     --background-color: #f0f2f5;
     --text-color: #333;
     --accent-color: #007bff;
@@ -18,110 +15,122 @@
     --button-active-bg: var(--accent-color);
     --button-active-text: #fff;
     --border-color: #ccc;
+    --app-container-bg: #ffffff;
+    --footer-bg: #d8dee9;
 
-    /* Typing Test Colors */
-    --correct-char-color: #28a745; /* Green */
-    --incorrect-char-color: #dc3545; /* Red */
-    --current-char-color: var(--accent-color); /* Blue for underline */
-    --extra-char-color: #ffc107; /* Yellow */
-}
-
-/* --- Dark Theme Colors (Applied via .dark-mode class on body) --- */
-body.dark-mode {
-    --background-color: #2c3e50; /* Darker blue-grey */
-    --text-color: #ecf0f1; /* Light grey */
-    --accent-color: #3498db; /* Brighter blue */
-    --button-bg: #4e6e8e;
-    --button-text: #ecf0f1;
-    --button-active-bg: var(--accent-color);
-    --button-active-text: #fff;
-    --border-color: #555;
-
-    /* Typing Test Colors */
-    --correct-char-color: #2ecc71; /* Brighter green */
-    --incorrect-char-color: #e74c3c; /* Brighter red */
+    --correct-char-color: #28a745;
+    --incorrect-char-color: #dc3545;
     --current-char-color: var(--accent-color);
-    --extra-char-color: #f1c40f; /* Brighter yellow */
+    --extra-char-color: #ffc107;
 }
 
+body.dark-mode {
+    --background-color: #1a1a1a;
+    --text-color: #f0f0f0;
+    --accent-color: #ffd700;
+    --button-bg: #333333;
+    --button-text: #f0f0f0;
+    --button-active-bg: var(--accent-color);
+    --button-active-text: #1a1a1a;
+    --border-color: #555555;
+    --app-container-bg: #2c2c2c;
+    --footer-bg: #111111;
+
+    --correct-char-color: #6aff6a;
+    --incorrect-char-color: #ff6a6a;
+    --current-char-color: var(--accent-color);
+    --extra-char-color: #ffea00;
+}
 
 body {
     font-family: 'Roboto', sans-serif;
     background-color: var(--background-color);
     color: var(--text-color);
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
-    min-height: 100vh; /* Full viewport height */
-    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transition */
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* App Container Styling */
+#theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    font-size: 1.8rem;
+    padding: 8px;
+    border-radius: 50%;
+    color: var(--accent-color);
+    background-color: var(--button-bg);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    z-index: 1000;
+}
+
+#theme-toggle:hover {
+    background-color: var(--button-active-bg);
+    color: var(--button-active-text);
+    transform: scale(1.1);
+}
+
 #app-container {
     width: 90%;
-    max-width: 960px; /* Monkeytype's common width */
+    max-width: 960px;
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Spacing between sections */
-    padding: 20px;
-    background-color: var(--background-color); /* Ensure container matches body for now */
+    gap: 20px;
+    padding: 30px;
+    background-color: var(--app-container-bg);
     border-radius: 8px;
-    /* Optional: Add a subtle shadow later if desired */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-top: 60px;
+    margin-bottom: 80px;
 }
 
-/* Header Styling */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 1.2rem;
     font-weight: 700;
+    margin-bottom: 10px;
 }
 
 .timer {
-    font-size: 1.8rem;
+    font-size: 2.5rem;
     color: var(--accent-color);
+    font-weight: 700;
 }
 
-.theme-toggle {
-    cursor: pointer;
-    font-size: 1.5rem;
-    padding: 5px;
-    border-radius: 50%;
-    transition: background-color 0.2s ease;
-}
-
-.theme-toggle:hover {
-    background-color: var(--button-bg);
-}
-
-/* Controls (Mode & Time Selectors) */
 .controls {
     display: flex;
     justify-content: center;
-    gap: 20px; /* Space between mode and time selectors */
-    flex-wrap: wrap; /* Allow wrapping on small screens */
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
 .mode-selector, .time-selector {
     display: flex;
     border: 1px solid var(--border-color);
     border-radius: 5px;
-    overflow: hidden; /* For rounded corners on buttons */
+    overflow: hidden;
 }
 
 .mode-button, .time-button {
     background-color: var(--button-bg);
     color: var(--button-text);
     border: none;
-    padding: 8px 15px;
+    padding: 10px 18px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 1rem;
     transition: background-color 0.2s ease, color 0.2s ease;
+    flex-grow: 1;
 }
 
 .mode-button:hover, .time-button:hover {
-    background-color: var(--accent-color);
+    background-color: var(--button-active-bg);
     color: var(--button-active-text);
 }
 
@@ -131,32 +140,38 @@ body {
     font-weight: bold;
 }
 
-/* Typing Test Area */
 .typing-test-area {
-    position: relative; /* Needed for absolute positioning of input/stats if we go that route */
-    min-height: 200px; /* Give it some space */
-    padding: 20px;
+    position: relative;
+    min-height: 200px;
+    padding: 30px 20px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center horizontally */
-    justify-content: center; /* Center vertically */
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    line-height: 1.6;
 }
 
 .words-display {
-    font-family: monospace; /* Monospaced font for consistent character width */
-    font-size: 1.8rem; /* Large enough for typing */
-    line-height: 1.6;
+    font-family: 'Fira Code', monospace;
+    font-size: 1.8rem;
     letter-spacing: 0.05em;
-    text-align: justify; /* Distribute words evenly */
-    max-height: 150px; /* Limit height to show 2-3 lines initially */
-    overflow: hidden; /* Hide overflow before auto-scroll */
-    user-select: none; /* Prevent text selection */
-    cursor: text; /* Indicate it's a typing area */
+    text-align: justify;
+    user-select: none;
+    cursor: text;
+    width: 100%;
+    max-height: 150px;
+    overflow: hidden;
+    word-wrap: break-word;
+    white-space: normal;
 }
 
-/* Individual character styling (will be added by JS) */
+.words-display span {
+    display: inline-block;
+    transition: color 0.05s linear;
+}
 .words-display .correct {
     color: var(--correct-char-color);
 }
@@ -164,7 +179,6 @@ body {
     color: var(--incorrect-char-color);
 }
 .words-display .current {
-    /* Underline effect for current character */
     text-decoration: underline;
     text-decoration-color: var(--current-char-color);
     text-decoration-thickness: 2px;
@@ -174,44 +188,41 @@ body {
     text-decoration: underline dotted var(--extra-char-color);
 }
 .words-display .missing {
-    background-color: var(--incorrect-char-color); /* Highlight missing with a background */
-    display: inline-block; /* To allow background on non-existent character */
-    width: 0.5ch; /* A small visual indicator for missing */
-    height: 1.2em; /* Height similar to a character */
-    vertical-align: middle; /* Align with text */
-    margin-right: -0.5ch; /* Adjust spacing */
+    background-color: var(--incorrect-char-color);
+    display: inline-block;
+    width: 0.5ch;
+    height: 1.2em;
+    vertical-align: middle;
+    margin-right: -0.5ch;
 }
 
-
-/* Invisible Input Field */
 .text-input {
-    position: absolute; /* Position over the words display */
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0; /* Make it invisible */
-    cursor: default; /* Keep cursor default, not text cursor */
-    z-index: 10; /* Ensure it's on top to capture events */
+    opacity: 0;
+    cursor: default;
+    z-index: 10;
 }
 
-/* Live Stats */
 .live-stats {
     position: absolute;
-    bottom: 10px;
+    bottom: 15px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: var(--accent-color);
-    opacity: 0; /* Hidden by default, shown by JS when typing starts */
+    opacity: 0;
     transition: opacity 0.3s ease;
+    pointer-events: none;
 }
 
 .live-stats.visible {
     opacity: 1;
 }
 
-/* Results Screen */
 .results-screen {
     text-align: center;
     padding: 40px 20px;
@@ -220,106 +231,128 @@ body {
 }
 
 .results-screen h2 {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
+    font-size: 3rem;
+    margin-bottom: 25px;
     color: var(--accent-color);
 }
 
 .results-screen p {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
+    font-size: 1.6rem;
+    margin-bottom: 12px;
 }
 
 .results-buttons {
-    margin-top: 30px;
+    margin-top: 40px;
 }
 
 .action-button {
     background-color: var(--accent-color);
     color: var(--button-active-text);
     border: none;
-    padding: 12px 25px;
-    margin: 0 10px;
+    padding: 15px 30px;
+    margin: 0 15px;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: bold;
     transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .action-button:hover {
-    background-color: var(--incorrect-char-color); /* A bit of a subtle red for hover, or just a darker accent */
+    background-color: var(--text-color);
     transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Hidden Utility Class */
 .hidden {
     display: none !important;
 }
 
-/* High Score Tracker */
 .high-score-tracker {
     text-align: center;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: var(--accent-color);
+    margin-top: 20px;
 }
 
-/* Typing History */
 .typing-history {
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 15px;
+    padding: 20px;
     margin-top: 20px;
     text-align: center;
 }
 
 .typing-history h3 {
-    margin-bottom: 10px;
-    cursor: pointer; /* Indicate it's collapsible */
+    margin-bottom: 15px;
+    cursor: pointer;
     color: var(--accent-color);
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
+    font-size: 1.4rem;
 }
 
 #toggle-history {
     background: none;
     border: none;
     color: var(--accent-color);
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     cursor: pointer;
     transition: transform 0.2s ease;
 }
-/* Rotate the arrow when history is visible */
+
 .history-list:not(.hidden) + h3 #toggle-history {
     transform: rotate(180deg);
 }
 
-
 .history-list {
-    margin-top: 10px;
-    max-height: 300px; /* Limit history list height */
-    overflow-y: auto; /* Scroll if too many items */
+    margin-top: 15px;
+    max-height: 350px;
+    overflow-y: auto;
+    padding-right: 5px;
 }
 
 .history-item {
     background-color: var(--button-bg);
-    padding: 10px;
-    margin-bottom: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
     border-radius: 5px;
     display: flex;
     justify-content: space-between;
-    font-size: 0.95rem;
+    font-size: 1rem;
+    align-items: center;
 }
 
-/* Footer */
+.history-list::-webkit-scrollbar {
+    width: 8px;
+}
+.history-list::-webkit-scrollbar-track {
+    background: var(--background-color);
+    border-radius: 10px;
+}
+.history-list::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+    border-radius: 10px;
+}
+.history-list::-webkit-scrollbar-thumb:hover {
+    background: #e6b800;
+}
+
 .footer {
+    width: 100%;
     text-align: center;
-    padding: 20px 0 10px;
-    font-size: 0.85rem;
+    padding: 20px 0;
+    font-size: 0.95rem;
     color: var(--text-color);
-    opacity: 0.7;
+    background-color: var(--footer-bg);
+    margin-top: auto;
+    border-top: 1px solid var(--border-color);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 999;
 }
 
 .footer a {
@@ -331,12 +364,76 @@ body {
     text-decoration: underline;
 }
 
-/* Initial Dark Mode for now */
-body {
-    background-color: var(--background-color);
-    color: var(--text-color);
+@media (max-width: 768px) {
+    #app-container {
+        width: 95%;
+        padding: 20px;
+        margin-top: 80px;
+        margin-bottom: 100px;
+    }
+
+    .timer {
+        font-size: 2rem;
+    }
+
+    .words-display {
+        font-size: 1.5rem;
+    }
+
+    .mode-button, .time-button {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+
+    .results-screen h2 {
+        font-size: 2rem;
+    }
+
+    .results-screen p {
+        font-size: 1.2rem;
+    }
+
+    .action-button {
+        padding: 10px 20px;
+        font-size: 1rem;
+        margin: 0 5px;
+    }
+
+    #theme-toggle {
+        top: 10px;
+        right: 10px;
+        font-size: 1.5rem;
+    }
+
+    .footer {
+        padding: 15px 0;
+        font-size: 0.8rem;
+    }
 }
-/* Apply dark mode by default if not set in local storage initially */
-/* This will be handled by JavaScript to read localStorage */
-/* For now, just uncomment the next line to see dark mode */
-body.dark-mode { }
+
+@media (max-width: 480px) {
+    .controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .mode-selector, .time-selector {
+        width: 100%;
+        justify-content: stretch;
+    }
+    .mode-button, .time-button {
+        padding: 10px 10px;
+        font-size: 0.8rem;
+    }
+    .typing-test-area {
+        min-height: 150px;
+    }
+    .words-display {
+        font-size: 1.2rem;
+    }
+    .live-stats {
+        font-size: 0.9rem;
+    }
+    .high-score-tracker, .typing-history {
+        font-size: 1rem;
+    }
+}
