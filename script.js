@@ -184,3 +184,20 @@ function initializeTest() {
     console.log("Test initialized. Mode:", currentMode, "Time:", currentTime, "s");
 }
 
+function startTimer() {
+    if (timerId) clearInterval(timerId);
+    startTime = Date.now();
+
+    timerId = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = timeLeft;
+        updateTabTitle();
+        updateLiveStats();
+
+        if (timeLeft <= 0) {
+            clearInterval(timerId);
+            endTest();
+        }
+    }, 1000);
+}
+
