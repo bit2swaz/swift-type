@@ -5,6 +5,11 @@
     box-sizing: border-box;
 }
 
+:root {
+    --line-height: 1.5em; /* Define a CSS variable for consistent line height */
+    --font-size-words: 1.8em;
+}
+
 body {
     font-family: 'Roboto Mono', monospace; /* A common choice for typing tests */
     background-color: #282c34; /* Dark background, similar to MonkeyType's default */
@@ -13,7 +18,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    overflow: hidden; /* Prevent body scroll, we'll manage inner content scroll */
+    overflow: hidden; /* Prevent body scroll */
 }
 
 .container {
@@ -34,9 +39,18 @@ body {
 }
 
 .logo {
-    font-size: 1.8em;
+    font-size: var(--font-size-words); /* Use font size variable */
     font-weight: bold;
     color: #61afef; /* A nice blue accent */
+}
+
+.timer {
+    font-size: var(--font-size-words);
+    font-weight: bold;
+    color: #61afef;
+    padding: 5px 10px;
+    border: 2px solid #61afef;
+    border-radius: 5px;
 }
 
 .typing-test {
@@ -45,35 +59,41 @@ body {
     flex-direction: column;
     justify-content: center; /* Center content vertically */
     align-items: center; /* Center content horizontally */
-    position: relative; /* For positioning future elements like timer */
+    position: relative;
+}
+
+.words-container {
+    width: 100%;
+    max-height: calc(var(--font-size-words) * 3); /* Show about 3 lines of text, adjust as needed */
+    overflow: hidden; /* Hide overflow */
+    position: relative; /* For positioning the words-display inside */
+    margin-bottom: 30px;
+    line-height: var(--line-height); /* Ensure words-container also respects line-height */
 }
 
 .words-display {
-    font-size: 1.8em;
-    line-height: 1.5;
+    font-size: var(--font-size-words);
+    line-height: var(--line-height);
     word-spacing: 8px; /* Space between words */
-    text-align: center; /* Center words */
-    margin-bottom: 30px;
-    height: 100px; /* Fixed height to control display, will make it scrollable later */
-    overflow: hidden; /* Hide overflow for now, will be `auto` for scrolling */
+    text-align: center;
     white-space: normal; /* Allow words to wrap */
-    max-width: 100%; /* Ensure it doesn't overflow horizontally */
-    display: flex; /* Use flexbox for displaying words */
-    flex-wrap: wrap; /* Allow words to wrap */
+    display: flex;
+    flex-wrap: wrap;
     justify-content: center; /* Center words within the display */
-    align-content: flex-start; /* Align content to the top */
+    transform: translateY(0); /* Initial position */
+    transition: transform 0.2s ease-out; /* Smooth scroll effect */
 }
 
 .word {
-    display: inline-block; /* Treat words as blocks for individual styling */
-    margin-right: 8px; /* Space between words */
+    display: inline-block;
+    margin-right: 8px;
     white-space: pre; /* Preserve leading/trailing spaces for words, if any */
 }
 
 .char {
-    display: inline-block; /* Each character can be styled individually */
+    display: inline-block;
     opacity: 0.7; /* Default opacity for untyped characters */
-    transition: opacity 0.1s ease; /* Smooth transition for opacity changes */
+    transition: opacity 0.1s ease, color 0.1s ease, background-color 0.1s ease, border-bottom 0.1s ease; /* Smooth transitions */
 }
 
 .char.current {
@@ -93,12 +113,20 @@ body {
     opacity: 1;
 }
 
+/* Optional: Add a 'extra' class for chars typed beyond the word length */
+.char.extra {
+    color: #e06c75; /* Red for extra characters */
+    background-color: rgba(224, 108, 117, 0.5);
+    opacity: 1;
+}
+
+
 .text-input {
     background-color: #3e4451; /* Darker input background */
     border: none;
     outline: none;
     color: #e6e6e6; /* Lighter text in input */
-    font-size: 1.8em;
+    font-size: var(--font-size-words);
     padding: 15px 20px;
     border-radius: 8px;
     width: 60%; /* Adjust width as needed */
