@@ -63,15 +63,23 @@ body {
     padding: 8px;
     border-radius: 50%;
     color: var(--accent-color);
-    background-color: var(--button-bg);
-    transition: background-color 0.2s ease, transform 0.2s ease;
+    background-color: transparent; /* Changed to transparent */
+    border: 1px solid transparent; /* Changed to transparent border */
+    transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
     z-index: 1000;
 }
 
 #theme-toggle:hover {
+    background-color: rgba(var(--accent-color-rgb, 255, 215, 0), 0.1); /* Subtle hover effect */
+    color: var(--accent-color);
+    transform: scale(1.1);
+    border-color: var(--accent-color); /* Border appears on hover */
+}
+
+#theme-toggle:active {
     background-color: var(--button-active-bg);
     color: var(--button-active-text);
-    transform: scale(1.1);
+    border-color: var(--button-active-bg);
 }
 
 #app-container {
@@ -358,10 +366,35 @@ body {
 .footer a {
     color: var(--accent-color);
     text-decoration: none;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.footer a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    display: block;
+    margin-top: 5px;
+    left: 0;
+    background: var(--accent-color);
+    transition: width 0.3s ease;
 }
 
 .footer a:hover {
-    text-decoration: underline;
+    color: var(--accent-color); /* Ensure color stays accent on hover */
+}
+
+.footer a:hover::after {
+    width: 100%;
+}
+
+.footer a:active {
+    color: var(--button-active-text);
+    background-color: var(--accent-color);
+    border-radius: 2px;
+    padding: 2px 4px;
 }
 
 @media (max-width: 768px) {
