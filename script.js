@@ -235,3 +235,8 @@ function calculateWPM() {
     return Math.round((typedCorrectlyOnce / 5) / minutes);
 }
 
+function calculateAccuracy() {
+    if (totalTypedChars === 0) return 0;
+    return Math.round((correctChars / totalTypedChars) * 100);
+}
+
