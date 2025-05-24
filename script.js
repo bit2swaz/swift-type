@@ -13,9 +13,20 @@ const restartBtn = document.getElementById('restart-btn');
 const themeToggle = document.getElementById('theme-toggle');
 const liveWpmElement = document.getElementById('live-wpm');
 const liveAccuracyElement = document.getElementById('live-accuracy');
-// NEW: Get reference to the caret element
 const caret = document.getElementById('caret');
 
+// NEW: Elements for accuracy breakdown
+const correctCharsResult = document.createElement('div');
+correctCharsResult.className = 'detail-item';
+correctCharsResult.innerHTML = '<span class="detail-label">Correct</span><span class="detail-value correct" id="correct-chars-value">0</span>';
+
+const incorrectCharsResult = document.createElement('div');
+incorrectCharsResult.className = 'detail-item';
+incorrectCharsResult.innerHTML = '<span class="detail-label">Incorrect</span><span class="detail-value incorrect" id="incorrect-chars-value">0</span>';
+
+const extraCharsResult = document.createElement('div');
+extraCharsResult.className = 'detail-item';
+extraCharsResult.innerHTML = '<span class="detail-label">Extra</span><span class="detail-value extra" id="extra-chars-value">0</span>';
 
 // --- Configuration and State Variables ---
 const baseWordList = [
@@ -57,6 +68,7 @@ let timeLeft = 60;
 let typingStarted = false;
 let totalCorrectChars = 0;
 let totalIncorrectChars = 0;
+let totalExtraChars = 0; // NEW: Track extra characters
 let rawCharsTyped = 0;
 let startTime = 0;
 let generatedWordCount = 0;
@@ -76,6 +88,7 @@ function initGame() {
     typingStarted = false;
     totalCorrectChars = 0;
     totalIncorrectChars = 0;
+    totalExtraChars = 0; // NEW: Reset extra chars
     rawCharsTyped = 0;
     clearInterval(timerId);
     timerElement.textContent = timeLeft;
@@ -92,8 +105,8 @@ function initGame() {
     generateWords(true); // Generate new words (true for initial clear)
     textInput.focus();
     scrollWordsDisplay(true); // Reset scroll to top
-    positionCaret(); // NEW: Position caret on game start
-    caret.style.display = 'block'; // NEW: Show caret
+    caret.style.display = 'none'; // NEW: Hide caret initially, show on first input
+    // positionCaret() will be called when typing starts or current word/char changes
 }
 
 // --- Word Generation ---
@@ -113,7 +126,7 @@ function generateWords(clearExisting = false) {
     if (clearExisting) {
         wordsDisplay.innerHTML = '';
         // NEW: Re-append caret to ensure it's always the first child
-        wordsDisplay.appendChild(caret);
+        // Removed: wordsDisplay.appendChild(caret); We append it dynamically during positionCaret if needed.
         words = [];
         wordElements = [];
     }
@@ -136,8 +149,14 @@ function generateWords(clearExisting = false) {
     }
     generatedWordCount += wordsToGenerate;
 
-    // NEW: Highlight the first word and position caret
-    updateWordAndCaretHighlight();
+    // Initial highlight for the first word and caret placement
+    if (currentWordIndex === 0 && wordElements[0]) {
+        wordElements[0].classList.add('current-word-highlight');
+        if (wordElements[0].children[0]) {
+            wordElements[0].children[0].classList.add('current');
+        }
+    }
+    positionCaret(); // Ensure caret is positioned after words are generated
 }
 
 // --- Live Stats Update ---
@@ -189,13 +208,12 @@ function endTest() {
 
     wordsContainer.style.display = 'none';
     textInput.style.display = 'none';
-    caret.style.display = 'none'; // NEW: Hide caret on test end
+    caret.style.display = 'none'; // Hide caret on test end
 
     // Remove current word highlight
     if (currentWordIndex < wordElements.length) {
         wordElements[currentWordIndex].classList.remove('current-word-highlight');
     }
-
 
     const finalTimeTaken = timeLeft;
     const grossWPM = (rawCharsTyped / 5) / (finalTimeTaken / 60);
@@ -209,6 +227,25 @@ function endTest() {
     wpmValue.textContent = Math.max(0, netWPM).toFixed(0);
     accuracyValue.textContent = `${Math.max(0, accuracy).toFixed(0)}%`;
     rawWpmValue.textContent = Math.max(0, grossWPM).toFixed(0);
+
+    // NEW: Display accuracy breakdown
+    document.getElementById('correct-chars-value').textContent = totalCorrectChars;
+    document.getElementById('incorrect-chars-value').textContent = totalIncorrectChars;
+    document.getElementById('extra-chars-value').textContent = totalExtraChars;
+
+    // Create a container for the detail items and append
+    const accuracyDetailsContainer = document.createElement('div');
+    accuracyDetailsContainer.className = 'accuracy-details';
+    accuracyDetailsContainer.appendChild(correctCharsResult);
+    accuracyDetailsContainer.appendChild(incorrectCharsResult);
+    accuracyDetailsContainer.appendChild(extraCharsResult);
+
+    // Append the details container to the results screen, if not already there
+    const existingDetails = resultsScreen.querySelector('.accuracy-details');
+    if (existingDetails) {
+        existingDetails.remove(); // Remove old one if exists
+    }
+    resultsScreen.querySelector('.result-stats').after(accuracyDetailsContainer); // Insert after main stats
 
     resultsScreen.classList.remove('hidden');
 }
@@ -224,48 +261,72 @@ function scrollWordsDisplay(reset = false) {
     if (currentWordIndex >= wordElements.length) return;
 
     const currentWordElement = wordElements[currentWordIndex];
+    // This is the top of the current word relative to the wordsDisplay container
     const wordTopRelativeToDisplay = currentWordElement.offsetTop;
 
-    // Target the current line to be at the top of the container (0 lines offset)
-    const targetScrollPosition = lineHeight * 1; // Keep the current word's line roughly at the 2nd line
+    // We want the current line to be approximately centered or at a certain visible position
+    // Let's aim for the current line to be roughly at the 2nd line's position within the 3-line view.
+    const targetScrollPosition = lineHeight * 1; // 1 means the second line (0-indexed)
 
+    // Calculate the Y translation needed
+    // The wordsDisplay moves UP by this amount
     const requiredTranslateY = -(wordTopRelativeToDisplay - targetScrollPosition);
 
     wordsDisplay.style.transform = `translateY(${requiredTranslateY}px)`;
 }
 
-// --- Caret Positioning and Word Highlighting ---
+// --- Caret Positioning (REVISED for accuracy) ---
 
 function positionCaret() {
     const currentWordElement = wordElements[currentWordIndex];
     if (!currentWordElement) {
-        caret.style.display = 'none'; // Hide caret if no current word
+        caret.style.display = 'none'; // Hide caret if no current word (e.g., end of test)
         return;
     }
 
     let targetCharElement;
-    let caretLeftOffset = 0;
+    let caretLeft = 0; // Relative to the start of the wordsDisplay
+    let caretTop = 0; // Relative to the start of the wordsDisplay
 
     if (currentCharIndex < currentWordElement.children.length) {
+        // Caret is before a character within the current word
         targetCharElement = currentWordElement.children[currentCharIndex];
-        // Caret positions to the left edge of the target character
-        caretLeftOffset = targetCharElement.offsetLeft;
     } else {
-        // At the end of the word, position caret to the right of the last char
+        // Caret is at the end of the current word (after the last char)
         targetCharElement = currentWordElement.children[currentWordElement.children.length - 1];
-        if (targetCharElement) {
-            caretLeftOffset = targetCharElement.offsetLeft + targetCharElement.offsetWidth;
-        } else {
-            // For empty words (e.g., just punctuation or numbers), position at word's left
-            caretLeftOffset = currentWordElement.offsetLeft;
-        }
     }
 
-    // Position relative to wordsDisplay (which is the scrollable container)
-    const caretTop = targetCharElement ? targetCharElement.offsetTop : currentWordElement.offsetTop;
-    const wordsDisplayScrollY = parseFloat(wordsDisplay.style.transform.replace('translateY(', '').replace('px', '') || 0);
+    if (targetCharElement) {
+        const wordsDisplayRect = wordsDisplay.getBoundingClientRect();
+        const targetRect = targetCharElement.getBoundingClientRect();
 
-    caret.style.left = `${currentWordElement.offsetLeft + caretLeftOffset}px`;
+        // Calculate caret's left position
+        if (currentCharIndex < currentWordElement.children.length) {
+            // Caret is at the start of targetCharElement
+            caretLeft = targetRect.left - wordsDisplayRect.left;
+        } else {
+            // Caret is at the end of the last character
+            caretLeft = targetRect.right - wordsDisplayRect.left;
+        }
+
+        // Calculate caret's top position (should be the same as the character's top)
+        caretTop = targetRect.top - wordsDisplayRect.top;
+
+    } else {
+        // This case handles empty words or when starting the first word.
+        // Position caret at the beginning of the current word element.
+        const wordsDisplayRect = wordsDisplay.getBoundingClientRect();
+        const currentWordRect = currentWordElement.getBoundingClientRect();
+        caretLeft = currentWordRect.left - wordsDisplayRect.left;
+        caretTop = currentWordRect.top - wordsDisplayRect.top;
+    }
+
+    // Apply the current scroll translation of wordsDisplay to caret's top
+    // Because caret is positioned absolutely inside wordsDisplay, its 'top' is relative to wordsDisplay's content.
+    // The `wordsDisplay.style.transform` already handles the visual scroll.
+    // So, caretTop calculated above is already correct relative to the visible part of wordsDisplay.
+
+    caret.style.left = `${caretLeft}px`;
     caret.style.top = `${caretTop}px`;
     caret.style.display = 'block'; // Ensure caret is visible
 }
@@ -276,8 +337,10 @@ function updateWordAndCaretHighlight() {
     if (currentWordIndex > 0 && wordElements[currentWordIndex - 1]) {
         wordElements[currentWordIndex - 1].classList.remove('current-word-highlight');
         // Ensure character highlight is also removed from old word
-        if (wordElements[currentWordIndex - 1].children[currentCharIndex]) {
-            wordElements[currentWordIndex - 1].children[currentCharIndex].classList.remove('current');
+        const prevWordChildren = wordElements[currentWordIndex - 1].children;
+        if (prevWordChildren && prevWordChildren.length > 0) {
+            // Remove 'current' from all chars in previous word
+            Array.from(prevWordChildren).forEach(charEl => charEl.classList.remove('current'));
         }
     }
 
@@ -290,7 +353,7 @@ function updateWordAndCaretHighlight() {
         }
     }
 
-    // Position caret
+    // Position caret after all class updates
     positionCaret();
 }
 
@@ -298,7 +361,18 @@ function updateWordAndCaretHighlight() {
 // --- Event Handlers ---
 
 function handleKeyDown(e) {
+    if (textInput.disabled && (e.key === 'Tab' || e.key === 'Enter')) {
+        e.preventDefault(); // Prevent default Tab/Enter behavior
+        initGame(); // Restart game
+        return;
+    }
     if (textInput.disabled) return;
+
+    if (e.key === 'Tab' || e.key === 'Enter') {
+        e.preventDefault(); // Prevent default Tab/Enter behavior
+        initGame(); // Restart game even if typing
+        return;
+    }
 
     if (!typingStarted && e.key.length === 1 && e.key !== ' ') {
         typingStarted = true;
@@ -326,15 +400,18 @@ function handleKeyDown(e) {
         }
         // Count extra characters typed beyond the word length as incorrect
         if (typedValue.length > targetWord.length) {
-             totalIncorrectChars += (typedValue.length - targetWord.length);
+             totalExtraChars += (typedValue.length - targetWord.length); // NEW: Track as extra
+             // No need to add to totalIncorrectChars here, it's covered by totalExtraChars for final accuracy
         }
 
         currentWordElement.classList.add('typed'); // Apply 'typed' class for visual fading
-        currentWordElement.classList.remove('current-word-highlight'); // NEW: Remove highlight from current word
+        currentWordElement.classList.remove('current-word-highlight'); // Remove highlight from current word
 
         // Remove 'current' class from the last char of the previous word (if it exists)
-        if (currentWordElement.children[currentCharIndex - 1]) {
+        if (currentCharIndex > 0 && currentWordElement.children[currentCharIndex - 1]) {
             currentWordElement.children[currentCharIndex - 1].classList.remove('current');
+        } else if (currentWordElement.children[0]) { // If only 1 char typed or none, remove from first
+             currentWordElement.children[0].classList.remove('current');
         }
 
 
@@ -342,12 +419,12 @@ function handleKeyDown(e) {
         currentCharIndex = 0;
         textInput.value = '';
 
-        if (currentWordIndex >= generatedWordCount - 20) {
+        if (currentWordIndex >= generatedWordCount - 20) { // If near end of generated words, generate more
             generateWords();
         }
 
         if (currentWordIndex < wordElements.length) {
-            updateWordAndCaretHighlight(); // NEW: Update highlight and caret for new word
+            updateWordAndCaretHighlight(); // Update highlight and caret for new word
             scrollWordsDisplay();
         } else {
             endTest();
@@ -357,20 +434,39 @@ function handleKeyDown(e) {
 
         const typedText = textInput.value;
 
+        // Handle backspacing within the current word
         if (currentCharIndex > 0) {
             const charEl = currentWordElement.children[currentCharIndex - 1];
-            charEl.classList.remove('current', 'correct', 'incorrect', 'extra');
+
+            // If we're deleting an 'extra' character (typed beyond word length)
+            if (typedText.length > words[currentWordIndex].length && charEl.classList.contains('incorrect') && charEl.classList.contains('extra')) {
+                totalExtraChars--;
+            } else if (charEl.classList.contains('correct')) {
+                totalCorrectChars--;
+            } else if (charEl.classList.contains('incorrect')) {
+                totalIncorrectChars--;
+            }
+
+            charEl.classList.remove('current', 'correct', 'incorrect', 'extra'); // Remove all classes
 
             currentCharIndex--;
             textInput.value = typedText.substring(0, typedText.length - 1);
 
-            charEl.classList.add('current'); // NEW: Re-add current class to the character before backspace
-            currentWordElement.classList.remove('typed');
+            // Re-add 'current' class to the char *before* the backspace (if any)
+            if (currentCharIndex >= 0 && currentWordElement.children[currentCharIndex]) {
+                currentWordElement.children[currentCharIndex].classList.add('current');
+            } else if (currentCharIndex === 0 && currentWordElement.children[0]) {
+                currentWordElement.children[0].classList.add('current');
+            }
+
+
+            currentWordElement.classList.remove('typed'); // Ensure word is not faded if backspacing into it
             rawCharsTyped = Math.max(0, rawCharsTyped - 1); // Decrement raw typed count
-            recalculateCharStatesAndCounts();
-            positionCaret(); // NEW: Reposition caret
-        } else if (currentWordIndex > 0) {
-            // Remove 'current' class from the char we were just on
+            positionCaret(); // Reposition caret
+        }
+        // Handle backspacing to the previous word
+        else if (currentWordIndex > 0) {
+            // Remove 'current' class from the char we were just on (first char of current word)
             if (currentWordElement.children[0]) {
                 currentWordElement.children[0].classList.remove('current');
             }
@@ -378,10 +474,10 @@ function handleKeyDown(e) {
             currentWordIndex--;
             const prevWordElement = wordElements[currentWordIndex];
             const prevWord = words[currentWordIndex];
-            currentCharIndex = prevWord.length;
+            currentCharIndex = prevWord.length; // Set index to end of previous word
 
             prevWordElement.classList.remove('typed');
-            updateWordAndCaretHighlight(); // NEW: Highlight previous word and position caret
+            updateWordAndCaretHighlight(); // Highlight previous word and position caret
 
             // Clear char states on the previous word as we are re-typing it
             for (let i = 0; i < prevWord.length; i++) {
@@ -390,6 +486,7 @@ function handleKeyDown(e) {
 
             textInput.value = prevWord; // Load the whole word into the input for backspacing
             scrollWordsDisplay();
+            // Re-evaluate counts for previous word
             recalculateCharStatesAndCounts();
         }
         updateLiveStats();
@@ -408,7 +505,7 @@ function handleInput(e) {
     const currentWordElement = wordElements[currentWordIndex];
     const targetWord = words[currentWordIndex];
     const typedValue = textInput.value;
-    rawCharsTyped++;
+    rawCharsTyped++; // Increment raw typed count for every input character
 
     // Remove 'current' class from the character that *was* current (if any)
     if (currentCharIndex > 0 && currentWordElement.children[currentCharIndex - 1]) {
@@ -416,15 +513,15 @@ function handleInput(e) {
     }
 
     if (typedValue.length > targetWord.length) {
-        // If extra chars are typed, add 'extra' class to the target word's last char (if word isn't empty)
-        if (targetWord.length > 0 && currentWordElement.children[targetWord.length - 1]) {
-            const lastCharOfWord = currentWordElement.children[targetWord.length - 1];
-            if (!lastCharOfWord.classList.contains('incorrect')) { // Only add if not already incorrect
-                lastCharOfWord.classList.add('incorrect', 'extra');
-            }
-        }
-        totalIncorrectChars++; // Count each extra char as incorrect
-    } else if (currentCharIndex < targetWord.length) { // Only process if within the bounds of the current word
+        // If extra chars are typed, mark them as 'extra' incorrect.
+        // We need to add an 'extra' class to the word element if it's new.
+        // Or handle an actual new extra char in the char list.
+        // For simplicity, we'll increment totalExtraChars and rely on the input's length.
+        // The display will just show a caret past the word, and the user can delete.
+        totalExtraChars++;
+        // No char element to mark, as it's an "excess" character not belonging to the word
+        // The visual will be just the caret moving past the last character of the word.
+    } else if (currentCharIndex < targetWord.length) {
         const charEl = currentWordElement.children[currentCharIndex];
         const targetChar = targetWord[currentCharIndex];
         const typedChar = typedValue[typedValue.length - 1]; // Get the last typed character
@@ -440,28 +537,28 @@ function handleInput(e) {
             charEl.classList.add('incorrect');
             totalIncorrectChars++;
         }
-        currentCharIndex++;
     }
 
-    // Set the next character as 'current' or remove it if at word end
+    currentCharIndex++; // Move to the next expected character index
+
+    // Set the next character as 'current' or handle end of word for caret positioning
     if (currentCharIndex < targetWord.length) {
         currentWordElement.children[currentCharIndex].classList.add('current');
-    } else {
-        // When typing past the last character of the word, ensure no 'current' class
-        // on the word's characters as the caret will be at the end.
-        if (currentWordElement.children[targetWord.length - 1]) {
-             currentWordElement.children[targetWord.length - 1].classList.remove('current');
-        }
+    } else if (currentWordElement.children[targetWord.length - 1]) {
+        // If at the end of the word (or beyond it), remove 'current' from the last char.
+        // The caret will position itself after the last char.
+        currentWordElement.children[targetWord.length - 1].classList.remove('current');
     }
 
-    positionCaret(); // NEW: Reposition caret after each input
+    positionCaret(); // Reposition caret after each input
     updateLiveStats();
 }
 
 function recalculateCharStatesAndCounts() {
     totalCorrectChars = 0;
     totalIncorrectChars = 0;
-    rawCharsTyped = 0; // Reset and recount raw chars
+    totalExtraChars = 0; // NEW: Reset extra chars
+    rawCharsTyped = 0;
 
     for (let i = 0; i <= currentWordIndex; i++) {
         const wordEl = wordElements[i];
@@ -472,21 +569,19 @@ function recalculateCharStatesAndCounts() {
             const charEl = wordEl.children[j];
             if (charEl.classList.contains('correct')) {
                 totalCorrectChars++;
-                rawCharsTyped++;
             } else if (charEl.classList.contains('incorrect')) {
                 totalIncorrectChars++;
-                rawCharsTyped++;
             }
-            // If it's the current word and character not yet typed, don't count towards rawCharsTyped
-            if (i === currentWordIndex && j >= currentTypedValue.length) {
-                // Do nothing, not typed yet
+            // Count raw characters for all typed chars (correct/incorrect) within the target word length
+            if (j < currentTypedValue.length) {
+                 rawCharsTyped++;
             }
         }
 
         // Account for extra characters on the *current* word if present in textInput
         if (i === currentWordIndex && currentTypedValue.length > wordText.length) {
-            totalIncorrectChars += (currentTypedValue.length - wordText.length);
-            rawCharsTyped += (currentTypedValue.length - wordText.length);
+            totalExtraChars += (currentTypedValue.length - wordText.length);
+            rawCharsTyped += (currentTypedValue.length - wordText.length); // Count extra chars as raw typed
         }
     }
 }
@@ -581,6 +676,17 @@ function setupEventListeners() {
         document.body.classList.toggle('light-theme');
         document.body.classList.toggle('dark-theme');
         saveSettings();
+    });
+
+    // NEW: Global keydown listener for Tab key restart
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab' || e.key === 'Enter') {
+            // Only prevent default and restart if input is focused or results screen is visible
+            if (document.activeElement === textInput || !resultsScreen.classList.contains('hidden')) {
+                e.preventDefault();
+                initGame();
+            }
+        }
     });
 }
 
