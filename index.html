@@ -11,22 +11,31 @@
         ☀️
     </div>
 
-    <main id="app-container">
-        <header class="header">
-            <div id="timer" class="timer">60</div>
-        </header>
+    <header class="app-header">
+        <h1>SwiftType <span class="byline">by bit2swaz</span></h1>
+    </header>
 
-        <section class="controls">
-            <div id="mode-selector" class="mode-selector">
-                <button data-mode="words" class="mode-button active">Words</button>
-                <button data-mode="numbers" class="mode-button">Numbers</button>
-                <button data-mode="punctuation" class="mode-button">Punctuation</button>
+    <main id="app-container">
+        <section id="top-bar" class="top-bar">
+            <div id="timer" class="timer">60</div>
+            <div id="live-stats" class="live-stats">
+                <span id="live-wpm">WPM: 0</span> | <span id="live-accuracy">Accuracy: 0%</span>
             </div>
-            <div id="time-selector" class="time-selector">
-                <button data-time="15" class="time-button">15s</button>
-                <button data-time="30" class="time-button">30s</button>
-                <button data-time="60" class="time-button active">60s</button>
-                <button data-time="120" class="time-button">120s</button>
+        </section>
+
+        <section id="controls-section" class="controls-section">
+            <div class="controls">
+                <div id="mode-selector" class="mode-selector">
+                    <button data-mode="words" class="mode-button active">Words</button>
+                    <button data-mode="numbers" class="mode-button">Numbers</button>
+                    <button data-mode="punctuation" class="mode-button">Punctuation</button>
+                </div>
+                <div id="time-selector" class="time-selector">
+                    <button data-time="15" class="time-button">15s</button>
+                    <button data-time="30" class="time-button">30s</button>
+                    <button data-time="60" class="time-button active">60s</button>
+                    <button data-time="120" class="time-button">120s</button>
+                </div>
             </div>
         </section>
 
@@ -35,10 +44,6 @@
                 <p>Loading words...</p>
             </div>
             <input type="text" id="text-input" class="text-input" autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-
-            <div id="live-stats" class="live-stats">
-                <span id="live-wpm">WPM: 0</span> | <span id="live-accuracy">Accuracy: 0%</span>
-            </div>
         </section>
 
         <section id="results-screen" class="results-screen hidden">
@@ -53,17 +58,19 @@
             </div>
         </section>
 
-        <section id="high-score-tracker" class="high-score-tracker">
-            <h3>High Score</h3>
-            <p>Max WPM: <span id="max-wpm">0</span></p>
-            <p>Best Accuracy: <span id="best-accuracy">0%</span></p>
-        </section>
+        <section id="info-sections" class="info-sections">
+            <section id="high-score-tracker" class="high-score-tracker">
+                <h3>High Score</h3>
+                <p>Max WPM: <span id="max-wpm">0</span></p>
+                <p>Best Accuracy: <span id="best-accuracy">0%</span></p>
+            </section>
 
-        <section id="typing-history" class="typing-history">
-            <h3>Typing History <button id="toggle-history">▼</button></h3>
-            <div id="history-list" class="history-list hidden">
-                <p>No tests yet.</p>
-            </div>
+            <section id="typing-history" class="typing-history">
+                <h3>Typing History <button id="toggle-history">▼</button></h3>
+                <div id="history-list" class="history-list hidden">
+                    <p>No tests yet.</p>
+                </div>
+            </section>
         </section>
     </main>
 
