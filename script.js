@@ -413,3 +413,14 @@ themeToggle.addEventListener('click', () => {
     themeToggle.textContent = isDarkMode ? '🌙' : '☀️';
 });
 
+function applySavedTheme() {
+    const savedTheme = localStorage.getItem(LOCAL_STORAGE_THEME_KEY);
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeToggle.textContent = '🌙';
+    } else {
+        document.body.classList.remove('dark-mode');
+        themeToggle.textContent = '☀️';
+    }
+}
+
