@@ -59,12 +59,15 @@ Made with ❤️ by [bit2swaz](https://www.github.com/bit2swaz)
 ---
 
 ## What's Next
-- Implement a basic calculation history feature.
-- Add scientific functions (e.g., trigonometry, logarithms).
-- Enhance error handling for more specific user feedback.
-- Further optimize for touch interfaces.
+- Implement my iconic custom footer design.
+- Fully integrate my signature light and dark themes with refined color palettes.
+- Add more test configuration options (e.g., custom text, word count modes).
+- Introduce a high-score tracking system using local storage.
+- Implement advanced error handling and visual feedback for missed characters.
+- Further refine the user interface and animations for a smoother experience.
+
 
 ---
 
 ## License
-This project is open source and free to use.# swift-type
+This project is open source and free to use under the MIT License.
