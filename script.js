@@ -495,3 +495,9 @@ toggleHistoryButton.addEventListener('click', () => {
 
 loadAllWords();
 
+document.addEventListener('click', (e) => {
+    if (!testFinished && !e.target.closest('.controls') && !e.target.closest('#results-screen')) {
+        textInput.focus();
+    }
+});
+
