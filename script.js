@@ -15,13 +15,12 @@ let testFinished = false;
 let timerId = null;
 let timeLeft = 60;
 let initialTestTime = 60;
-// >>>>>>>>>>>>> THE CRUCIAL LINE WAS MISSING HERE <<<<<<<<<<<<<
-let currentTime = 60; // <--- ADD THIS LINE HERE!
+let currentTime = 60; // Correctly declared and initialized
 
 let correctChars = 0;
 let incorrectChars = 0;
-let totalTypedChars = 0;
-let typedCorrectlyOnce = 0;
+let totalTypedChars = 0; // All characters user tried to type
+let typedCorrectlyOnce = 0; // Characters typed correctly *on the first attempt* for WPM
 let startTime = 0;
 
 const themeToggle = document.getElementById('theme-toggle');
@@ -47,10 +46,14 @@ const typingHistorySection = document.getElementById('typing-history');
 const toggleHistoryButton = document.getElementById('toggle-history');
 const historyList = document.getElementById('history-list');
 
+// NEW DOM elements for smoother transitions and loading
+const appWrapper = document.getElementById('app-wrapper'); // Added this ID to your main content div
+const loadingOverlay = document.getElementById('loading-overlay'); // New loading overlay element
 const appHeader = document.querySelector('.app-header');
 const controlsSection = document.getElementById('controls-section');
 const infoSections = document.getElementById('info-sections');
 const footer = document.querySelector('.footer');
+
 
 // Updated for flexible modes
 let activeModes = {
@@ -70,6 +73,10 @@ for (let i = 1; i <= 1000; i++) {
 }
 
 async function loadAllWords() {
+    // Show loading overlay
+    loadingOverlay.classList.remove('hidden');
+    appWrapper.style.opacity = '0'; // Hide main content during loading
+
     try {
         const response = await fetch('words.txt');
         if (!response.ok) {
@@ -89,6 +96,10 @@ async function loadAllWords() {
         console.error("Error loading words.txt:", error);
         wordsDisplay.innerHTML = `<p style="color: ${getComputedStyle(document.body).getPropertyValue('--incorrect-char-color')}">Error loading words. Please ensure 'words.txt' is in the root directory. Check console for details.</p>`;
         textInput.disabled = true;
+    } finally {
+        // Hide loading overlay and show content after initialization
+        loadingOverlay.classList.add('hidden');
+        appWrapper.style.opacity = '1';
     }
 }
 
@@ -96,7 +107,6 @@ function getRandomElement(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// Generates the sequence of words/numbers/punctuation for the test
 function generateTestContent(count = 50) {
     const generatedContent = [];
     const availableElements = [];
@@ -106,7 +116,6 @@ function generateTestContent(count = 50) {
     if (activeModes.punctuation && punctuations.length > 0) availableElements.push('punctuation');
 
     if (availableElements.length === 0) {
-        // Fallback to words if no modes are active or lists are empty
         if (allWords.length > 0) {
             availableElements.push('word');
         } else {
@@ -139,16 +148,9 @@ function generateTestContent(count = 50) {
 function renderContent() {
     wordsDisplay.innerHTML = '';
     currentTestContent.forEach((word, wordIndex) => {
-        const wordWrapper = document.createElement('span');
-        wordWrapper.classList.add('word-wrapper');
-
         const wordSpan = document.createElement('span');
         wordSpan.classList.add('word');
         wordSpan.setAttribute('data-word-index', wordIndex);
-
-        if (wordIndex === 0) {
-            wordSpan.classList.add('active');
-        }
 
         word.split('').forEach(char => {
             const charSpan = document.createElement('span');
@@ -157,22 +159,20 @@ function renderContent() {
             wordSpan.appendChild(charSpan);
         });
 
-        wordWrapper.appendChild(wordSpan);
-
-        // Add a space character AFTER the word, inside the word-wrapper
+        // Add a space character as a separate span *after* each word, except the last one
         if (wordIndex < currentTestContent.length - 1) {
             const spaceSpan = document.createElement('span');
             spaceSpan.classList.add('letter', 'space');
-            spaceSpan.textContent = ' ';
-            wordWrapper.appendChild(spaceSpan);
+            spaceSpan.textContent = ' '; // Actual space character
+            wordSpan.appendChild(spaceSpan); // Append space *inside* the wordSpan for easier selection/traversal
         }
-        wordsDisplay.appendChild(wordWrapper);
+        wordsDisplay.appendChild(wordSpan); // Append the wordSpan (which now includes its trailing space)
     });
 
     // Highlight the first character of the first word as current
     if (wordsDisplay.children.length > 0) {
-        const firstWordWrapper = wordsDisplay.children[0];
-        const firstLetter = firstWordWrapper.querySelector('.letter');
+        const firstWordSpan = wordsDisplay.children[0];
+        const firstLetter = firstWordSpan.querySelector('.letter');
         if (firstLetter) {
             firstLetter.classList.add('current');
         }
@@ -181,18 +181,19 @@ function renderContent() {
     textInput.focus();
 }
 
+
 function initializeTest() {
     currentWordIndex = 0;
     currentCharIndex = 0;
     testActive = false;
     testFinished = false;
-    timeLeft = currentTime; // Now `currentTime` is correctly defined globally
+    timeLeft = currentTime;
     timerDisplay.textContent = timeLeft;
     timerDisplay.style.setProperty('--timer-progress', '100%');
     textInput.value = '';
     textInput.disabled = false;
     wordsDisplay.classList.remove('blur-on-finish');
-    liveStats.classList.remove('visible');
+    liveStats.classList.remove('visible'); // Hide live stats initially
 
     correctChars = 0;
     incorrectChars = 0;
@@ -206,9 +207,9 @@ function initializeTest() {
     resultsScreen.classList.add('hidden');
     document.getElementById('typing-test-area').classList.remove('hidden');
 
-    // Show initial UI elements
-    document.body.classList.remove('test-in-progress');
-    appHeader.classList.remove('hidden');
+    // Show initial UI elements smoothly
+    document.body.classList.remove('test-in-progress'); // Triggers CSS transition
+    appHeader.classList.remove('hidden'); // Ensure these are not 'hidden' in HTML
     controlsSection.classList.remove('hidden');
     infoSections.classList.remove('hidden');
     footer.classList.remove('hidden');
@@ -222,9 +223,9 @@ function startTimer() {
     if (timerId) clearInterval(timerId);
     startTime = Date.now();
 
-    // Hide unnecessary UI elements
-    document.body.classList.add('test-in-progress');
-    liveStats.classList.add('visible');
+    // Hide unnecessary UI elements smoothly
+    document.body.classList.add('test-in-progress'); // Triggers CSS transition
+    liveStats.classList.add('visible'); // Show live stats
 
     timerId = setInterval(() => {
         timeLeft--;
@@ -251,7 +252,7 @@ function endTest() {
 
     const finalWPMValue = calculateWPM();
     const finalAccuracyValue = calculateAccuracy();
-    const actualTimeTaken = initialTestTime - timeLeft;
+    const actualTimeTaken = initialTestTime - timeLeft; // If timeLeft is 0, timeTaken is initialTestTime
 
     finalWPM.textContent = finalWPMValue;
     finalAccuracy.textContent = `${finalAccuracyValue}%`;
@@ -261,7 +262,7 @@ function endTest() {
     resultsScreen.classList.remove('hidden');
     document.getElementById('typing-test-area').classList.add('hidden');
 
-    // Show all UI elements for results screen
+    // Show all UI elements for results screen smoothly
     document.body.classList.remove('test-in-progress');
     appHeader.classList.remove('hidden');
     controlsSection.classList.remove('hidden');
@@ -278,13 +279,16 @@ function endTest() {
 
 function calculateWPM() {
     if (typedCorrectlyOnce === 0 || (!testActive && !testFinished)) return 0;
-    const minutes = (initialTestTime - timeLeft) / 60;
+    // Calculate minutes based on actual time elapsed, not just initialTestTime
+    const actualElapsedSeconds = initialTestTime - timeLeft;
+    const minutes = actualElapsedSeconds / 60;
     if (minutes <= 0) return 0;
     return Math.round((typedCorrectlyOnce / 5) / minutes);
 }
 
 function calculateAccuracy() {
     if (totalTypedChars === 0) return 0;
+    // Accuracy is calculated based on correct typed characters vs total attempted characters
     return Math.round((correctChars / totalTypedChars) * 100);
 }
 
@@ -299,13 +303,12 @@ function updateLiveStats() {
 }
 
 textInput.addEventListener('keydown', (e) => {
-    if (e.key === ' ') {
-        e.preventDefault();
-    }
-    if (e.key === 'Tab') {
+    // Prevent default behavior for space and tab to control it manually
+    if (e.key === ' ' || e.key === 'Tab') {
         e.preventDefault();
     }
 
+    // Start test on first valid key press
     if (!testActive && !testFinished && e.key.length === 1 && e.key !== ' ') {
         testActive = true;
         startTimer();
@@ -316,121 +319,149 @@ textInput.addEventListener('input', (e) => {
     if (testFinished) return;
 
     const typedText = textInput.value;
-    const currentWordWrapper = wordsDisplay.children[currentWordIndex];
-    if (!currentWordWrapper) return;
-
-    const currentWordSpan = currentWordWrapper.querySelector('.word');
+    const currentWordSpan = wordsDisplay.children[currentWordIndex];
     if (!currentWordSpan) return;
 
     const targetWord = currentTestContent[currentWordIndex];
     const targetSequence = targetWord + (currentWordIndex < currentTestContent.length - 1 ? ' ' : '');
 
-    const allCurrentLetters = currentWordWrapper.querySelectorAll('.letter');
+    const allLettersInCurrentSpan = currentWordSpan.querySelectorAll('.letter');
 
-    allCurrentLetters.forEach(charSpan => {
+    // Remove all previous feedback classes and the current class for this word
+    allLettersInCurrentSpan.forEach(charSpan => {
         charSpan.classList.remove('correct', 'incorrect', 'current', 'extra', 'missing');
     });
+    // Remove any previously added extra spans
+    currentWordSpan.querySelectorAll('.extra').forEach(el => el.remove());
 
-    let currentWordTypedChars = 0;
 
-    for (let i = 0; i < allCurrentLetters.length; i++) {
-        const charSpan = allCurrentLetters[i];
+    // Compare typed characters with target sequence and apply classes
+    for (let i = 0; i < targetSequence.length; i++) {
+        const charSpan = allLettersInCurrentSpan[i];
         if (i < typedText.length) {
-            currentWordTypedChars++;
+            // Character has been typed
             if (typedText[i] === targetSequence[i]) {
                 charSpan.classList.add('correct');
             } else {
                 charSpan.classList.add('incorrect');
             }
+        } else {
+            // Character is missing (not yet typed)
+            charSpan.classList.add('missing'); // Visual feedback for missing chars
         }
     }
 
+    // Handle "extra" characters (typed beyond target sequence length)
     if (typedText.length > targetSequence.length) {
-        currentWordWrapper.querySelectorAll('.extra').forEach(el => el.remove());
-
         for (let i = targetSequence.length; i < typedText.length; i++) {
             const extraCharSpan = document.createElement('span');
             extraCharSpan.classList.add('letter', 'extra');
             extraCharSpan.textContent = typedText[i];
-            currentWordWrapper.appendChild(extraCharSpan);
+            currentWordSpan.appendChild(extraCharSpan);
         }
-    } else {
-        currentWordWrapper.querySelectorAll('.extra').forEach(el => el.remove());
     }
 
+    // Update currentCharIndex and apply current-char highlight
     currentCharIndex = typedText.length;
-
-    if (currentCharIndex < allCurrentLetters.length) {
-        allCurrentLetters[currentCharIndex].classList.add('current');
-    } else {
-        const lastChar = allCurrentLetters[allCurrentLetters.length - 1];
-        if (lastChar) {
-            lastChar.classList.add('current');
-        }
+    let charToHighlight = allLettersInCurrentSpan[currentCharIndex];
+    
+    if (!charToHighlight && typedText.length > targetSequence.length) {
+        charToHighlight = currentWordSpan.lastElementChild;
+    }
+    
+    if (charToHighlight) {
+        charToHighlight.classList.add('current');
     }
 
-    if (e.data === ' ') {
-        const typedWordWithTrailingSpace = typedText;
-        const actualTargetWord = currentTestContent[currentWordIndex];
-        const actualTargetSequence = actualTargetWord + (currentWordIndex < currentTestContent.length - 1 ? ' ' : '');
+    // Live stats update only if test is active
+    if (testActive) {
+        updateLiveStats();
+    }
 
-        let wordCorrectCount = 0;
-        let wordIncorrectCount = 0;
-        let wordTypedCorrectlyOnceFlag = true;
-
-        for (let i = 0; i < typedWordWithTrailingSpace.length; i++) {
-            totalTypedChars++;
-            if (i < actualTargetSequence.length && typedWordWithTrailingSpace[i] === actualTargetSequence[i]) {
-                correctChars++;
-                wordCorrectCount++;
-            } else {
-                incorrectChars++;
-                wordIncorrectCount++;
-                wordTypedCorrectlyOnceFlag = false;
-            }
-        }
-
-        if (typedWordWithTrailingSpace.length < actualTargetSequence.length) {
-            incorrectChars += (actualTargetSequence.length - typedWordWithTrailingSpace.length);
-            wordTypedCorrectlyOnceFlag = false;
-        }
-
-        if (wordTypedCorrectlyOnceFlag && typedWordWithTrailingSpace.length === actualTargetSequence.length) {
-            typedCorrectlyOnce += actualTargetSequence.length;
-        }
-
-        textInput.value = '';
-
-        currentWordSpan.classList.remove('active');
-        currentWordIndex++;
-        currentCharIndex = 0;
-
-        if (currentWordIndex < currentTestContent.length) {
-            const nextWordWrapper = wordsDisplay.children[currentWordIndex];
-            const nextWordSpan = nextWordWrapper.querySelector('.word');
-            const nextFirstLetter = nextWordWrapper.querySelector('.letter');
-
-            if (nextWordSpan) nextWordSpan.classList.add('active');
-            if (nextFirstLetter) nextFirstLetter.classList.add('current');
-
-            scrollWordsDisplay();
-        } else {
-            endTest();
-        }
+    // Check if the word (and its trailing space) is completed
+    if (typedText.length > 0 && typedText[typedText.length - 1] === ' ') {
+        advanceWord();
     }
 });
 
-function scrollWordsDisplay() {
-    const activeWordWrapper = wordsDisplay.querySelector('.word-wrapper .word.active');
-    if (!activeWordWrapper) return;
 
-    const displayRect = wordsDisplay.getBoundingClientRect();
-    const activeWordRect = activeWordWrapper.getBoundingClientRect();
+function advanceWord() {
+    const typedText = textInput.value;
+    const targetWord = currentTestContent[currentWordIndex];
+    const targetSequence = targetWord + (currentWordIndex < currentTestContent.length - 1 ? ' ' : '');
 
-    if (activeWordRect.bottom > displayRect.bottom || activeWordRect.top < displayRect.top) {
-        wordsDisplay.scrollTop = activeWordRect.top - wordsDisplay.getBoundingClientRect().top + wordsDisplay.scrollTop - (wordsDisplay.offsetHeight / 4);
+    let wordCorrectCount = 0;
+    let wordTypedCorrectlyOnceFlag = true;
+
+    // Compare character by character for the word and its trailing space
+    for (let i = 0; i < targetSequence.length; i++) {
+        totalTypedChars++; // Each target character is counted as attempted
+        if (i < typedText.length && typedText[i] === targetSequence[i]) {
+            correctChars++;
+            wordCorrectCount++;
+        } else {
+            incorrectChars++;
+            wordTypedCorrectlyOnceFlag = false;
+        }
+    }
+
+    // Account for extra characters typed beyond the target sequence
+    if (typedText.length > targetSequence.length) {
+        incorrectChars += (typedText.length - targetSequence.length);
+        totalTypedChars += (typedText.length - targetSequence.length); // Count extra chars as attempted
+        wordTypedCorrectlyOnceFlag = false;
+    }
+
+    // If the word was typed perfectly (including space) on the first attempt
+    if (wordTypedCorrectlyOnceFlag && typedText.length === targetSequence.length) {
+        typedCorrectlyOnce += targetSequence.length;
+    }
+
+    // Clear input for next word
+    textInput.value = '';
+
+    // Deactivate current word, move to next
+    const currentWordSpan = wordsDisplay.children[currentWordIndex];
+    if (currentWordSpan) {
+        currentWordSpan.classList.remove('active');
+        // Remove 'current' class from any child letter in the just-completed word
+        currentWordSpan.querySelectorAll('.letter').forEach(charSpan => charSpan.classList.remove('current'));
+    }
+
+    currentWordIndex++;
+    currentCharIndex = 0;
+
+    // Move to the next word or end test
+    if (currentWordIndex < currentTestContent.length) {
+        const nextWordSpan = wordsDisplay.children[currentWordIndex];
+        const nextFirstLetter = nextWordSpan ? nextWordSpan.querySelector('.letter') : null;
+
+        if (nextWordSpan) nextWordSpan.classList.add('active');
+        if (nextFirstLetter) nextFirstLetter.classList.add('current');
+
+        scrollWordsDisplay();
+    } else {
+        endTest();
     }
 }
+
+
+function scrollWordsDisplay() {
+    const activeWordSpan = wordsDisplay.querySelector('.word.active');
+    if (!activeWordSpan) return;
+
+    const displayRect = wordsDisplay.getBoundingClientRect();
+    const activeWordRect = activeWordSpan.getBoundingClientRect();
+
+    // Calculate if the current word is out of view (below the bottom or above the top)
+    const isBelow = activeWordRect.bottom > displayRect.bottom;
+    const isAbove = activeWordRect.top < displayRect.top;
+
+    if (isBelow || isAbove) {
+        wordsDisplay.scrollTop = activeWordRect.top - displayRect.top + wordsDisplay.scrollTop - (wordsDisplay.offsetHeight / 3);
+    }
+}
+
 
 modeSelector.addEventListener('click', (e) => {
     if (e.target.classList.contains('mode-button')) {
@@ -595,10 +626,11 @@ document.addEventListener('keyup', (e) => {
     if (e.key === 'Escape' && testFinished) {
         restartButton.click();
     }
-    if (e.key === 'Tab' && document.activeElement === textInput && testFinished) {
-         e.preventDefault();
-         restartButton.focus();
+    if (e.key === 'Enter' && testFinished && !resultsScreen.classList.contains('hidden')) { // Ensure results screen is visible
+        e.preventDefault();
+        restartButton.click();
     } else if (e.key === 'Tab' && !testActive && !testFinished && document.activeElement !== textInput) {
+        e.preventDefault();
         textInput.focus();
     }
 });
