@@ -155,3 +155,32 @@ function renderContent() {
     textInput.focus();
 }
 
+function initializeTest() {
+    currentWordIndex = 0;
+    currentCharIndex = 0;
+    testActive = false;
+    testFinished = false;
+    timeLeft = currentTime;
+    timerDisplay.textContent = timeLeft;
+    textInput.value = '';
+    textInput.disabled = false;
+    wordsDisplay.classList.remove('blur-on-finish');
+    liveStats.classList.remove('visible');
+
+    correctChars = 0;
+    incorrectChars = 0;
+    totalTypedChars = 0;
+    typedCorrectlyOnce = 0;
+    startTime = 0;
+
+    currentTestWords = generateTestContent(50);
+    renderContent();
+
+    resultsScreen.classList.add('hidden');
+    document.getElementById('typing-test-area').classList.remove('hidden');
+
+    textInput.focus();
+    updateTabTitle();
+    console.log("Test initialized. Mode:", currentMode, "Time:", currentTime, "s");
+}
+
