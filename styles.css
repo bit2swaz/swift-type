@@ -216,3 +216,12 @@ body {
     color: var(--accent-color);
 }
 
+.results-screen p {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.results-buttons {
+    margin-top: 30px;
+}
+
