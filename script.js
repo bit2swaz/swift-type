@@ -406,3 +406,10 @@ restartButton.addEventListener('click', () => {
     initializeTest();
 });
 
+themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    localStorage.setItem(LOCAL_STORAGE_THEME_KEY, isDarkMode ? 'dark' : 'light');
+    themeToggle.textContent = isDarkMode ? '🌙' : '☀️';
+});
+
