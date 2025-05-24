@@ -290,4 +290,14 @@ body {
     overflow-y: auto;
 }
 
+.history-item {
+    background-color: var(--button-bg);
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+}
+
 
