@@ -210,3 +210,9 @@ body {
     border-radius: 8px;
 }
 
+.results-screen h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: var(--accent-color);
+}
+
