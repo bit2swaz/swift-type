@@ -228,3 +228,10 @@ function endTest() {
     console.log("WPM:", finalWPMValue, "Accuracy:", finalAccuracyValue + "%");
 }
 
+function calculateWPM() {
+    if (typedCorrectlyOnce === 0 || !testActive && !testFinished) return 0;
+    const minutes = (initialTestTime - timeLeft) / 60;
+    if (minutes <= 0) return 0;
+    return Math.round((typedCorrectlyOnce / 5) / minutes);
+}
+
