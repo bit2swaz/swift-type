@@ -243,3 +243,7 @@ body {
     transform: translateY(-2px);
 }
 
+.hidden {
+    display: none !important;
+}
+
