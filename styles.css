@@ -1,4 +1,4 @@
-/* Basic Reset */
+/* Basic Reset (Keep this) */
 * {
     margin: 0;
     padding: 0;
@@ -6,23 +6,23 @@
 }
 
 :root {
-    --line-height: 1.5em; /* Define a CSS variable for consistent line height */
+    --line-height: 1.5em;
     --font-size-words: 1.8em;
 
-    /* Dark Theme Variables */
-    --bg-color-primary: #282c34; /* Main background */
-    --bg-color-secondary: #3e4451; /* Elements background (input, buttons) */
-    --text-color-primary: #abb2bf; /* Main text color */
-    --text-color-secondary: #5c6370; /* Muted text (footer, unhighlighted) */
-    --accent-color: #61afef; /* Blue accent */
-    --correct-char: #98c379; /* Green for correct */
-    --incorrect-char: #e06c75; /* Red for incorrect */
-    --current-char-underline: #e06c75; /* Red underline for current */
+    /* Dark Theme Variables (Keep these) */
+    --bg-color-primary: #282c34;
+    --bg-color-secondary: #3e4451;
+    --text-color-primary: #abb2bf;
+    --text-color-secondary: #5c6370;
+    --accent-color: #61afef;
+    --correct-char: #98c379;
+    --incorrect-char: #e06c75;
+    --current-char-underline: #e06c75;
     --input-focus-shadow: #61afef;
     --btn-active-text: #fff;
     --toggle-slider-bg: #7f8c8d;
     --toggle-slider-checked-bg: #61afef;
-    --completed-word-fade: rgba(153, 153, 153, 0.2); /* Faded color for typed words */
+    --completed-word-fade: rgba(153, 153, 153, 0.2);
     --results-bg-overlay: rgba(40, 44, 52, 0.95);
 }
 
@@ -34,26 +34,26 @@ body.dark-theme {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    overflow: hidden; /* Prevent body scroll */
+    overflow: hidden;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Light Theme Variables */
+/* Light Theme Variables (Keep these, but I might have a fix below) */
 body.light-theme {
-    --bg-color-primary: #f0f2f5; /* Light background */
-    --bg-color-secondary: #e9ecef; /* Lighter elements background */
+    --bg-color-primary: #f0f2f5;
+    --bg-color-secondary: #e9ecef;
     --text-color-primary: #333;
     --text-color-secondary: #6c757d;
-    --accent-color: #007bff; /* Blue accent */
-    --correct-char: #28a745; /* Green */
-    --incorrect-char: #dc3545; /* Red */
-    --current-char-underline: #dc3545; /* Red */
+    --accent-color: #007bff;
+    --correct-char: #28a745;
+    --incorrect-char: #dc3545;
+    --current-char-underline: #dc3545;
     --input-focus-shadow: #007bff;
     --btn-active-text: #fff;
     --toggle-slider-bg: #ccc;
     --toggle-slider-checked-bg: #007bff;
-    --completed-word-fade: rgba(51, 51, 51, 0.1); /* Faded color for typed words */
-    --results-bg-overlay: rgba(240, 242, 245, 0.95); /* Light overlay */
+    --completed-word-fade: rgba(51, 51, 51, 0.1);
+    --results-bg-overlay: rgba(240, 242, 245, 0.95);
 }
 
 
@@ -95,7 +95,6 @@ body.light-theme {
     border-radius: 5px;
 }
 
-/* New: Live Stats */
 .live-stats {
     font-size: 1.2em;
     color: var(--text-color-primary);
@@ -104,7 +103,7 @@ body.light-theme {
     margin-left: 20px;
 }
 
-/* Theme Toggle Switch */
+/* Theme Toggle Switch (Keep this) */
 .theme-switch {
     position: relative;
     width: 60px;
@@ -154,30 +153,30 @@ body.light-theme {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    align-items: center; /* Center items in the typing test container */
     position: relative;
 }
 
 /* Test Controls */
 .test-controls {
     display: flex;
-    gap: 30px;
+    flex-direction: column; /* Stack time modes and word types */
+    gap: 15px;
     margin-bottom: 30px;
-    align-items: center; /* Vertically align time modes and word types */
+    align-items: center; /* Center items within test controls */
+    width: 100%; /* Make test controls take full width */
 }
 
-.time-modes, .word-types {
+.time-modes {
     display: flex;
     gap: 10px;
-    align-items: center;
-    border-radius: 5px; /* Add some border radius for group */
+    border-radius: 5px;
     background-color: var(--bg-color-secondary);
     padding: 5px 10px;
 }
 
 .time-btn {
-    background-color: transparent; /* Transparent button */
+    background-color: transparent;
     color: var(--text-color-primary);
     border: none;
     padding: 8px 15px;
@@ -188,7 +187,7 @@ body.light-theme {
 }
 
 .time-btn:hover {
-    background-color: rgba(97, 175, 239, 0.1); /* Light blue hover */
+    background-color: rgba(97, 175, 239, 0.1);
 }
 
 .time-btn.active {
@@ -197,14 +196,23 @@ body.light-theme {
 }
 
 /* Toggle Switch (for Numbers/Punctuation) - FIXES START HERE */
+.word-types {
+    display: flex;
+    gap: 20px; /* Space between the two toggles */
+    align-items: center;
+    background-color: var(--bg-color-secondary);
+    padding: 5px 15px;
+    border-radius: 5px;
+}
+
 .toggle-switch {
     position: relative;
-    display: flex; /* Use flex to align slider and text */
+    display: flex;
     align-items: center;
-    gap: 10px; /* Space between slider and text */
-    height: 34px; /* Match slider height */
+    gap: 10px;
+    height: 34px;
     cursor: pointer;
-    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+    -webkit-tap-highlight-color: transparent;
 }
 
 .toggle-switch input {
@@ -216,42 +224,54 @@ body.light-theme {
 .toggle-switch .slider {
     background-color: var(--toggle-slider-bg);
     border-radius: 34px;
-    width: 45px; /* Adjust width of slider */
-    height: 25px; /* Adjust height of slider */
+    width: 45px;
+    height: 25px;
     transition: .4s;
+}
+
+.toggle-switch .slider.round {
+    border-radius: 34px;
+}
+
+.toggle-switch .slider.round:before {
+    border-radius: 50%;
 }
 
 .toggle-switch .slider:before {
     position: absolute;
     content: "";
-    height: 19px; /* Adjust size of knob */
-    width: 19px; /* Adjust size of knob */
-    left: 3px; /* Adjust knob position */
-    bottom: 3px; /* Adjust knob position */
+    height: 19px;
+    width: 19px;
+    left: 3px;
+    bottom: 3px;
     background-color: white;
     transition: .4s;
-    border-radius: 50%;
 }
 
 .toggle-switch input:checked + .slider {
     background-color: var(--toggle-slider-checked-bg);
 }
 
+.toggle-switch input:focus + .slider {
+    box-shadow: 0 0 1px var(--toggle-slider-checked-bg);
+}
+
 .toggle-switch input:checked + .slider:before {
-    transform: translateX(20px); /* Adjust knob translate */
+    transform: translateX(20px);
 }
 
 .toggle-switch .toggle-text {
-    font-size: 1em; /* Adjust label font size */
+    font-size: 1em;
     color: var(--text-color-primary);
-    white-space: nowrap; /* Prevent text from wrapping */
+    white-space: nowrap;
 }
 /* FIXES END HERE */
 
 
 .words-container {
     width: 100%;
-    max-height: calc(var(--font-size-words) * 3); /* Show about 3 lines of text */
+    /* Increased max-height to show more lines */
+    max-height: calc(var(--font-size-words) * 4.5); /* Adjust as needed, around 3-4 lines */
     overflow: hidden;
     position: relative;
     margin-bottom: 30px;
@@ -261,31 +281,31 @@ body.light-theme {
 .words-display {
     font-size: var(--font-size-words);
     line-height: var(--line-height);
-    word-spacing: 8px; /* Space between words */
+    word-spacing: 8px;
     text-align: center;
     white-space: normal;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     transform: translateY(0);
-    transition: transform 0.2s ease-out; /* Smooth scroll effect */
+    transition: transform 0.2s ease-out;
 }
 
 .word {
     display: inline-block;
     margin-right: 8px;
-    white-space: pre; /* Preserve leading/trailing spaces for words, if any */
-    transition: opacity 0.3s ease; /* Smooth fade for completed words */
+    white-space: pre;
+    transition: opacity 0.3s ease;
 }
 
 .word.typed {
-    opacity: 0.4; /* Faded for completed words */
-    color: var(--completed-word-fade); /* New: faded color */
+    opacity: 0.4;
+    color: var(--completed-word-fade);
 }
 
 .char {
     display: inline-block;
-    opacity: 0.7; /* Default opacity for untyped characters */
+    opacity: 0.7;
     transition: opacity 0.1s ease, color 0.1s ease, background-color 0.1s ease, border-bottom 0.1s ease;
 }
 
@@ -321,7 +341,7 @@ body.light-theme {
     font-size: var(--font-size-words);
     padding: 15px 20px;
     border-radius: 8px;
-    width: 60%;
+    width: 70%; /* Slightly wider input field */
     text-align: center;
     caret-color: var(--accent-color);
     transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
@@ -336,14 +356,14 @@ body.light-theme {
     opacity: 0.7;
 }
 
-/* Results Screen */
+/* Results Screen (Keep this) */
 .results-screen {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: var(--results-bg-overlay); /* Semi-transparent overlay */
+    background-color: var(--results-bg-overlay);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -399,10 +419,11 @@ body.light-theme {
 }
 
 .restart-btn:hover {
-    background-color: var(--input-focus-shadow); /* Slightly different accent on hover */
+    background-color: var(--input-focus-shadow);
     transform: translateY(-2px);
 }
 
+/* Footer (Keep this) */
 .footer {
     display: flex;
     justify-content: center;
