@@ -201,3 +201,30 @@ function startTimer() {
     }, 1000);
 }
 
+function endTest() {
+    testActive = false;
+    testFinished = true;
+    clearInterval(timerId);
+    textInput.disabled = true;
+    wordsDisplay.classList.add('blur-on-finish');
+
+    const finalWPMValue = calculateWPM();
+    const finalAccuracyValue = calculateAccuracy();
+    const actualTimeTaken = initialTestTime - timeLeft;
+
+    finalWPM.textContent = finalWPMValue;
+    finalAccuracy.textContent = `${finalAccuracyValue}%`;
+    charsTyped.textContent = totalTypedChars;
+    timeTaken.textContent = `${actualTimeTaken}s`;
+
+    resultsScreen.classList.remove('hidden');
+    document.getElementById('typing-test-area').classList.add('hidden');
+
+    updateHighScores(finalWPMValue, finalAccuracyValue);
+    saveTestToHistory(finalWPMValue, finalAccuracyValue, actualTimeTaken);
+    updateTabTitle();
+
+    console.log("Test ended!");
+    console.log("WPM:", finalWPMValue, "Accuracy:", finalAccuracyValue + "%");
+}
+
