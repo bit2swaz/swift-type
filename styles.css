@@ -1,0 +1,119 @@
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto Mono', monospace; /* A common choice for typing tests */
+    background-color: #282c34; /* Dark background, similar to MonkeyType's default */
+    color: #abb2bf; /* Light text color */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden; /* Prevent body scroll, we'll manage inner content scroll */
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    max-width: 1000px; /* Limit overall width */
+    min-height: 80vh;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    margin-bottom: 30px; /* Space between header and typing area */
+}
+
+.logo {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #61afef; /* A nice blue accent */
+}
+
+.typing-test {
+    flex-grow: 1; /* Allow typing area to take available space */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically */
+    align-items: center; /* Center content horizontally */
+    position: relative; /* For positioning future elements like timer */
+}
+
+.words-display {
+    font-size: 1.8em;
+    line-height: 1.5;
+    word-spacing: 8px; /* Space between words */
+    text-align: center; /* Center words */
+    margin-bottom: 30px;
+    height: 100px; /* Fixed height to control display, will make it scrollable later */
+    overflow: hidden; /* Hide overflow for now, will be `auto` for scrolling */
+    white-space: normal; /* Allow words to wrap */
+    max-width: 100%; /* Ensure it doesn't overflow horizontally */
+    display: flex; /* Use flexbox for displaying words */
+    flex-wrap: wrap; /* Allow words to wrap */
+    justify-content: center; /* Center words within the display */
+    align-content: flex-start; /* Align content to the top */
+}
+
+.word {
+    display: inline-block; /* Treat words as blocks for individual styling */
+    margin-right: 8px; /* Space between words */
+    white-space: pre; /* Preserve leading/trailing spaces for words, if any */
+}
+
+.char {
+    display: inline-block; /* Each character can be styled individually */
+    opacity: 0.7; /* Default opacity for untyped characters */
+    transition: opacity 0.1s ease; /* Smooth transition for opacity changes */
+}
+
+.char.current {
+    color: #e06c75; /* Red for the current character to type */
+    opacity: 1;
+    border-bottom: 1px solid #e06c75; /* Underline current character */
+}
+
+.char.correct {
+    color: #98c379; /* Green for correct characters */
+    opacity: 1;
+}
+
+.char.incorrect {
+    color: #e06c75; /* Red for incorrect characters */
+    background-color: rgba(224, 108, 117, 0.3); /* Light red background for errors */
+    opacity: 1;
+}
+
+.text-input {
+    background-color: #3e4451; /* Darker input background */
+    border: none;
+    outline: none;
+    color: #e6e6e6; /* Lighter text in input */
+    font-size: 1.8em;
+    padding: 15px 20px;
+    border-radius: 8px;
+    width: 60%; /* Adjust width as needed */
+    text-align: center; /* Center typed text */
+    caret-color: #61afef; /* Blue blinking cursor */
+}
+
+.text-input:focus {
+    box-shadow: 0 0 0 3px #61afef; /* Blue focus ring */
+}
+
+.footer {
+    text-align: center;
+    padding: 20px 0 10px;
+    font-size: 0.9em;
+    color: #5c6370; /* Muted color for footer text */
+    margin-top: auto; /* Push footer to the bottom */
+}
