@@ -45,3 +45,11 @@ const typingHistorySection = document.getElementById('typing-history');
 const toggleHistoryButton = document.getElementById('toggle-history');
 const historyList = document.getElementById('history-list');
 
+let currentMode = 'words';
+let currentTime = 60;
+
+const LOCAL_STORAGE_THEME_KEY = 'monkeytypeCloneTheme';
+const LOCAL_STORAGE_MAX_WPM_KEY = 'monkeytypeCloneMaxWPM';
+const LOCAL_STORAGE_BEST_ACCURACY_KEY = 'monkeytypeCloneBestAccuracy';
+const LOCAL_STORAGE_HISTORY_KEY = 'monkeytypeCloneHistory';
+
