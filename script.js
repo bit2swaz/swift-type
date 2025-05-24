@@ -501,3 +501,15 @@ document.addEventListener('click', (e) => {
     }
 });
 
+document.addEventListener('keyup', (e) => {
+    if (e.key === 'Escape' && testFinished) {
+        restartButton.click();
+    }
+    if (e.key === 'Tab' && document.activeElement === textInput && testFinished) {
+         e.preventDefault();
+         restartButton.focus();
+    } else if (e.key === 'Tab' && !testActive && !testFinished && document.activeElement !== textInput) {
+        textInput.focus();
+    }
+});
+
