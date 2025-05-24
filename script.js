@@ -432,3 +432,20 @@ function loadHighScores() {
     if (savedBestAccuracy) bestAccuracy.textContent = `${savedBestAccuracy}%`;
 }
 
+function updateHighScores(wpm, accuracy) {
+    let currentMaxWPM = parseInt(localStorage.getItem(LOCAL_STORAGE_MAX_WPM_KEY) || '0');
+    let currentBestAccuracy = parseInt(localStorage.getItem(LOCAL_STORAGE_BEST_ACCURACY_KEY) || '0');
+
+    if (wpm > currentMaxWPM) {
+        localStorage.setItem(LOCAL_STORAGE_MAX_WPM_KEY, wpm);
+        maxWPM.textContent = wpm;
+    }
+    if (wpm >= currentMaxWPM && accuracy > currentBestAccuracy) {
+        localStorage.setItem(LOCAL_STORAGE_BEST_ACCURACY_KEY, accuracy);
+        bestAccuracy.textContent = `${accuracy}%`;
+    } else if (currentMaxWPM === 0) {
+         localStorage.setItem(LOCAL_STORAGE_BEST_ACCURACY_KEY, accuracy);
+         bestAccuracy.textContent = `${accuracy}%`;
+    }
+}
+
