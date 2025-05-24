@@ -3,7 +3,6 @@ const textInput = document.getElementById('text-input');
 const timerElement = document.getElementById('timer');
 const wordsContainer = document.getElementById('words-container');
 const timeButtons = document.querySelectorAll('.time-btn');
-// CHANGED: Select buttons by their new IDs
 const includeNumbersBtn = document.getElementById('include-numbers-btn');
 const includePunctuationBtn = document.getElementById('include-punctuation-btn');
 const resultsScreen = document.getElementById('results-screen');
@@ -14,6 +13,9 @@ const restartBtn = document.getElementById('restart-btn');
 const themeToggle = document.getElementById('theme-toggle');
 const liveWpmElement = document.getElementById('live-wpm');
 const liveAccuracyElement = document.getElementById('live-accuracy');
+// NEW: Get reference to the caret element
+const caret = document.getElementById('caret');
+
 
 // --- Configuration and State Variables ---
 const baseWordList = [
@@ -59,12 +61,10 @@ let rawCharsTyped = 0;
 let startTime = 0;
 let generatedWordCount = 0;
 
-// NEW: Variables for Numbers/Punctuation state
 let includeNumbers = false;
 let includePunctuation = false;
 
 
-// Get the computed line height from CSS variable for scrolling calculations
 const lineHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--calculated-line-height'));
 
 // --- Game Initialization & Reset ---
@@ -92,6 +92,8 @@ function initGame() {
     generateWords(true); // Generate new words (true for initial clear)
     textInput.focus();
     scrollWordsDisplay(true); // Reset scroll to top
+    positionCaret(); // NEW: Position caret on game start
+    caret.style.display = 'block'; // NEW: Show caret
 }
 
 // --- Word Generation ---
@@ -110,6 +112,8 @@ function getRandomWordBasedOnSettings() {
 function generateWords(clearExisting = false) {
     if (clearExisting) {
         wordsDisplay.innerHTML = '';
+        // NEW: Re-append caret to ensure it's always the first child
+        wordsDisplay.appendChild(caret);
         words = [];
         wordElements = [];
     }
@@ -132,14 +136,13 @@ function generateWords(clearExisting = false) {
     }
     generatedWordCount += wordsToGenerate;
 
-    if (wordElements[currentWordIndex] && wordElements[currentWordIndex].children[currentCharIndex]) {
-        wordElements[currentWordIndex].children[currentCharIndex].classList.add('current');
-    }
+    // NEW: Highlight the first word and position caret
+    updateWordAndCaretHighlight();
 }
 
 // --- Live Stats Update ---
 function updateLiveStats() {
-    if (!typingStarted || rawCharsTyped === 0) { // Check rawCharsTyped instead of sum for accuracy
+    if (!typingStarted || rawCharsTyped === 0) {
         liveWpmElement.textContent = 'WPM: 0';
         liveAccuracyElement.textContent = 'Acc: 0%';
         return;
@@ -186,6 +189,13 @@ function endTest() {
 
     wordsContainer.style.display = 'none';
     textInput.style.display = 'none';
+    caret.style.display = 'none'; // NEW: Hide caret on test end
+
+    // Remove current word highlight
+    if (currentWordIndex < wordElements.length) {
+        wordElements[currentWordIndex].classList.remove('current-word-highlight');
+    }
+
 
     const finalTimeTaken = timeLeft;
     const grossWPM = (rawCharsTyped / 5) / (finalTimeTaken / 60);
@@ -217,12 +227,71 @@ function scrollWordsDisplay(reset = false) {
     const wordTopRelativeToDisplay = currentWordElement.offsetTop;
 
     // Target the current line to be at the top of the container (0 lines offset)
-    // Or, for a slightly more natural feel, the second line (1 line offset)
     const targetScrollPosition = lineHeight * 1; // Keep the current word's line roughly at the 2nd line
 
     const requiredTranslateY = -(wordTopRelativeToDisplay - targetScrollPosition);
 
     wordsDisplay.style.transform = `translateY(${requiredTranslateY}px)`;
+}
+
+// --- Caret Positioning and Word Highlighting ---
+
+function positionCaret() {
+    const currentWordElement = wordElements[currentWordIndex];
+    if (!currentWordElement) {
+        caret.style.display = 'none'; // Hide caret if no current word
+        return;
+    }
+
+    let targetCharElement;
+    let caretLeftOffset = 0;
+
+    if (currentCharIndex < currentWordElement.children.length) {
+        targetCharElement = currentWordElement.children[currentCharIndex];
+        // Caret positions to the left edge of the target character
+        caretLeftOffset = targetCharElement.offsetLeft;
+    } else {
+        // At the end of the word, position caret to the right of the last char
+        targetCharElement = currentWordElement.children[currentWordElement.children.length - 1];
+        if (targetCharElement) {
+            caretLeftOffset = targetCharElement.offsetLeft + targetCharElement.offsetWidth;
+        } else {
+            // For empty words (e.g., just punctuation or numbers), position at word's left
+            caretLeftOffset = currentWordElement.offsetLeft;
+        }
+    }
+
+    // Position relative to wordsDisplay (which is the scrollable container)
+    const caretTop = targetCharElement ? targetCharElement.offsetTop : currentWordElement.offsetTop;
+    const wordsDisplayScrollY = parseFloat(wordsDisplay.style.transform.replace('translateY(', '').replace('px', '') || 0);
+
+    caret.style.left = `${currentWordElement.offsetLeft + caretLeftOffset}px`;
+    caret.style.top = `${caretTop}px`;
+    caret.style.display = 'block'; // Ensure caret is visible
+}
+
+
+function updateWordAndCaretHighlight() {
+    // Remove highlight from previous word
+    if (currentWordIndex > 0 && wordElements[currentWordIndex - 1]) {
+        wordElements[currentWordIndex - 1].classList.remove('current-word-highlight');
+        // Ensure character highlight is also removed from old word
+        if (wordElements[currentWordIndex - 1].children[currentCharIndex]) {
+            wordElements[currentWordIndex - 1].children[currentCharIndex].classList.remove('current');
+        }
+    }
+
+    // Add highlight to current word
+    if (wordElements[currentWordIndex]) {
+        wordElements[currentWordIndex].classList.add('current-word-highlight');
+        // Add current char highlight to the first char of the new word
+        if (wordElements[currentWordIndex].children[0]) {
+            wordElements[currentWordIndex].children[0].classList.add('current');
+        }
+    }
+
+    // Position caret
+    positionCaret();
 }
 
 
@@ -234,6 +303,7 @@ function handleKeyDown(e) {
     if (!typingStarted && e.key.length === 1 && e.key !== ' ') {
         typingStarted = true;
         startTimer();
+        caret.style.display = 'block'; // Ensure caret is visible when typing starts
     }
 
     const currentWordElement = wordElements[currentWordIndex];
@@ -260,12 +330,13 @@ function handleKeyDown(e) {
         }
 
         currentWordElement.classList.add('typed'); // Apply 'typed' class for visual fading
+        currentWordElement.classList.remove('current-word-highlight'); // NEW: Remove highlight from current word
 
-        if (currentWordElement.children[currentCharIndex]) {
-            currentWordElement.children[currentCharIndex].classList.remove('current');
-        } else if (currentCharIndex > 0 && currentWordElement.children[currentCharIndex - 1]) {
+        // Remove 'current' class from the last char of the previous word (if it exists)
+        if (currentWordElement.children[currentCharIndex - 1]) {
             currentWordElement.children[currentCharIndex - 1].classList.remove('current');
         }
+
 
         currentWordIndex++;
         currentCharIndex = 0;
@@ -276,7 +347,7 @@ function handleKeyDown(e) {
         }
 
         if (currentWordIndex < wordElements.length) {
-            wordElements[currentWordIndex].children[0].classList.add('current');
+            updateWordAndCaretHighlight(); // NEW: Update highlight and caret for new word
             scrollWordsDisplay();
         } else {
             endTest();
@@ -289,35 +360,36 @@ function handleKeyDown(e) {
         if (currentCharIndex > 0) {
             const charEl = currentWordElement.children[currentCharIndex - 1];
             charEl.classList.remove('current', 'correct', 'incorrect', 'extra');
-            
+
             currentCharIndex--;
             textInput.value = typedText.substring(0, typedText.length - 1);
-            charEl.classList.add('current');
+
+            charEl.classList.add('current'); // NEW: Re-add current class to the character before backspace
             currentWordElement.classList.remove('typed');
             rawCharsTyped = Math.max(0, rawCharsTyped - 1); // Decrement raw typed count
-            // Recalculate correct/incorrect chars based on current textInput content (simplification)
             recalculateCharStatesAndCounts();
-            
+            positionCaret(); // NEW: Reposition caret
         } else if (currentWordIndex > 0) {
+            // Remove 'current' class from the char we were just on
             if (currentWordElement.children[0]) {
                 currentWordElement.children[0].classList.remove('current');
             }
+
             currentWordIndex--;
             const prevWordElement = wordElements[currentWordIndex];
             const prevWord = words[currentWordIndex];
             currentCharIndex = prevWord.length;
 
             prevWordElement.classList.remove('typed');
+            updateWordAndCaretHighlight(); // NEW: Highlight previous word and position caret
+
+            // Clear char states on the previous word as we are re-typing it
             for (let i = 0; i < prevWord.length; i++) {
                 prevWordElement.children[i].classList.remove('correct', 'incorrect', 'extra');
-                prevWordElement.children[i].classList.add('current');
             }
-            if (prevWordElement.children[prevWord.length - 1]) {
-                prevWordElement.children[prevWord.length - 1].classList.add('current');
-            }
-            textInput.value = prevWord;
+
+            textInput.value = prevWord; // Load the whole word into the input for backspacing
             scrollWordsDisplay();
-            // Recalculate for the word we backed into
             recalculateCharStatesAndCounts();
         }
         updateLiveStats();
@@ -330,7 +402,7 @@ function handleInput(e) {
     if (textInput.disabled) return;
 
     if (e.inputType === 'deleteContentBackward') {
-        return;
+        return; // Handled by keydown backspace
     }
 
     const currentWordElement = wordElements[currentWordIndex];
@@ -338,97 +410,93 @@ function handleInput(e) {
     const typedValue = textInput.value;
     rawCharsTyped++;
 
-    if (typedValue.length < currentCharIndex) {
-        return;
-    }
-
     // Remove 'current' class from the character that *was* current (if any)
-    if (currentWordElement.children[currentCharIndex] && currentCharIndex > 0) {
-        currentWordElement.children[currentCharIndex].classList.remove('current');
-    } else if (currentCharIndex > 0 && currentWordElement.children[currentCharIndex - 1]) {
+    if (currentCharIndex > 0 && currentWordElement.children[currentCharIndex - 1]) {
         currentWordElement.children[currentCharIndex - 1].classList.remove('current');
     }
 
     if (typedValue.length > targetWord.length) {
+        // If extra chars are typed, add 'extra' class to the target word's last char (if word isn't empty)
         if (targetWord.length > 0 && currentWordElement.children[targetWord.length - 1]) {
             const lastCharOfWord = currentWordElement.children[targetWord.length - 1];
-            if (!lastCharOfWord.classList.contains('incorrect')) {
+            if (!lastCharOfWord.classList.contains('incorrect')) { // Only add if not already incorrect
                 lastCharOfWord.classList.add('incorrect', 'extra');
             }
         }
-        totalIncorrectChars++;
-        updateLiveStats();
-        return;
-    }
-
-    if (currentCharIndex < targetWord.length) {
+        totalIncorrectChars++; // Count each extra char as incorrect
+    } else if (currentCharIndex < targetWord.length) { // Only process if within the bounds of the current word
         const charEl = currentWordElement.children[currentCharIndex];
         const targetChar = targetWord[currentCharIndex];
-        const typedChar = typedValue[typedValue.length - 1];
+        const typedChar = typedValue[typedValue.length - 1]; // Get the last typed character
 
-        if (!typedChar) return;
+        if (!typedChar) return; // Should not happen if inputType isn't delete
 
         if (typedChar === targetChar) {
-            charEl.classList.remove('current', 'incorrect', 'extra');
+            charEl.classList.remove('incorrect', 'extra'); // Clean up before adding correct
             charEl.classList.add('correct');
             totalCorrectChars++;
         } else {
-            charEl.classList.remove('current', 'correct', 'extra');
+            charEl.classList.remove('correct', 'extra'); // Clean up before adding incorrect
             charEl.classList.add('incorrect');
             totalIncorrectChars++;
         }
         currentCharIndex++;
+    }
 
-        if (currentCharIndex < targetWord.length) {
-            charEl.classList.remove('current');
-            currentWordElement.children[currentCharIndex].classList.add('current');
-        } else {
-            charEl.classList.remove('current');
+    // Set the next character as 'current' or remove it if at word end
+    if (currentCharIndex < targetWord.length) {
+        currentWordElement.children[currentCharIndex].classList.add('current');
+    } else {
+        // When typing past the last character of the word, ensure no 'current' class
+        // on the word's characters as the caret will be at the end.
+        if (currentWordElement.children[targetWord.length - 1]) {
+             currentWordElement.children[targetWord.length - 1].classList.remove('current');
         }
     }
+
+    positionCaret(); // NEW: Reposition caret after each input
     updateLiveStats();
 }
 
-// NEW: Helper to recalculate char states and counts on backspace/word-back
 function recalculateCharStatesAndCounts() {
     totalCorrectChars = 0;
     totalIncorrectChars = 0;
-    // Iterate through all typed words up to currentWordIndex
+    rawCharsTyped = 0; // Reset and recount raw chars
+
     for (let i = 0; i <= currentWordIndex; i++) {
         const wordEl = wordElements[i];
         const wordText = words[i];
-        let currentTypedChars = (i === currentWordIndex) ? textInput.value.length : wordText.length;
+        let currentTypedValue = (i === currentWordIndex) ? textInput.value : wordText; // For completed words, use original word for re-evaluation
 
         for (let j = 0; j < wordText.length; j++) {
             const charEl = wordEl.children[j];
             if (charEl.classList.contains('correct')) {
                 totalCorrectChars++;
+                rawCharsTyped++;
             } else if (charEl.classList.contains('incorrect')) {
                 totalIncorrectChars++;
+                rawCharsTyped++;
+            }
+            // If it's the current word and character not yet typed, don't count towards rawCharsTyped
+            if (i === currentWordIndex && j >= currentTypedValue.length) {
+                // Do nothing, not typed yet
             }
         }
-        // Account for extra characters if the word was fully typed (or partially typed on current word)
-        if (i === currentWordIndex) {
-            if (currentTypedChars > wordText.length) {
-                 totalIncorrectChars += (currentTypedChars - wordText.length);
-            }
-        } else { // For previously completed words, assume correct completion if not marked incorrect
-            // This simplification might need more robust tracking if skipping words is common.
-            // For now, if a word was "typed" (marked as .typed), count its errors based on its elements.
-            // A truly accurate approach needs to track errors per character.
-            // For speedrun, we'll rely on the class lists for simplicity.
+
+        // Account for extra characters on the *current* word if present in textInput
+        if (i === currentWordIndex && currentTypedValue.length > wordText.length) {
+            totalIncorrectChars += (currentTypedValue.length - wordText.length);
+            rawCharsTyped += (currentTypedValue.length - wordText.length);
         }
     }
-    // Update rawCharsTyped based on characters actually rendered as typed
-    rawCharsTyped = totalCorrectChars + totalIncorrectChars;
 }
 
 
 // --- Settings Persistence ---
 function saveSettings() {
     localStorage.setItem('selectedTime', timeLeft);
-    localStorage.setItem('includeNumbers', includeNumbers); // Save boolean directly
-    localStorage.setItem('includePunctuation', includePunctuation); // Save boolean directly
+    localStorage.setItem('includeNumbers', includeNumbers);
+    localStorage.setItem('includePunctuation', includePunctuation);
     localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
 }
 
@@ -444,9 +512,8 @@ function loadSettings() {
         });
     }
 
-    // NEW: Load boolean values for numbers/punctuation
     const savedNumbers = localStorage.getItem('includeNumbers');
-    if (savedNumbers !== null) { // Check for null as 'false' string is truthy
+    if (savedNumbers !== null) {
         includeNumbers = (savedNumbers === 'true');
         if (includeNumbers) {
             includeNumbersBtn.classList.add('active');
@@ -494,17 +561,16 @@ function setupEventListeners() {
         });
     });
 
-    // NEW: Event listeners for the new type-buttons
     includeNumbersBtn.addEventListener('click', () => {
-        includeNumbers = !includeNumbers; // Toggle the state
-        includeNumbersBtn.classList.toggle('active', includeNumbers); // Toggle active class
+        includeNumbers = !includeNumbers;
+        includeNumbersBtn.classList.toggle('active', includeNumbers);
         saveSettings();
         initGame();
     });
 
     includePunctuationBtn.addEventListener('click', () => {
-        includePunctuation = !includePunctuation; // Toggle the state
-        includePunctuationBtn.classList.toggle('active', includePunctuation); // Toggle active class
+        includePunctuation = !includePunctuation;
+        includePunctuationBtn.classList.toggle('active', includePunctuation);
         saveSettings();
         initGame();
     });
