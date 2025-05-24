@@ -5,3 +5,19 @@
     margin: 0;
     padding: 0;
 }
+
+:root {
+    --background-color: #f0f2f5;
+    --text-color: #333;
+    --accent-color: #007bff;
+    --button-bg: #e0e0e0;
+    --button-text: #333;
+    --button-active-bg: var(--accent-color);
+    --button-active-text: #fff;
+    --border-color: #ccc;
+
+     --correct-char-color: #28a745;
+    --incorrect-char-color: #dc3545;
+    --current-char-color: var(--accent-color);
+    --extra-char-color: #ffc107;
+}
