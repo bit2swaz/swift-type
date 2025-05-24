@@ -449,3 +449,24 @@ function updateHighScores(wpm, accuracy) {
     }
 }
 
+function loadTypingHistory() {
+    const history = JSON.parse(localStorage.getItem(LOCAL_STORAGE_HISTORY_KEY) || '[]');
+    renderHistory(history);
+}
+
+function saveTestToHistory(wpm, accuracy, time) {
+    const history = JSON.parse(localStorage.getItem(LOCAL_STORAGE_HISTORY_KEY) || '[]');
+    const newEntry = {
+        wpm: wpm,
+        accuracy: accuracy,
+        time: time,
+        date: new Date().toLocaleString()
+    };
+    history.unshift(newEntry);
+    if (history.length > 10) {
+        history.pop();
+    }
+    localStorage.setItem(LOCAL_STORAGE_HISTORY_KEY, JSON.stringify(history));
+    renderHistory(history);
+}
+
