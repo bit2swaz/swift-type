@@ -187,3 +187,15 @@ body {
     cursor: default;
     z-index: 10;
 }
+
+.live-stats {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1rem;
+    color: var(--accent-color);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
