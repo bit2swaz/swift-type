@@ -4,27 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SwiftType by bit2swaz</title>
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="dark-mode">
+    <div id="theme-toggle" class="theme-toggle">
+        ☀️
+    </div>
 
     <main id="app-container">
         <header class="header">
             <div id="timer" class="timer">60</div>
-
-            <div id="theme-toggle" class="theme-toggle">☀️</div>
         </header>
 
         <section class="controls">
             <div id="mode-selector" class="mode-selector">
                 <button data-mode="words" class="mode-button active">Words</button>
                 <button data-mode="numbers" class="mode-button">Numbers</button>
-                <button data-mode="punctuations" class="mode-button">Punctuations</button>
+                <button data-mode="punctuation" class="mode-button">Punctuation</button>
             </div>
             <div id="time-selector" class="time-selector">
                 <button data-time="15" class="time-button">15s</button>
                 <button data-time="30" class="time-button">30s</button>
-                <button data-time="60" class="time-button">60s</button>
+                <button data-time="60" class="time-button active">60s</button>
                 <button data-time="120" class="time-button">120s</button>
             </div>
         </section>
@@ -64,13 +65,12 @@
                 <p>No tests yet.</p>
             </div>
         </section>
-
     </main>
 
     <footer class="footer">
-        <p>Made with ❤️ by <a href="https://www.github.com/bit2swaz" target="_blank">bit2swaz</a></p>
+        <p>Made with ❤️ by bit2swaz | <a href="YOUR_GITHUB_REPO_LINK" target="_blank">GitHub Repo</a></p>
     </footer>
 
-    <script src="./script.js" defer></script>
+    <script src="script.js" defer></script>
 </body>
 </html>
