@@ -83,3 +83,38 @@ function getRandomElement(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
+function generateTestContent(count = 50) {
+    const generatedContent = [];
+    for (let i = 0; i < count; i++) {
+        let element;
+        const randomChooser = Math.random();
+
+        switch (currentMode) {
+            case 'words':
+                element = getRandomElement(allWords);
+                break;
+            case 'numbers':
+                if (randomChooser < 0.7) {
+                    element = getRandomElement(allWords);
+                } else {
+                    element = getRandomElement(numbers);
+                }
+                break;
+            case 'punctuation':
+                if (randomChooser < 0.6) {
+                    element = getRandomElement(allWords);
+                } else if (randomChooser < 0.85) {
+                    element = getRandomElement(numbers);
+                } else {
+                    element = getRandomElement(punctuations);
+                }
+                break;
+            default:
+                element = getRandomElement(allWords);
+                break;
+        }
+        generatedContent.push(element);
+    }
+    return generatedContent;
+}
+
