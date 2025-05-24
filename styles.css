@@ -168,3 +168,12 @@ body {
     text-decoration: underline dotted var(--extra-char-color);
 }
 
+.words-display .missing {
+    background-color: var(--incorrect-char-color);
+    display: inline-block;
+    width: 0.5ch;
+    height: 1.2em;
+    vertical-align: middle;
+    margin-right: -0.5ch;
+}
+
