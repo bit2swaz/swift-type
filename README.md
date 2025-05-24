@@ -46,7 +46,7 @@ A sleek, responsive, and performance-focused typing test application, heavily in
 
 ## How to Run Locally
 ```bash
-git clone YOUR_REPO_URL_HERE
+git clone https://github.com/bit2swaz/swift-type.git
 cd SwiftType
 open index.html
 ```
