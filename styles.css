@@ -96,7 +96,7 @@ body.test-in-progress .footer {
 .app-header {
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Pushes content to ends */
     align-items: center;
     padding: 10px 0;
     margin-bottom: 20px;
@@ -212,7 +212,6 @@ body.test-in-progress .footer {
     overflow: hidden; /* Hide overflowing words, JS handles scroll */
     white-space: normal; /* Allow text to wrap */
     word-wrap: break-word;
-    /* Removed display: flex and gap from here. Words are individual spans. */
     transition: filter 0.3s ease;
     user-select: none; /* Prevent text selection */
     caret-color: transparent; /* Hide browser's blinking caret */
@@ -224,7 +223,6 @@ body.test-in-progress .footer {
 
 .word {
     display: inline-block; /* Essential for proper rendering and selection */
-    /* background-color: rgba(0,0,0,0.02); */ /* Optional: to see word bounds */
     margin-right: 0.5em; /* Spacing between words - IMPORTANT! */
 }
 
@@ -255,7 +253,7 @@ body.test-in-progress .footer {
     animation: none; /* No animation on the background itself */
 }
 
-/* This is the new blinking block cursor */
+/* The new blinking block cursor */
 .letter.current::after {
     content: '';
     position: absolute;
@@ -269,19 +267,7 @@ body.test-in-progress .footer {
     z-index: -1; /* Place behind the letter text */
 }
 
-/* Ensure the space character also has a cursor-like highlight */
-.letter.space.current::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 0.5em; /* A narrower cursor for spaces */
-    height: 100%;
-    background-color: var(--current-char-color);
-    opacity: 0.5;
-    animation: blink-cursor 1s infinite alternate;
-    z-index: -1;
-}
+/* No special styling for .letter.space.current::after as spaces are not separate `letter` spans anymore */
 
 @keyframes blink-cursor {
     from { opacity: 0.5; }
@@ -452,15 +438,16 @@ body.test-in-progress .footer {
     border-bottom: none;
 }
 
-/* Footer - stick to bottom */
+/* Footer - Revert to simpler, "signature" style */
 .footer {
     width: 100%;
     text-align: center;
     padding: 20px 0;
     margin-top: auto; /* Pushes footer to the bottom */
     font-size: 0.9em;
-    color: rgba(255, 255, 255, 0.6);
-    border-top: 1px solid var(--border-color);
+    color: rgba(255, 255, 255, 0.6); /* Use a softer white/grey for text */
+    border-top: none; /* Remove border top */
+    padding-bottom: 10px; /* Add some space from bottom */
 }
 
 /* Loading Overlay */
