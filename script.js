@@ -424,3 +424,11 @@ function applySavedTheme() {
     }
 }
 
+function loadHighScores() {
+    const savedMaxWPM = localStorage.getItem(LOCAL_STORAGE_MAX_WPM_KEY);
+    const savedBestAccuracy = localStorage.getItem(LOCAL_STORAGE_BEST_ACCURACY_KEY);
+
+    if (savedMaxWPM) maxWPM.textContent = savedMaxWPM;
+    if (savedBestAccuracy) bestAccuracy.textContent = `${savedBestAccuracy}%`;
+}
+
