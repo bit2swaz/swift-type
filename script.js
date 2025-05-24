@@ -1,9 +1,19 @@
 const wordsDisplay = document.getElementById('words-display');
 const textInput = document.getElementById('text-input');
 const timerElement = document.getElementById('timer');
-const wordsContainer = document.getElementById('words-container'); // Get the words-container
+const wordsContainer = document.getElementById('words-container');
+const timeButtons = document.querySelectorAll('.time-btn');
+const includeNumbersToggle = document.getElementById('include-numbers');
+const includePunctuationToggle = document.getElementById('include-punctuation');
+const resultsScreen = document.getElementById('results-screen');
+const wpmValue = document.getElementById('wpm-value');
+const accuracyValue = document.getElementById('accuracy-value');
+const rawWpmValue = document.getElementById('raw-wpm-value');
+const restartBtn = document.getElementById('restart-btn');
+const themeToggle = document.getElementById('theme-toggle');
 
-const wordList = [
+// --- Configuration and State Variables ---
+const baseWordList = [
     "the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog",
     "apple", "banana", "orange", "grape", "kiwi", "melon", "peach", "plum",
     "keyboard", "mouse", "monitor", "speaker", "headphone", "microphone",
@@ -15,31 +25,89 @@ const wordList = [
     "serene", "tranquil", "peaceful", "calm", "relax", "meditate", "breathe",
     "wisdom", "knowledge", "learn", "teach", "educate", "understand", "insight",
     "computer", "science", "algorithm", "data", "structure", "network", "internet",
-    "website", "frontend", "backend", "database", "server", "client", "framework"
+    "website", "frontend", "backend", "database", "server", "client", "framework",
+    "javascript", "html", "css", "python", "java", "ruby", "csharp", "php", "swift",
+    "typescript", "react", "angular", "vue", "node", "express", "django", "rails",
+    "spring", "flask", "laravel", "bootstrap", "tailwind", "material", "design",
+    "responsive", "mobile", "desktop", "application", "software", "hardware", "firmware"
 ];
+const numbers = "0123456789";
+const symbols = "!@#$%^&*()_+-=[]{};':\"|,.<>/?`~";
 
 let words = [];
+let wordElements = [];
 let currentWordIndex = 0;
 let currentCharIndex = 0;
 let timerId = null;
-let timeLeft = 60;
+let timeLeft = 60; // Default time
 let typingStarted = false;
 let totalCorrectChars = 0;
-let totalIncorrectChars = 0;
-let wordElements = [];
+let totalIncorrectChars = 0; // Includes skipped chars and incorrectly typed
+let rawCharsTyped = 0; // Total characters typed (correct, incorrect, extra)
+let startTime = 0;
 
 // Get the computed line height from CSS variable for scrolling calculations
+// We multiply by fontSize to get actual pixels if line-height is in 'em'
 const lineHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--line-height')) * parseFloat(getComputedStyle(document.documentElement).fontSize);
+
+// --- Game Initialization & Reset ---
+
+function initGame() {
+    // Reset state
+    currentWordIndex = 0;
+    currentCharIndex = 0;
+    typingStarted = false;
+    totalCorrectChars = 0;
+    totalIncorrectChars = 0;
+    rawCharsTyped = 0;
+    clearInterval(timerId); // Clear any running timer
+    timerElement.textContent = timeLeft; // Reset timer display
+
+    // Hide results, show typing area
+    resultsScreen.classList.add('hidden');
+    wordsContainer.style.display = 'block';
+    textInput.style.display = 'block';
+    textInput.disabled = false;
+    textInput.value = '';
+
+    generateWords(); // Generate new words based on current settings
+    textInput.focus(); // Focus input for immediate typing
+    scrollWordsDisplay(true); // Reset scroll to top
+}
+
+// --- Word Generation ---
 
 function generateWords() {
     wordsDisplay.innerHTML = '';
     words = [];
     wordElements = [];
 
-    for (let i = 0; i < 50; i++) {
-        const randomIndex = Math.floor(Math.random() * wordList.length);
-        words.push(wordList[randomIndex]);
+    let availableChars = baseWordList;
+    if (includeNumbersToggle.checked) {
+        availableChars = availableChars.concat(numbers.split('')); // Add each number as a 'word'
     }
+    if (includePunctuationToggle.checked) {
+        availableChars = availableChars.concat(symbols.split('')); // Add each symbol as a 'word'
+    }
+
+    // Ensure we generate enough words (a good buffer)
+    for (let i = 0; i < 200; i++) { // Generate more words than typically needed for smooth scrolling
+        const randomIndex = Math.floor(Math.random() * baseWordList.length); // Always pick from base words first
+        let word = baseWordList[randomIndex];
+
+        // Randomly inject numbers/punctuation into words or as standalone 'words'
+        if (includeNumbersToggle.checked && Math.random() < 0.15) { // 15% chance to add a number
+            const numIndex = Math.floor(Math.random() * numbers.length);
+            word += numbers[numIndex];
+        }
+        if (includePunctuationToggle.checked && Math.random() < 0.15) { // 15% chance to add a punctuation
+            const symIndex = Math.floor(Math.random() * symbols.length);
+            word += symbols[symIndex];
+        }
+
+        words.push(word);
+    }
+
 
     words.forEach(word => {
         const wordSpan = document.createElement('span');
@@ -54,23 +122,29 @@ function generateWords() {
         wordElements.push(wordSpan);
     });
 
+    // Highlight the first character of the first word
     if (wordElements.length > 0 && wordElements[0].children.length > 0) {
         wordElements[0].children[0].classList.add('current');
     }
 }
 
-function startTimer() {
-    timerElement.textContent = `${timeLeft}s`;
-    timerId = setInterval(() => {
-        timeLeft--;
-        timerElement.textContent = `${timeLeft}s`;
+// --- Timer Logic ---
 
-        if (timeLeft <= 0) {
+function startTimer() {
+    startTime = Date.now(); // Record start time
+    timerId = setInterval(() => {
+        const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+        const remainingTime = timeLeft - elapsedTime;
+        timerElement.textContent = remainingTime > 0 ? remainingTime : 0;
+
+        if (remainingTime <= 0) {
             clearInterval(timerId);
             endTest();
         }
     }, 1000);
 }
+
+// --- End Test Logic ---
 
 function endTest() {
     textInput.disabled = true;
@@ -78,36 +152,42 @@ function endTest() {
     typingStarted = false;
     clearInterval(timerId); // Ensure timer is cleared
 
-    // Optionally calculate WPM and accuracy here
-    const timeTaken = 60 - timeLeft; // Assuming 60s test
-    const grossWPM = (totalCorrectChars / 5) / (timeTaken / 60);
-    const accuracy = totalCorrectChars / (totalCorrectChars + totalIncorrectChars) * 100;
+    // Hide typing area elements
+    wordsContainer.style.display = 'none';
+    textInput.style.display = 'none';
 
-    console.log("Test finished!");
-    console.log(`Gross WPM: ${grossWPM.toFixed(2)}`);
-    console.log(`Accuracy: ${accuracy.toFixed(2)}%`);
+    // Calculate results
+    const finalTimeTaken = timeLeft; // Total configured time
+    const grossWPM = (rawCharsTyped / 5) / (finalTimeTaken / 60);
+    const netWPM = (totalCorrectChars / 5) / (finalTimeTaken / 60); // Or (correct_words / time_in_minutes)
 
-    // Reset for a new test or display results
-    // We'll add a restart button later
+    let accuracy = 0;
+    if (totalCorrectChars + totalIncorrectChars > 0) {
+        accuracy = (totalCorrectChars / (totalCorrectChars + totalIncorrectChars)) * 100;
+    }
+
+    wpmValue.textContent = netWPM.toFixed(0);
+    accuracyValue.textContent = `${accuracy.toFixed(0)}%`;
+    rawWpmValue.textContent = grossWPM.toFixed(0); // Display raw WPM or WPM with errors
+
+    resultsScreen.classList.remove('hidden'); // Show results screen
 }
 
-function scrollWordsDisplay() {
+// --- Scrolling Logic ---
+
+function scrollWordsDisplay(reset = false) {
+    if (reset) {
+        wordsDisplay.style.transform = `translateY(0px)`;
+        return;
+    }
+
     if (currentWordIndex >= wordElements.length) return;
 
     const currentWordElement = wordElements[currentWordIndex];
-    const wordsDisplayRect = wordsDisplay.getBoundingClientRect();
-    const currentWordRect = currentWordElement.getBoundingClientRect();
-    const wordsContainerRect = wordsContainer.getBoundingClientRect();
+    // Get the top position of the current word relative to its parent (wordsDisplay)
+    const wordTopRelativeToDisplay = currentWordElement.offsetTop;
 
-    // Calculate how many lines are currently above the viewport of words-container
-    // This is a simplified approach assuming a relatively uniform line height.
-    // We want the current word to be visible, ideally starting a new line if it would go off screen.
-
-    // If the top of the current word is above the top of the words-container's visible area,
-    // or if the current word's bottom is below the words-container's bottom.
-    // The goal is to keep the current word roughly at the top of the visible lines.
-
-    // Calculate the current scroll position (transformY)
+    // Get the current scroll position (translateY) of wordsDisplay
     const currentTransform = getComputedStyle(wordsDisplay).transform;
     let translateY = 0;
     if (currentTransform && currentTransform !== 'none') {
@@ -118,35 +198,37 @@ function scrollWordsDisplay() {
         }
     }
 
-    // Determine the vertical position of the current word relative to wordsDisplay's top
-    const wordTopRelativeToDisplay = currentWordRect.top - wordsDisplayRect.top;
+    // Calculate the current visible range of the wordsContainer
+    const containerHeight = wordsContainer.offsetHeight; // Actual height of the container
+    const currentScrollBottom = -translateY + containerHeight; // Bottom of the visible area relative to full wordsDisplay
 
-    // The threshold for scrolling: when the word's top is nearing the bottom of the container
-    // We scroll up by one line height if the word goes off screen (or very close to it)
-    if (currentWordRect.bottom > (wordsContainerRect.top + wordsContainerRect.height) - lineHeight * 0.5) {
-        translateY -= lineHeight;
-    } else if (currentWordRect.top < wordsContainerRect.top && translateY < 0) {
-        // This condition is for scrolling back up if we typed back into a previous line.
-        // It prevents words from disappearing off the top.
-        // More robust handling would check if the previous word is *completely* off screen.
-        // For now, if we are typing back to a word that is off screen, scroll back down.
-        // This part might need further refinement based on user experience.
-        const prevWordElement = currentWordIndex > 0 ? wordElements[currentWordIndex - 1] : null;
-        if (prevWordElement) {
-             const prevWordRect = prevWordElement.getBoundingClientRect();
-             if (prevWordRect.top < wordsContainerRect.top) {
-                 translateY += lineHeight;
-             }
-        }
+    // We want the current word's line to be visible and ideally at the top of the container.
+    // If the current word's top is off-screen (above the current translateY offset)
+    // or if its bottom is below the visible container, adjust.
+
+    // Calculate the line number for the current word (rough estimation)
+    let currentWordLine = Math.floor(wordTopRelativeToDisplay / lineHeight);
+    let currentVisibleLineOffset = Math.floor(Math.abs(translateY) / lineHeight);
+
+    // If the current word's line is beyond the first visible line (after 0, 1, or 2 lines)
+    // We want to scroll up such that the current line is always the first or second visible line.
+    const scrollThresholdLines = 1; // When the current word passes the 1st line, scroll
+    if (currentWordLine > currentVisibleLineOffset + scrollThresholdLines) {
+        wordsDisplay.style.transform = `translateY(${-currentWordLine * lineHeight}px)`;
+    } else if (currentWordLine < currentVisibleLineOffset) {
+        // This handles backing up to a previous line
+        wordsDisplay.style.transform = `translateY(${-currentWordLine * lineHeight}px)`;
     }
-
-    wordsDisplay.style.transform = `translateY(${translateY}px)`;
 }
 
 
-// Event listener for keyboard input
-textInput.addEventListener('keydown', (e) => {
-    if (!typingStarted && e.key.length === 1 && e.key !== ' ') { // Start timer only on valid character input, not space
+// --- Event Handlers ---
+
+function handleKeyDown(e) {
+    if (textInput.disabled) return;
+
+    // Start timer on first valid keypress
+    if (!typingStarted && e.key.length === 1 && e.key !== ' ') {
         typingStarted = true;
         startTimer();
     }
@@ -154,9 +236,8 @@ textInput.addEventListener('keydown', (e) => {
     const currentWordElement = wordElements[currentWordIndex];
     const targetWord = words[currentWordIndex];
 
-    // Handle Spacebar
     if (e.key === ' ') {
-        e.preventDefault(); // Prevent default space behavior (e.g., scrolling)
+        e.preventDefault(); // Prevent default space behavior
 
         const typedValue = textInput.value;
         let wordCorrectlyTyped = true;
@@ -176,16 +257,16 @@ textInput.addEventListener('keydown', (e) => {
         // Mark any untyped characters as incorrect on spacebar press
         for (let i = typedValue.length; i < targetWord.length; i++) {
             const charEl = currentWordElement.children[i];
-            if (!charEl.classList.contains('correct') && !charEl.classList.contains('incorrect')) {
-                charEl.classList.add('incorrect');
-                totalIncorrectChars++;
+            if (charEl) { // Ensure charEl exists
+                if (!charEl.classList.contains('correct') && !charEl.classList.contains('incorrect')) {
+                    charEl.classList.add('incorrect');
+                    totalIncorrectChars++;
+                }
             }
         }
         // Mark any extra characters typed beyond the word length as incorrect
-        for (let i = targetWord.length; i < typedValue.length; i++) {
-            // We don't have explicit char spans for extra characters in the DOM yet,
-            // so we just count them as errors.
-            totalIncorrectChars++;
+        if (typedValue.length > targetWord.length) {
+             totalIncorrectChars += (typedValue.length - targetWord.length);
         }
 
         // Remove 'current' highlight from the character that was current
@@ -194,7 +275,6 @@ textInput.addEventListener('keydown', (e) => {
         } else if (currentWordElement.children[0]) { // If at start of word and current on first char
             currentWordElement.children[0].classList.remove('current');
         }
-        
 
         // Advance to next word
         currentWordIndex++;
@@ -209,9 +289,7 @@ textInput.addEventListener('keydown', (e) => {
             // End of test (all words typed)
             endTest();
         }
-    }
-    // Handle Backspace
-    else if (e.key === 'Backspace') {
+    } else if (e.key === 'Backspace') {
         e.preventDefault(); // Prevent default backspace behavior
 
         const typedText = textInput.value;
@@ -219,21 +297,17 @@ textInput.addEventListener('keydown', (e) => {
         if (currentCharIndex > 0) {
             const charEl = currentWordElement.children[currentCharIndex - 1];
             charEl.classList.remove('current', 'correct', 'incorrect', 'extra');
-            // We don't add 'current' back directly to charEl as it's handled by input logic
             currentCharIndex--;
             textInput.value = typedText.substring(0, typedText.length - 1); // Remove last typed char
-            // If the char was correct, decrement correct count, if incorrect, decrement incorrect count.
-            // This is complex. For simplicity, we just reset its state. Accurate WPM/accuracy needs more tracking.
-            if (charEl.classList.contains('correct')) totalCorrectChars--; // This isn't perfectly accurate, we'd need to track original status
-            else if (charEl.classList.contains('incorrect')) totalIncorrectChars--; // Same here
-            
             charEl.classList.add('current'); // Re-highlight the char we are backing into
+            // Note: Accurate WPM/accuracy tracking with backspace needs more complex state management
+            // For now, we simplify: just revert class.
         } else if (currentWordIndex > 0) { // If at the beginning of a word, go back to previous word
             // Clear current highlight from the first char of the current word
             if (currentWordElement.children[0]) {
                 currentWordElement.children[0].classList.remove('current');
             }
-            
+
             currentWordIndex--;
             const prevWordElement = wordElements[currentWordIndex];
             const prevWord = words[currentWordIndex];
@@ -248,39 +322,29 @@ textInput.addEventListener('keydown', (e) => {
             if (prevWordElement.children[prevWord.length - 1]) {
                 prevWordElement.children[prevWord.length - 1].classList.add('current');
             }
-            
-            textInput.value = prevWord; // Populate input with target word (assuming correct re-typing)
 
+            textInput.value = prevWord; // Populate input with target word (assuming correct re-typing)
             scrollWordsDisplay(); // Adjust scroll if necessary
         }
+    } else if (e.key.length > 1 && e.key !== 'Enter' && e.key !== 'Tab' && e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Meta') {
+        e.preventDefault(); // Prevent default for non-character keys
     }
-    // Handle any other key that is not a single character (e.g., Alt, Ctrl, Shift, Arrows)
-    else if (e.key.length > 1 && e.key !== 'Enter' && e.key !== 'Tab' && e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Meta') {
-        // Do nothing for meta keys, arrows, etc.
-        e.preventDefault();
-    }
-});
+}
 
-// Use 'input' event for character comparison
-textInput.addEventListener('input', (e) => {
-    // Only process input if it's not backspace and test has started/is starting
+function handleInput(e) {
+    if (textInput.disabled) return;
+
     if (e.inputType === 'deleteContentBackward') {
-        return; // Backspace is handled in keydown
-    }
-
-    if (!typingStarted && e.data && e.data.length === 1) { // Start timer only on valid character input
-        typingStarted = true;
-        startTimer();
+        return; // Backspace is handled in keydown for better control
     }
 
     const currentWordElement = wordElements[currentWordIndex];
     const targetWord = words[currentWordIndex];
     const typedValue = textInput.value;
+    rawCharsTyped++; // Increment raw chars typed for WPM calculation
 
-    // Ensure we don't process if textInput value is out of sync or if backspace happened
+    // Ensure we don't process if textInput value is out of sync
     if (typedValue.length < currentCharIndex) {
-        // This can happen if user holds backspace, we already handled it in keydown,
-        // but this acts as a safeguard.
         return;
     }
 
@@ -291,15 +355,15 @@ textInput.addEventListener('input', (e) => {
 
     // Handle characters typed beyond the current word's length (extra chars)
     if (typedValue.length > targetWord.length) {
-        // We'll mark the last character of the word as incorrect if an extra character is typed.
-        // Or, we could add 'extra' class to a dynamically created char for the UI.
-        // For now, simpler: just count as incorrect and highlight the last actual char of the word as incorrect.
+        // Mark the last character of the word as incorrect/extra.
         if (targetWord.length > 0 && currentWordElement.children[targetWord.length - 1]) {
             const lastCharOfWord = currentWordElement.children[targetWord.length - 1];
             lastCharOfWord.classList.remove('current', 'correct');
-            lastCharOfWord.classList.add('incorrect', 'extra'); // Mark the last actual char as incorrect/extra
+            if (!lastCharOfWord.classList.contains('incorrect')) { // Only add if not already marked
+                lastCharOfWord.classList.add('incorrect', 'extra');
+            }
         }
-        totalIncorrectChars++;
+        totalIncorrectChars++; // Count it as an error
         return; // Don't process further for valid character comparison
     }
 
@@ -309,8 +373,7 @@ textInput.addEventListener('input', (e) => {
         const targetChar = targetWord[currentCharIndex];
         const typedChar = typedValue[typedValue.length - 1]; // Get the last typed char
 
-        // Ensure typedChar exists (e.g. not null from certain mobile keyboard behaviors)
-        if (!typedChar) return;
+        if (!typedChar) return; // Should not happen with typical typing, but safety
 
         if (typedChar === targetChar) {
             charEl.classList.remove('current', 'incorrect', 'extra');
@@ -325,16 +388,42 @@ textInput.addEventListener('input', (e) => {
 
         // Highlight the next character or indicate end of word
         if (currentCharIndex < targetWord.length) {
+            charEl.classList.remove('current'); // Ensure current is only on the *next* char
             currentWordElement.children[currentCharIndex].classList.add('current');
         } else {
             // If at the end of the word, remove 'current' from the last char.
-            // It will be re-added to the first char of the next word on space.
             charEl.classList.remove('current');
+            // We wait for spacebar for word transition
         }
     }
-});
+}
 
+// --- Event Listeners Setup ---
 
-// Initial setup
-generateWords();
-textInput.focus(); // Focus on the input field when the page loads
+function setupEventListeners() {
+    textInput.addEventListener('keydown', handleKeyDown);
+    textInput.addEventListener('input', handleInput);
+
+    timeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            timeButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            timeLeft = parseInt(button.dataset.time);
+            initGame(); // Restart game with new time
+        });
+    });
+
+    includeNumbersToggle.addEventListener('change', initGame);
+    includePunctuationToggle.addEventListener('change', initGame);
+
+    restartBtn.addEventListener('click', initGame);
+
+    themeToggle.addEventListener('change', () => {
+        document.body.classList.toggle('light-theme');
+        document.body.classList.toggle('dark-theme');
+    });
+}
+
+// --- Initial Game Setup ---
+setupEventListeners();
+initGame(); // Start the first game
