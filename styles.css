@@ -163,3 +163,8 @@ body {
     text-decoration-thickness: 2px;
 }
 
+.words-display .extra {
+    color: var(--extra-char-color);
+    text-decoration: underline dotted var(--extra-char-color);
+}
+
