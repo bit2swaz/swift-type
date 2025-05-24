@@ -22,7 +22,11 @@
     --correct-char-color: #28a745;
     --incorrect-char-color: #dc3545;
     --current-char-color: var(--accent-color);
-    --extra-char-color: #ffc107;
+    --extra-char-color: #ffc107; /* Yellow for extra */
+    --missing-char-color: #dc3545; /* Red for missing */
+
+    /* Timer progress variable */
+    --timer-progress: 100%;
 }
 
 body.dark-mode {
@@ -42,6 +46,7 @@ body.dark-mode {
     --incorrect-char-color: #ff6a6a;
     --current-char-color: var(--accent-color);
     --extra-char-color: #ffea00;
+    --missing-char-color: #ff6a6a;
 }
 
 body {
@@ -54,6 +59,24 @@ body {
     align-items: center;
     min-height: 100vh;
     transition: background-color 0.3s ease, color 0.3s ease;
+    padding-top: 20px; /* Space for the header */
+}
+
+.app-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.app-header h1 {
+    font-size: 3.5rem;
+    color: var(--accent-color);
+    transition: color 0.3s ease;
+}
+
+.app-header .byline {
+    font-size: 0.5em; /* Smaller text for "by bit2swaz" */
+    vertical-align: middle;
+    opacity: 0.7;
 }
 
 #theme-toggle {
@@ -94,11 +117,10 @@ body {
     background-color: var(--app-container-bg);
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    margin-top: 60px;
-    margin-bottom: 80px;
+    margin-bottom: 80px; /* Space for footer */
 }
 
-.header {
+.top-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -111,6 +133,25 @@ body {
     font-size: 2.5rem;
     color: var(--accent-color);
     font-weight: 700;
+    position: relative; /* For countdown bar */
+    padding-bottom: 5px; /* Space for the bar */
+}
+
+/* Countdown bar */
+.timer::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: var(--timer-progress); /* Controlled by JS */
+    height: 3px;
+    background-color: var(--accent-color);
+    border-radius: 2px;
+    transition: width 0.9s linear; /* Smooth transition for countdown */
+}
+
+.controls-section {
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .controls {
@@ -162,6 +203,7 @@ body {
     justify-content: center;
     overflow: hidden;
     line-height: 1.6;
+    transition: border-color 0.3s ease;
 }
 
 .words-display {
@@ -172,15 +214,25 @@ body {
     user-select: none;
     cursor: text;
     width: 100%;
-    max-height: 150px;
-    overflow: hidden;
+    max-height: 150px; /* Limit height to 2-3 lines */
+    overflow: hidden; /* Hide overflowing words */
     word-wrap: break-word;
     white-space: normal;
+    transition: filter 0.3s ease; /* For blur on finish */
 }
 
-.words-display span {
-    display: inline-block;
-    transition: color 0.05s linear;
+.words-display.blur-on-finish {
+    filter: blur(5px);
+}
+
+.words-display .word-wrapper {
+    display: inline-block; /* Each word wrapper (word + trailing space) */
+    margin-right: 8px; /* Visual space between words */
+}
+
+.words-display .letter {
+    display: inline-block; /* For individual letter styling */
+    transition: color 0.05s linear, background-color 0.05s linear;
 }
 .words-display .correct {
     color: var(--correct-char-color);
@@ -189,25 +241,43 @@ body {
     color: var(--incorrect-char-color);
 }
 .words-display .current {
-    text-decoration: underline;
-    text-decoration-color: var(--current-char-color);
-    text-decoration-thickness: 2px;
+    /* Style for the typing cursor/underline */
+    position: relative;
 }
+/* More advanced cursor style (blinking bar) */
+.words-display .current::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; /* Adjust based on line height */
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--current-char-color);
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    from, to { background-color: transparent; }
+    50% { background-color: var(--current-char-color); }
+}
+
 .words-display .extra {
     color: var(--extra-char-color);
+    background-color: rgba(var(--extra-char-color-rgb), 0.2); /* Light yellow background */
     text-decoration: underline dotted var(--extra-char-color);
 }
 .words-display .missing {
-    background-color: var(--incorrect-char-color);
+    background-color: var(--missing-char-color); /* Red block */
     display: inline-block;
-    width: 0.5ch;
-    height: 1.2em;
+    width: 0.6em; /* Width of a typical character */
+    height: 1.2em; /* Height of the line */
     vertical-align: middle;
-    margin-right: -0.5ch;
+    margin-right: -0.6em; /* Overlap if needed */
+    opacity: 0.8;
 }
 
 .text-input {
-    position: absolute;
+    position: absolute; /* Keep it invisible and cover words-display */
     top: 0;
     left: 0;
     width: 100%;
@@ -218,10 +288,6 @@ body {
 }
 
 .live-stats {
-    position: absolute;
-    bottom: 15px;
-    left: 50%;
-    transform: translateX(-50%);
     font-size: 1.1rem;
     color: var(--accent-color);
     opacity: 0;
@@ -399,7 +465,52 @@ body {
     padding: 2px 4px;
 }
 
+/* UI Hiding for test in progress */
+body.test-in-progress .controls-section,
+body.test-in-progress .info-sections,
+body.test-in-progress .app-header,
+body.test-in-progress .footer {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-20px); /* Optional: slide up/down effect */
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+body.test-in-progress #app-container {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    justify-content: center; /* Center the words display */
+    height: 100vh; /* Take full height for better centering */
+    max-width: none; /* Allow full width if needed */
+    border: none;
+    background: none;
+    box-shadow: none;
+    gap: 0;
+}
+
+body.test-in-progress .typing-test-area {
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+body.test-in-progress .top-bar {
+    position: fixed;
+    top: 20px;
+    width: 90%;
+    max-width: 960px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+}
+
+
 @media (max-width: 768px) {
+    .app-header h1 {
+        font-size: 2.5rem;
+    }
     #app-container {
         width: 95%;
         padding: 20px;
@@ -447,6 +558,9 @@ body {
 }
 
 @media (max-width: 480px) {
+    .app-header h1 {
+        font-size: 2rem;
+    }
     .controls {
         flex-direction: column;
         gap: 10px;
@@ -470,5 +584,10 @@ body {
     }
     .high-score-tracker, .typing-history {
         font-size: 1rem;
+    }
+    body.test-in-progress .top-bar {
+        position: static; /* Let it flow normally */
+        width: auto;
+        transform: none;
     }
 }
