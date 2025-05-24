@@ -5,6 +5,12 @@
     box-sizing: border-box;
 }
 
+/* Explicitly set html and body height and overflow properties */
+html, body {
+    height: 100%; /* Ensure html and body take full viewport height */
+    overflow: hidden; /* Prevent scrolling on the main page */
+}
+
 :root {
     --line-height-factor: 1.5; /* Factor for line-height in em */
     --font-size-words: 1.8em;
@@ -25,16 +31,19 @@
     --results-bg-overlay: rgba(40, 44, 52, 0.95);
 }
 
+body { /* Apply base font family here, it's global */
+    font-family: 'Roboto Mono', monospace; /* Ensure this applies consistently */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 body.dark-theme {
-    font-family: 'Roboto Mono', monospace;
     background-color: var(--bg-color-primary);
     color: var(--text-color-primary);
     display: flex;
     justify-content: center; /* Center the container horizontally */
     align-items: center; /* Center the container vertically */
-    min-height: 100vh;
-    overflow: hidden; /* Prevent body scroll */
-    transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh; /* Using min-height here is fine for dark mode */
+    /* overflow: hidden; Removed from here as it's on html, body now */
 }
 
 /* Light Theme Variables - REVISED for proper contrast and visibility */
@@ -51,6 +60,14 @@ body.light-theme {
     --btn-active-text: #fff;
     --completed-word-fade: rgba(51, 51, 51, 0.1); /* Faded color for typed words */
     --results-bg-overlay: rgba(240, 242, 245, 0.95);
+
+    /* Explicitly apply light theme background and make sure it's centered */
+    background-color: var(--bg-color-primary); /* Apply background here directly */
+    color: var(--text-color-primary); /* Apply text color directly */
+    display: flex; /* Ensure flex is applied for centering */
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Keep this for consistency, maybe remove if it causes issues with large content */
 }
 
 /* Main Container - Ensure it centers correctly in both themes */
@@ -59,9 +76,14 @@ body.light-theme {
     flex-direction: column;
     width: 90%;
     max-width: 1000px;
+    /* Changed min-height from 80vh to a flexible value if content grows */
+    /* Keeping it for now, but if content overflows and shifts, this might be a culprit */
     min-height: 80vh;
     padding: 20px;
     /* No direct width/margin here, let body's flexbox handle centering */
+    /* Add a subtle shadow to distinguish from background in light mode */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
 
 .header {
@@ -159,11 +181,13 @@ body.light-theme {
 /* Test Controls */
 .test-controls {
     display: flex;
-    flex-direction: column; /* Stack time modes and word types */
+    /* Changed to row for time-modes and word-types to be side-by-side */
+    flex-direction: row; /* WAS: column */
     gap: 15px;
     margin-bottom: 30px;
-    align-items: center; /* Center items within test controls */
+    justify-content: center; /* Center the groups within controls */
     width: 100%;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 
 .time-modes, .word-types {
