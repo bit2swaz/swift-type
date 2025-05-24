@@ -157,3 +157,9 @@ body {
     color: var(--incorrect-char-color);
 }
 
+.words-display .current {
+    text-decoration: underline;
+    text-decoration-color: var(--current-char-color);
+    text-decoration-thickness: 2px;
+}
+
