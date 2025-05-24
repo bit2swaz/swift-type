@@ -3,8 +3,9 @@ const textInput = document.getElementById('text-input');
 const timerElement = document.getElementById('timer');
 const wordsContainer = document.getElementById('words-container');
 const timeButtons = document.querySelectorAll('.time-btn');
-const includeNumbersToggle = document.getElementById('include-numbers');
-const includePunctuationToggle = document.getElementById('include-punctuation');
+// CHANGED: Select buttons by their new IDs
+const includeNumbersBtn = document.getElementById('include-numbers-btn');
+const includePunctuationBtn = document.getElementById('include-punctuation-btn');
 const resultsScreen = document.getElementById('results-screen');
 const wpmValue = document.getElementById('wpm-value');
 const accuracyValue = document.getElementById('accuracy-value');
@@ -43,23 +44,28 @@ const baseWordList = [
     "algorithm", "cryptography", "blockchain", "ethereum", "bitcoin", "nft", "smart", "contract"
 ];
 const numbers = "0123456789";
-const symbols = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"; // More comprehensive symbols
+const symbols = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
-let words = []; // Stores the actual words for the test
-let wordElements = []; // Stores references to the DOM word spans
+let words = [];
+let wordElements = [];
 let currentWordIndex = 0;
 let currentCharIndex = 0;
 let timerId = null;
-let timeLeft = 60; // Current test duration
+let timeLeft = 60;
 let typingStarted = false;
 let totalCorrectChars = 0;
-let totalIncorrectChars = 0; // Includes incorrectly typed, skipped, and extra chars
-let rawCharsTyped = 0; // Total characters typed (correct, incorrect, extra)
+let totalIncorrectChars = 0;
+let rawCharsTyped = 0;
 let startTime = 0;
-let generatedWordCount = 0; // To track how many words are generated for dynamic loading
+let generatedWordCount = 0;
+
+// NEW: Variables for Numbers/Punctuation state
+let includeNumbers = false;
+let includePunctuation = false;
+
 
 // Get the computed line height from CSS variable for scrolling calculations
-const lineHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--line-height')) * parseFloat(getComputedStyle(document.documentElement).fontSize);
+const lineHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--calculated-line-height'));
 
 // --- Game Initialization & Reset ---
 
@@ -71,32 +77,31 @@ function initGame() {
     totalCorrectChars = 0;
     totalIncorrectChars = 0;
     rawCharsTyped = 0;
-    clearInterval(timerId); // Clear any running timer
-    timerElement.textContent = timeLeft; // Reset timer display
+    clearInterval(timerId);
+    timerElement.textContent = timeLeft;
     liveWpmElement.textContent = 'WPM: 0';
     liveAccuracyElement.textContent = 'Acc: 0%';
 
-    // Hide results, show typing area
     resultsScreen.classList.add('hidden');
     wordsContainer.style.display = 'block';
     textInput.style.display = 'block';
     textInput.disabled = false;
     textInput.value = '';
 
-    generatedWordCount = 0; // Reset generated word count
-    generateWords(true); // Generate new words based on current settings (true for initial clear)
-    textInput.focus(); // Focus input for immediate typing
+    generatedWordCount = 0;
+    generateWords(true); // Generate new words (true for initial clear)
+    textInput.focus();
     scrollWordsDisplay(true); // Reset scroll to top
 }
 
 // --- Word Generation ---
 
-function getRandomWord(isNumbers, isPunctuation) {
+function getRandomWordBasedOnSettings() {
     const r = Math.random();
-    if (isNumbers && r < 0.1) { // 10% chance for a number
+    if (includeNumbers && r < 0.1) { // 10% chance for a number
         return numbers[Math.floor(Math.random() * numbers.length)];
     }
-    if (isPunctuation && r < 0.2) { // 20% chance for a symbol (if not a number)
+    if (includePunctuation && r < 0.2) { // 20% chance for a symbol (if not a number)
         return symbols[Math.floor(Math.random() * symbols.length)];
     }
     return baseWordList[Math.floor(Math.random() * baseWordList.length)];
@@ -109,12 +114,9 @@ function generateWords(clearExisting = false) {
         wordElements = [];
     }
 
-    const wordsToGenerate = 50; // Generate 50 words at a time for initial load and dynamic loading
-    const isNumbers = includeNumbersToggle.checked;
-    const isPunctuation = includePunctuationToggle.checked;
-
+    const wordsToGenerate = 50;
     for (let i = 0; i < wordsToGenerate; i++) {
-        const word = getRandomWord(isNumbers, isPunctuation);
+        const word = getRandomWordBasedOnSettings(); // Use the new function
         words.push(word);
 
         const wordSpan = document.createElement('span');
@@ -130,7 +132,6 @@ function generateWords(clearExisting = false) {
     }
     generatedWordCount += wordsToGenerate;
 
-    // Highlight the first character of the current word
     if (wordElements[currentWordIndex] && wordElements[currentWordIndex].children[currentCharIndex]) {
         wordElements[currentWordIndex].children[currentCharIndex].classList.add('current');
     }
@@ -138,17 +139,20 @@ function generateWords(clearExisting = false) {
 
 // --- Live Stats Update ---
 function updateLiveStats() {
-    if (!typingStarted || totalCorrectChars + totalIncorrectChars === 0) {
+    if (!typingStarted || rawCharsTyped === 0) { // Check rawCharsTyped instead of sum for accuracy
         liveWpmElement.textContent = 'WPM: 0';
         liveAccuracyElement.textContent = 'Acc: 0%';
         return;
     }
 
-    const timeElapsed = (Date.now() - startTime) / 1000; // in seconds
+    const timeElapsed = (Date.now() - startTime) / 1000;
     if (timeElapsed === 0) return;
 
     const currentWPM = (totalCorrectChars / 5) / (timeElapsed / 60);
-    const currentAccuracy = (totalCorrectChars / rawCharsTyped) * 100;
+    let currentAccuracy = 0;
+    if (rawCharsTyped > 0) {
+        currentAccuracy = (totalCorrectChars / rawCharsTyped) * 100;
+    }
 
     liveWpmElement.textContent = `WPM: ${Math.max(0, currentWPM).toFixed(0)}`;
     liveAccuracyElement.textContent = `Acc: ${Math.max(0, currentAccuracy).toFixed(0)}%`;
@@ -157,13 +161,13 @@ function updateLiveStats() {
 // --- Timer Logic ---
 
 function startTimer() {
-    startTime = Date.now(); // Record start time
+    startTime = Date.now();
     timerId = setInterval(() => {
         const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
         const remainingTime = timeLeft - elapsedTime;
         timerElement.textContent = remainingTime > 0 ? remainingTime : 0;
 
-        updateLiveStats(); // Update live WPM and Accuracy
+        updateLiveStats();
 
         if (remainingTime <= 0) {
             clearInterval(timerId);
@@ -178,19 +182,17 @@ function endTest() {
     textInput.disabled = true;
     textInput.value = '';
     typingStarted = false;
-    clearInterval(timerId); // Ensure timer is cleared
+    clearInterval(timerId);
 
-    // Hide typing area elements
     wordsContainer.style.display = 'none';
     textInput.style.display = 'none';
 
-    // Calculate results
-    const finalTimeTaken = timeLeft; // Total configured time
-    const grossWPM = (rawCharsTyped / 5) / (finalTimeTaken / 60); // WPM including errors
-    const netWPM = (totalCorrectChars / 5) / (finalTimeTaken / 60); // WPM excluding errors (more common)
+    const finalTimeTaken = timeLeft;
+    const grossWPM = (rawCharsTyped / 5) / (finalTimeTaken / 60);
+    const netWPM = (totalCorrectChars / 5) / (finalTimeTaken / 60);
 
     let accuracy = 0;
-    if (rawCharsTyped > 0) { // Calculate accuracy based on all chars typed
+    if (rawCharsTyped > 0) {
         accuracy = (totalCorrectChars / rawCharsTyped) * 100;
     }
 
@@ -198,7 +200,7 @@ function endTest() {
     accuracyValue.textContent = `${Math.max(0, accuracy).toFixed(0)}%`;
     rawWpmValue.textContent = Math.max(0, grossWPM).toFixed(0);
 
-    resultsScreen.classList.remove('hidden'); // Show results screen
+    resultsScreen.classList.remove('hidden');
 }
 
 // --- Scrolling Logic ---
@@ -212,18 +214,14 @@ function scrollWordsDisplay(reset = false) {
     if (currentWordIndex >= wordElements.length) return;
 
     const currentWordElement = wordElements[currentWordIndex];
-    // Calculate the top position of the current word relative to its parent (wordsDisplay)
     const wordTopRelativeToDisplay = currentWordElement.offsetTop;
 
-    // We want the current line to be at the second line from the top of the container.
-    // This allows for some buffer.
-    const targetScrollPosition = lineHeight * 1; // 1 line from top
+    // Target the current line to be at the top of the container (0 lines offset)
+    // Or, for a slightly more natural feel, the second line (1 line offset)
+    const targetScrollPosition = lineHeight * 1; // Keep the current word's line roughly at the 2nd line
 
-    // Calculate how much wordsDisplay needs to move up
-    // `wordsDisplay.offsetTop` would be 0 or current transform Y
     const requiredTranslateY = -(wordTopRelativeToDisplay - targetScrollPosition);
 
-    // Apply the transform
     wordsDisplay.style.transform = `translateY(${requiredTranslateY}px)`;
 }
 
@@ -233,7 +231,6 @@ function scrollWordsDisplay(reset = false) {
 function handleKeyDown(e) {
     if (textInput.disabled) return;
 
-    // Start timer on first valid keypress
     if (!typingStarted && e.key.length === 1 && e.key !== ' ') {
         typingStarted = true;
         startTimer();
@@ -243,11 +240,9 @@ function handleKeyDown(e) {
     const targetWord = words[currentWordIndex];
 
     if (e.key === ' ') {
-        e.preventDefault(); // Prevent default space behavior
+        e.preventDefault();
 
         const typedValue = textInput.value;
-        // Check for correct completion
-        let wordCorrectlyCompleted = (typedValue === targetWord);
 
         // Mark any untyped characters as incorrect on spacebar press
         for (let i = typedValue.length; i < targetWord.length; i++) {
@@ -264,84 +259,70 @@ function handleKeyDown(e) {
              totalIncorrectChars += (typedValue.length - targetWord.length);
         }
 
-        // Apply 'typed' class to the completed word for visual fading
-        currentWordElement.classList.add('typed');
+        currentWordElement.classList.add('typed'); // Apply 'typed' class for visual fading
 
-        // Remove 'current' highlight from the character that was current
         if (currentWordElement.children[currentCharIndex]) {
             currentWordElement.children[currentCharIndex].classList.remove('current');
-        } else if (currentCharIndex > 0 && currentWordElement.children[currentCharIndex - 1]) { // If at end of word
+        } else if (currentCharIndex > 0 && currentWordElement.children[currentCharIndex - 1]) {
             currentWordElement.children[currentCharIndex - 1].classList.remove('current');
         }
 
-
-        // Advance to next word
         currentWordIndex++;
         currentCharIndex = 0;
-        textInput.value = ''; // Clear input field
+        textInput.value = '';
 
-        // Dynamic word loading: If we're nearing the end of generated words
-        if (currentWordIndex >= generatedWordCount - 20) { // If 20 words left
-            generateWords(); // Generate more words
+        if (currentWordIndex >= generatedWordCount - 20) {
+            generateWords();
         }
 
         if (currentWordIndex < wordElements.length) {
-            // Highlight the first char of the next word
             wordElements[currentWordIndex].children[0].classList.add('current');
-            scrollWordsDisplay(); // Scroll if needed
+            scrollWordsDisplay();
         } else {
-            // End of test (all words typed - though with dynamic generation, this is less likely to happen before timer)
             endTest();
         }
     } else if (e.key === 'Backspace') {
-        e.preventDefault(); // Prevent default backspace behavior
+        e.preventDefault();
 
         const typedText = textInput.value;
 
         if (currentCharIndex > 0) {
             const charEl = currentWordElement.children[currentCharIndex - 1];
-            charEl.classList.remove('current', 'correct', 'incorrect', 'extra'); // Clean its state
+            charEl.classList.remove('current', 'correct', 'incorrect', 'extra');
             
-            // Decrement counts only if it was genuinely correct/incorrect
-            // This is a simplification; perfect accuracy tracking needs more state.
-            // For now, assume backspacing on a char means it's no longer counted as typed.
-            // rawCharsTyped--; // Careful with this, might lead to negative if not perfectly synced.
-            // totalCorrectChars--; // Same
-            // totalIncorrectChars--; // Same
-
             currentCharIndex--;
-            textInput.value = typedText.substring(0, typedText.length - 1); // Remove last typed char
-            charEl.classList.add('current'); // Re-highlight the char we are backing into
-            currentWordElement.classList.remove('typed'); // Untype the word if we backspace into it
-        } else if (currentWordIndex > 0) { // If at the beginning of a word, go back to previous word
-            // Clear current highlight from the first char of the current word
+            textInput.value = typedText.substring(0, typedText.length - 1);
+            charEl.classList.add('current');
+            currentWordElement.classList.remove('typed');
+            rawCharsTyped = Math.max(0, rawCharsTyped - 1); // Decrement raw typed count
+            // Recalculate correct/incorrect chars based on current textInput content (simplification)
+            recalculateCharStatesAndCounts();
+            
+        } else if (currentWordIndex > 0) {
             if (currentWordElement.children[0]) {
                 currentWordElement.children[0].classList.remove('current');
             }
-            
             currentWordIndex--;
             const prevWordElement = wordElements[currentWordIndex];
             const prevWord = words[currentWordIndex];
-            currentCharIndex = prevWord.length; // Go to end of previous word
+            currentCharIndex = prevWord.length;
 
-            // Reset highlighting for the previous word to re-type
-            prevWordElement.classList.remove('typed'); // Make previous word untyped again
+            prevWordElement.classList.remove('typed');
             for (let i = 0; i < prevWord.length; i++) {
                 prevWordElement.children[i].classList.remove('correct', 'incorrect', 'extra');
-                // We're about to type this word again, so all its chars should be ready
                 prevWordElement.children[i].classList.add('current');
             }
-            // The last character of the previous word should be the 'current' one
             if (prevWordElement.children[prevWord.length - 1]) {
                 prevWordElement.children[prevWord.length - 1].classList.add('current');
             }
-            
-            textInput.value = prevWord; // Populate input with target word (assuming correct re-typing)
-            scrollWordsDisplay(); // Adjust scroll if necessary
+            textInput.value = prevWord;
+            scrollWordsDisplay();
+            // Recalculate for the word we backed into
+            recalculateCharStatesAndCounts();
         }
-        updateLiveStats(); // Update stats after backspace
+        updateLiveStats();
     } else if (e.key.length > 1 && e.key !== 'Enter' && e.key !== 'Tab' && e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Meta') {
-        e.preventDefault(); // Prevent default for non-character keys
+        e.preventDefault();
     }
 }
 
@@ -349,49 +330,43 @@ function handleInput(e) {
     if (textInput.disabled) return;
 
     if (e.inputType === 'deleteContentBackward') {
-        return; // Backspace is handled in keydown for precise control
+        return;
     }
 
     const currentWordElement = wordElements[currentWordIndex];
     const targetWord = words[currentWordIndex];
     const typedValue = textInput.value;
-    rawCharsTyped++; // Increment raw chars typed for WPM calculation
+    rawCharsTyped++;
 
-    // Ensure we don't process if textInput value is out of sync or if backspace happened
     if (typedValue.length < currentCharIndex) {
         return;
     }
 
     // Remove 'current' class from the character that *was* current (if any)
-    if (currentWordElement.children[currentCharIndex] && currentCharIndex > 0) { // If the current was on the char about to be typed
+    if (currentWordElement.children[currentCharIndex] && currentCharIndex > 0) {
         currentWordElement.children[currentCharIndex].classList.remove('current');
-    } else if (currentCharIndex > 0 && currentWordElement.children[currentCharIndex - 1]) { // If it was on the prev char
+    } else if (currentCharIndex > 0 && currentWordElement.children[currentCharIndex - 1]) {
         currentWordElement.children[currentCharIndex - 1].classList.remove('current');
     }
 
-
-    // Handle characters typed beyond the current word's length (extra chars)
     if (typedValue.length > targetWord.length) {
-        // Mark the last character of the word as incorrect/extra.
-        // We only add the 'incorrect' and 'extra' class if it wasn't already marked.
         if (targetWord.length > 0 && currentWordElement.children[targetWord.length - 1]) {
             const lastCharOfWord = currentWordElement.children[targetWord.length - 1];
-            if (!lastCharOfWord.classList.contains('incorrect')) { // Prevent multiple error counts for same char
+            if (!lastCharOfWord.classList.contains('incorrect')) {
                 lastCharOfWord.classList.add('incorrect', 'extra');
             }
         }
-        totalIncorrectChars++; // Count it as an error
+        totalIncorrectChars++;
         updateLiveStats();
-        return; // Don't process further for valid character comparison
+        return;
     }
 
-    // Process regular character input
     if (currentCharIndex < targetWord.length) {
         const charEl = currentWordElement.children[currentCharIndex];
         const targetChar = targetWord[currentCharIndex];
-        const typedChar = typedValue[typedValue.length - 1]; // Get the last typed char
+        const typedChar = typedValue[typedValue.length - 1];
 
-        if (!typedChar) return; // Should not happen with typical typing, but safety
+        if (!typedChar) return;
 
         if (typedChar === targetChar) {
             charEl.classList.remove('current', 'incorrect', 'extra');
@@ -404,24 +379,56 @@ function handleInput(e) {
         }
         currentCharIndex++;
 
-        // Highlight the next character or indicate end of word
         if (currentCharIndex < targetWord.length) {
-            charEl.classList.remove('current'); // Ensure current is only on the *next* char
+            charEl.classList.remove('current');
             currentWordElement.children[currentCharIndex].classList.add('current');
         } else {
-            // If at the end of the word, remove 'current' from the last char.
-            // It will be re-added to the first char of the next word on space.
             charEl.classList.remove('current');
         }
     }
-    updateLiveStats(); // Update stats after every character input
+    updateLiveStats();
 }
+
+// NEW: Helper to recalculate char states and counts on backspace/word-back
+function recalculateCharStatesAndCounts() {
+    totalCorrectChars = 0;
+    totalIncorrectChars = 0;
+    // Iterate through all typed words up to currentWordIndex
+    for (let i = 0; i <= currentWordIndex; i++) {
+        const wordEl = wordElements[i];
+        const wordText = words[i];
+        let currentTypedChars = (i === currentWordIndex) ? textInput.value.length : wordText.length;
+
+        for (let j = 0; j < wordText.length; j++) {
+            const charEl = wordEl.children[j];
+            if (charEl.classList.contains('correct')) {
+                totalCorrectChars++;
+            } else if (charEl.classList.contains('incorrect')) {
+                totalIncorrectChars++;
+            }
+        }
+        // Account for extra characters if the word was fully typed (or partially typed on current word)
+        if (i === currentWordIndex) {
+            if (currentTypedChars > wordText.length) {
+                 totalIncorrectChars += (currentTypedChars - wordText.length);
+            }
+        } else { // For previously completed words, assume correct completion if not marked incorrect
+            // This simplification might need more robust tracking if skipping words is common.
+            // For now, if a word was "typed" (marked as .typed), count its errors based on its elements.
+            // A truly accurate approach needs to track errors per character.
+            // For speedrun, we'll rely on the class lists for simplicity.
+        }
+    }
+    // Update rawCharsTyped based on characters actually rendered as typed
+    rawCharsTyped = totalCorrectChars + totalIncorrectChars;
+}
+
 
 // --- Settings Persistence ---
 function saveSettings() {
     localStorage.setItem('selectedTime', timeLeft);
-    localStorage.setItem('includeNumbers', includeNumbersToggle.checked);
-    localStorage.setItem('includePunctuation', includePunctuationToggle.checked);
+    localStorage.setItem('includeNumbers', includeNumbers); // Save boolean directly
+    localStorage.setItem('includePunctuation', includePunctuation); // Save boolean directly
     localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
 }
 
@@ -437,14 +444,25 @@ function loadSettings() {
         });
     }
 
+    // NEW: Load boolean values for numbers/punctuation
     const savedNumbers = localStorage.getItem('includeNumbers');
-    if (savedNumbers !== null) {
-        includeNumbersToggle.checked = (savedNumbers === 'true');
+    if (savedNumbers !== null) { // Check for null as 'false' string is truthy
+        includeNumbers = (savedNumbers === 'true');
+        if (includeNumbers) {
+            includeNumbersBtn.classList.add('active');
+        } else {
+            includeNumbersBtn.classList.remove('active');
+        }
     }
 
     const savedPunctuation = localStorage.getItem('includePunctuation');
     if (savedPunctuation !== null) {
-        includePunctuationToggle.checked = (savedPunctuation === 'true');
+        includePunctuation = (savedPunctuation === 'true');
+        if (includePunctuation) {
+            includePunctuationBtn.classList.add('active');
+        } else {
+            includePunctuationBtn.classList.remove('active');
+        }
     }
 
     const savedTheme = localStorage.getItem('theme');
@@ -471,18 +489,24 @@ function setupEventListeners() {
             timeButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
             timeLeft = parseInt(button.dataset.time);
-            saveSettings(); // Save new time setting
-            initGame(); // Restart game with new time
+            saveSettings();
+            initGame();
         });
     });
 
-    includeNumbersToggle.addEventListener('change', () => {
-        saveSettings(); // Save new setting
-        initGame(); // Restart game with new word types
+    // NEW: Event listeners for the new type-buttons
+    includeNumbersBtn.addEventListener('click', () => {
+        includeNumbers = !includeNumbers; // Toggle the state
+        includeNumbersBtn.classList.toggle('active', includeNumbers); // Toggle active class
+        saveSettings();
+        initGame();
     });
-    includePunctuationToggle.addEventListener('change', () => {
-        saveSettings(); // Save new setting
-        initGame(); // Restart game with new word types
+
+    includePunctuationBtn.addEventListener('click', () => {
+        includePunctuation = !includePunctuation; // Toggle the state
+        includePunctuationBtn.classList.toggle('active', includePunctuation); // Toggle active class
+        saveSettings();
+        initGame();
     });
 
     restartBtn.addEventListener('click', initGame);
@@ -490,11 +514,11 @@ function setupEventListeners() {
     themeToggle.addEventListener('change', () => {
         document.body.classList.toggle('light-theme');
         document.body.classList.toggle('dark-theme');
-        saveSettings(); // Save new theme setting
+        saveSettings();
     });
 }
 
 // --- Initial Game Setup ---
-loadSettings(); // Load settings first
+loadSettings();
 setupEventListeners();
-initGame(); // Start the first game
+initGame();
