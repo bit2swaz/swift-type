@@ -261,3 +261,14 @@ body {
     text-align: center;
 }
 
+.typing-history h3 {
+    margin-bottom: 10px;
+    cursor: pointer;
+    color: var(--accent-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+
