@@ -247,3 +247,8 @@ body {
     display: none !important;
 }
 
+.high-score-tracker {
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--accent-color);
+}
