@@ -199,3 +199,7 @@ body {
     transition: opacity 0.3s ease;
 }
 
+.live-stats .visible {
+    opacity: 1;
+}
+
