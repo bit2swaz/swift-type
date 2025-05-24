@@ -8,18 +8,58 @@
 :root {
     --line-height: 1.5em; /* Define a CSS variable for consistent line height */
     --font-size-words: 1.8em;
+
+    /* Dark Theme Variables */
+    --bg-color-dark: #282c34;
+    --text-color-dark: #abb2bf;
+    --accent-color-dark: #61afef; /* Blue */
+    --correct-char-dark: #98c379; /* Green */
+    --incorrect-char-dark: #e06c75; /* Red */
+    --current-char-underline-dark: #e06c75; /* Red */
+    --input-bg-dark: #3e4451;
+    --input-focus-shadow-dark: #61afef;
+    --btn-bg-dark: #3e4451;
+    --btn-text-dark: #abb2bf;
+    --btn-hover-dark: #4b5263;
+    --btn-active-dark: #61afef;
+    --btn-active-text-dark: #fff;
+    --footer-text-dark: #5c6370;
+    --toggle-slider-bg-dark: #7f8c8d;
+    --toggle-slider-checked-bg-dark: #61afef;
 }
 
-body {
-    font-family: 'Roboto Mono', monospace; /* A common choice for typing tests */
-    background-color: #282c34; /* Dark background, similar to MonkeyType's default */
-    color: #abb2bf; /* Light text color */
+body.dark-theme {
+    font-family: 'Roboto Mono', monospace;
+    background-color: var(--bg-color-dark);
+    color: var(--text-color-dark);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     overflow: hidden; /* Prevent body scroll */
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* Light Theme Variables */
+body.light-theme {
+    --bg-color-dark: #f0f2f5; /* Light background */
+    --text-color-dark: #333;
+    --accent-color-dark: #007bff; /* Blue */
+    --correct-char-dark: #28a745; /* Green */
+    --incorrect-char-dark: #dc3545; /* Red */
+    --current-char-underline-dark: #dc3545; /* Red */
+    --input-bg-dark: #e9ecef;
+    --input-focus-shadow-dark: #007bff;
+    --btn-bg-dark: #e0e0e0;
+    --btn-text-dark: #333;
+    --btn-hover-dark: #d0d0d0;
+    --btn-active-dark: #007bff;
+    --btn-active-text-dark: #fff;
+    --footer-text-dark: #6c757d;
+    --toggle-slider-bg-dark: #ccc;
+    --toggle-slider-checked-bg-dark: #007bff;
+}
+
 
 .container {
     display: flex;
@@ -38,20 +78,72 @@ body {
     margin-bottom: 30px; /* Space between header and typing area */
 }
 
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
 .logo {
-    font-size: var(--font-size-words); /* Use font size variable */
+    font-size: var(--font-size-words);
     font-weight: bold;
-    color: #61afef; /* A nice blue accent */
+    color: var(--accent-color-dark);
 }
 
 .timer {
     font-size: var(--font-size-words);
     font-weight: bold;
-    color: #61afef;
+    color: var(--accent-color-dark);
     padding: 5px 10px;
-    border: 2px solid #61afef;
+    border: 2px solid var(--accent-color-dark);
     border-radius: 5px;
 }
+
+/* Theme Toggle Switch */
+.theme-switch {
+    position: relative;
+    width: 60px;
+    height: 34px;
+}
+
+.theme-toggle-checkbox {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-toggle-label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--toggle-slider-bg-dark);
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.theme-toggle-label:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label {
+    background-color: var(--toggle-slider-checked-bg-dark);
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label:before {
+    transform: translateX(26px);
+}
+
 
 .typing-test {
     flex-grow: 1; /* Allow typing area to take available space */
@@ -62,11 +154,112 @@ body {
     position: relative;
 }
 
+/* Test Controls */
+.test-controls {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.time-modes, .word-types {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.time-btn {
+    background-color: var(--btn-bg-dark);
+    color: var(--btn-text-dark);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.time-btn:hover {
+    background-color: var(--btn-hover-dark);
+}
+
+.time-btn.active {
+    background-color: var(--btn-active-dark);
+    color: var(--btn-active-text-dark);
+}
+
+/* Toggle Switch (for Numbers/Punctuation) */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin-left: 20px;
+    font-size: 1em; /* Adjust label font size */
+    color: var(--btn-text-dark);
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between slider and text */
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--toggle-slider-bg-dark);
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .slider {
+    background-color: var(--toggle-slider-checked-bg-dark);
+}
+
+.toggle-switch input:focus + .slider {
+    box-shadow: 0 0 1px var(--toggle-slider-checked-bg-dark);
+}
+
+.toggle-switch input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* Adjust text position for word type toggles */
+.toggle-switch span:last-child {
+    position: relative;
+    left: 70px; /* Adjust to place text next to slider */
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+
+
 .words-container {
     width: 100%;
-    max-height: calc(var(--font-size-words) * 3); /* Show about 3 lines of text, adjust as needed */
+    max-height: calc(var(--font-size-words) * 3); /* Show about 3 lines of text */
     overflow: hidden; /* Hide overflow */
-    position: relative; /* For positioning the words-display inside */
+    position: relative;
     margin-bottom: 30px;
     line-height: var(--line-height); /* Ensure words-container also respects line-height */
 }
@@ -93,55 +286,140 @@ body {
 .char {
     display: inline-block;
     opacity: 0.7; /* Default opacity for untyped characters */
-    transition: opacity 0.1s ease, color 0.1s ease, background-color 0.1s ease, border-bottom 0.1s ease; /* Smooth transitions */
+    transition: opacity 0.1s ease, color 0.1s ease, background-color 0.1s ease, border-bottom 0.1s ease;
 }
 
 .char.current {
-    color: #e06c75; /* Red for the current character to type */
+    color: var(--current-char-underline-dark);
     opacity: 1;
-    border-bottom: 1px solid #e06c75; /* Underline current character */
+    border-bottom: 1px solid var(--current-char-underline-dark);
 }
 
 .char.correct {
-    color: #98c379; /* Green for correct characters */
+    color: var(--correct-char-dark);
     opacity: 1;
 }
 
 .char.incorrect {
-    color: #e06c75; /* Red for incorrect characters */
-    background-color: rgba(224, 108, 117, 0.3); /* Light red background for errors */
+    color: var(--incorrect-char-dark);
+    background-color: rgba(224, 108, 117, 0.3);
     opacity: 1;
 }
 
-/* Optional: Add a 'extra' class for chars typed beyond the word length */
 .char.extra {
-    color: #e06c75; /* Red for extra characters */
+    color: var(--incorrect-char-dark);
     background-color: rgba(224, 108, 117, 0.5);
     opacity: 1;
 }
 
 
 .text-input {
-    background-color: #3e4451; /* Darker input background */
+    background-color: var(--input-bg-dark);
     border: none;
     outline: none;
-    color: #e6e6e6; /* Lighter text in input */
+    color: var(--text-color-dark);
     font-size: var(--font-size-words);
     padding: 15px 20px;
     border-radius: 8px;
-    width: 60%; /* Adjust width as needed */
-    text-align: center; /* Center typed text */
-    caret-color: #61afef; /* Blue blinking cursor */
+    width: 60%;
+    text-align: center;
+    caret-color: var(--accent-color-dark);
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .text-input:focus {
-    box-shadow: 0 0 0 3px #61afef; /* Blue focus ring */
+    box-shadow: 0 0 0 3px var(--input-focus-shadow-dark);
+}
+
+.text-input:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Results Screen */
+.results-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(40, 44, 52, 0.95); /* Semi-transparent overlay */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    z-index: 10; /* Ensure it's above other content */
+    transition: opacity 0.3s ease;
+}
+
+.results-screen.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.results-screen h2 {
+    font-size: 2.5em;
+    color: var(--accent-color-dark);
+    margin-bottom: 20px;
+}
+
+.result-stats {
+    display: flex;
+    gap: 50px;
+    text-align: center;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 1.2em;
+    color: var(--text-color-dark);
+    opacity: 0.8;
+}
+
+.stat-value {
+    font-size: 3em;
+    font-weight: bold;
+    color: var(--correct-char-dark);
+}
+
+.restart-btn {
+    background-color: var(--btn-active-dark);
+    color: var(--btn-active-text-dark);
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.restart-btn:hover {
+    background-color: var(--accent-color-dark);
+    transform: translateY(-2px);
 }
 
 .footer {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
     text-align: center;
     padding: 20px 0 10px;
     font-size: 0.9em;
-    color: #5c6370; /* Muted color for footer text */
+    color: var(--footer-text-dark);
     margin-top: auto; /* Push footer to the bottom */
+}
+
+.footer a {
+    color: var(--footer-text-dark);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer a:hover {
+    color: var(--accent-color-dark);
 }
