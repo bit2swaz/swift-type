@@ -513,3 +513,13 @@ document.addEventListener('keyup', (e) => {
     }
 });
 
+function updateTabTitle() {
+    if (testActive) {
+        document.title = `Typing... (${timeLeft}s) | SwiftType by bit2swaz`;
+    } else if (testFinished) {
+        document.title = `Results! | SwiftType by bit2swaz`;
+    } else {
+        document.title = `SwiftType by bit2swaz`;
+    }
+}
+
