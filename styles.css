@@ -101,3 +101,14 @@ body {
     overflow: hidden;
 }
 
+.mode-button,
+.time-button {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
