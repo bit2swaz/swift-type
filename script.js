@@ -57,3 +57,25 @@ for (let i = 1; i <= 1000; i++) {
     numbers.push(i.toString());
 }
 
+async function loadAllWords() {
+    try {
+        const response = await fetch('words.txt');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const text = await response.text();
+        allWords = text.split('\n').map(word => word.trim()).filter(word => word.length > 0);
+        console.log("All words loaded. Count:", allWords.length);
+
+        applySavedTheme();
+        loadHighScores();
+        loadTypingHistory();
+        initializeTest();
+
+    } catch (error) {
+        console.error("Error loading words.txt:", error);
+        wordsDisplay.innerHTML = `<p style="color: ${getComputedStyle(document.body).getPropertyValue('--incorrect-char-color')}">Error loading words. Please ensure 'words.txt' is in the root directory. Check console for details.</p>`;
+        textInput.disabled = true;
+    }
+}
+
