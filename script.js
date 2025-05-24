@@ -6,7 +6,7 @@ const punctuations = [
     '*', '^', '%', '$', '#', '@', '~', '`'
 ];
 
-let currentTestWords = [];
+let currentTestContent = []; // Changed from currentTestWords for clarity
 let currentWordIndex = 0;
 let currentCharIndex = 0;
 
@@ -18,8 +18,8 @@ let initialTestTime = 60;
 
 let correctChars = 0;
 let incorrectChars = 0;
-let totalTypedChars = 0;
-let typedCorrectlyOnce = 0;
+let totalTypedChars = 0; // All characters user tried to type
+let typedCorrectlyOnce = 0; // Characters typed correctly *on the first attempt* for WPM
 let startTime = 0;
 
 const themeToggle = document.getElementById('theme-toggle');
@@ -45,13 +45,23 @@ const typingHistorySection = document.getElementById('typing-history');
 const toggleHistoryButton = document.getElementById('toggle-history');
 const historyList = document.getElementById('history-list');
 
-let currentMode = 'words';
-let currentTime = 60;
+const appHeader = document.querySelector('.app-header'); // New
+const controlsSection = document.getElementById('controls-section'); // New
+const infoSections = document.getElementById('info-sections'); // New
+const footer = document.querySelector('.footer'); // New
+
+// Updated for flexible modes
+let activeModes = {
+    words: true,
+    numbers: false,
+    punctuation: false
+};
 
 const LOCAL_STORAGE_THEME_KEY = 'monkeytypeCloneTheme';
 const LOCAL_STORAGE_MAX_WPM_KEY = 'monkeytypeCloneMaxWPM';
 const LOCAL_STORAGE_BEST_ACCURACY_KEY = 'monkeytypeCloneBestAccuracy';
 const LOCAL_STORAGE_HISTORY_KEY = 'monkeytypeCloneHistory';
+const LOCAL_STORAGE_ACTIVE_MODES_KEY = 'monkeytypeCloneActiveModes'; // New
 
 for (let i = 1; i <= 1000; i++) {
     numbers.push(i.toString());
@@ -68,6 +78,7 @@ async function loadAllWords() {
         console.log("All words loaded. Count:", allWords.length);
 
         applySavedTheme();
+        loadActiveModes(); // Load saved modes
         loadHighScores();
         loadTypingHistory();
         initializeTest();
@@ -83,34 +94,38 @@ function getRandomElement(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
+// Generates the sequence of words/numbers/punctuation for the test
 function generateTestContent(count = 50) {
     const generatedContent = [];
-    for (let i = 0; i < count; i++) {
-        let element;
-        const randomChooser = Math.random();
+    const availableElements = [];
 
-        switch (currentMode) {
-            case 'words':
+    if (activeModes.words && allWords.length > 0) availableElements.push('word');
+    if (activeModes.numbers && numbers.length > 0) availableElements.push('number');
+    if (activeModes.punctuation && punctuations.length > 0) availableElements.push('punctuation');
+
+    if (availableElements.length === 0) {
+        // Fallback to words if no modes are active or lists are empty
+        if (allWords.length > 0) {
+            availableElements.push('word');
+        } else {
+            wordsDisplay.textContent = "No content available for typing. Please check wordlist or mode selections.";
+            textInput.disabled = true;
+            return [];
+        }
+    }
+
+    for (let i = 0; i < count; i++) {
+        const contentType = getRandomElement(availableElements);
+        let element;
+        switch (contentType) {
+            case 'word':
                 element = getRandomElement(allWords);
                 break;
-            case 'numbers':
-                if (randomChooser < 0.7) {
-                    element = getRandomElement(allWords);
-                } else {
-                    element = getRandomElement(numbers);
-                }
+            case 'number':
+                element = getRandomElement(numbers);
                 break;
             case 'punctuation':
-                if (randomChooser < 0.6) {
-                    element = getRandomElement(allWords);
-                } else if (randomChooser < 0.85) {
-                    element = getRandomElement(numbers);
-                } else {
-                    element = getRandomElement(punctuations);
-                }
-                break;
-            default:
-                element = getRandomElement(allWords);
+                element = getRandomElement(punctuations);
                 break;
         }
         generatedContent.push(element);
@@ -118,9 +133,13 @@ function generateTestContent(count = 50) {
     return generatedContent;
 }
 
+// Renders the words/content into the display area with proper spacing
 function renderContent() {
     wordsDisplay.innerHTML = '';
-    currentTestWords.forEach((word, wordIndex) => {
+    currentTestContent.forEach((word, wordIndex) => {
+        const wordWrapper = document.createElement('span'); // Wrapper for word + space
+        wordWrapper.classList.add('word-wrapper');
+
         const wordSpan = document.createElement('span');
         wordSpan.classList.add('word');
         wordSpan.setAttribute('data-word-index', wordIndex);
@@ -136,19 +155,24 @@ function renderContent() {
             wordSpan.appendChild(charSpan);
         });
 
-        if (wordIndex < currentTestWords.length - 1) {
+        wordWrapper.appendChild(wordSpan);
+
+        // Add a space character AFTER the word, inside the word-wrapper
+        if (wordIndex < currentTestContent.length - 1) {
             const spaceSpan = document.createElement('span');
             spaceSpan.classList.add('letter', 'space');
             spaceSpan.textContent = ' ';
-            wordSpan.appendChild(spaceSpan);
+            wordWrapper.appendChild(spaceSpan);
         }
-        wordsDisplay.appendChild(wordSpan);
+        wordsDisplay.appendChild(wordWrapper);
     });
 
+    // Highlight the first character of the first word as current
     if (wordsDisplay.children.length > 0) {
-        const firstWordElement = wordsDisplay.children[0];
-        if (firstWordElement.children.length > 0) {
-            firstWordElement.children[0].classList.add('current');
+        const firstWordWrapper = wordsDisplay.children[0];
+        const firstLetter = firstWordWrapper.querySelector('.letter');
+        if (firstLetter) {
+            firstLetter.classList.add('current');
         }
     }
 
@@ -162,6 +186,7 @@ function initializeTest() {
     testFinished = false;
     timeLeft = currentTime;
     timerDisplay.textContent = timeLeft;
+    timerDisplay.style.setProperty('--timer-progress', '100%'); // Reset timer bar
     textInput.value = '';
     textInput.disabled = false;
     wordsDisplay.classList.remove('blur-on-finish');
@@ -173,24 +198,38 @@ function initializeTest() {
     typedCorrectlyOnce = 0;
     startTime = 0;
 
-    currentTestWords = generateTestContent(50);
+    currentTestContent = generateTestContent(50);
     renderContent();
 
     resultsScreen.classList.add('hidden');
     document.getElementById('typing-test-area').classList.remove('hidden');
 
+    // Show initial UI elements
+    body.classList.remove('test-in-progress'); // Show everything
+    appHeader.classList.remove('hidden');
+    controlsSection.classList.remove('hidden');
+    infoSections.classList.remove('hidden');
+    footer.classList.remove('hidden');
+
     textInput.focus();
     updateTabTitle();
-    console.log("Test initialized. Mode:", currentMode, "Time:", currentTime, "s");
+    console.log("Test initialized. Active Modes:", activeModes, "Time:", currentTime, "s");
 }
 
 function startTimer() {
     if (timerId) clearInterval(timerId);
     startTime = Date.now();
 
+    // Hide unnecessary UI elements
+    body.classList.add('test-in-progress'); // Trigger CSS transition
+    liveStats.classList.add('visible'); // Show live stats
+
     timerId = setInterval(() => {
         timeLeft--;
         timerDisplay.textContent = timeLeft;
+        const progress = (timeLeft / initialTestTime) * 100;
+        timerDisplay.style.setProperty('--timer-progress', `${progress}%`); // Update CSS variable for bar
+
         updateTabTitle();
         updateLiveStats();
 
@@ -220,6 +259,13 @@ function endTest() {
     resultsScreen.classList.remove('hidden');
     document.getElementById('typing-test-area').classList.add('hidden');
 
+    // Show all UI elements for results screen
+    body.classList.remove('test-in-progress');
+    appHeader.classList.remove('hidden');
+    controlsSection.classList.remove('hidden');
+    infoSections.classList.remove('hidden');
+    footer.classList.remove('hidden');
+
     updateHighScores(finalWPMValue, finalAccuracyValue);
     saveTestToHistory(finalWPMValue, finalAccuracyValue, actualTimeTaken);
     updateTabTitle();
@@ -229,7 +275,7 @@ function endTest() {
 }
 
 function calculateWPM() {
-    if (typedCorrectlyOnce === 0 || !testActive && !testFinished) return 0;
+    if (typedCorrectlyOnce === 0 || (!testActive && !testFinished)) return 0;
     const minutes = (initialTestTime - timeLeft) / 60;
     if (minutes <= 0) return 0;
     return Math.round((typedCorrectlyOnce / 5) / minutes);
@@ -258,10 +304,6 @@ textInput.addEventListener('keydown', (e) => {
         e.preventDefault();
     }
 
-    if (!testActive && !testFinished) {
-        textInput.focus();
-    }
-
     if (!testActive && !testFinished && e.key.length === 1 && e.key !== ' ') {
         testActive = true;
         startTimer();
@@ -272,22 +314,32 @@ textInput.addEventListener('input', (e) => {
     if (testFinished) return;
 
     const typedText = textInput.value;
-    const currentWordElement = wordsDisplay.children[currentWordIndex];
-    const targetWordWithSpace = currentTestWords[currentWordIndex] + (currentWordIndex < currentTestWords.length - 1 ? ' ' : '');
-    const currentLetters = currentWordElement.querySelectorAll('.letter');
+    const currentWordWrapper = wordsDisplay.children[currentWordIndex];
+    if (!currentWordWrapper) return; // Guard against out of bounds
 
-    totalTypedChars++;
+    const currentWordSpan = currentWordWrapper.querySelector('.word');
+    if (!currentWordSpan) return;
 
-    currentLetters.forEach(charSpan => {
-        charSpan.classList.remove('correct', 'incorrect', 'current', 'extra', 'missing-char-placeholder');
+    const targetWord = currentTestContent[currentWordIndex];
+    // Include the space character for the target if it's not the last word
+    const targetSequence = targetWord + (currentWordIndex < currentTestContent.length - 1 ? ' ' : '');
+
+    // Get all letters within the current word wrapper (word letters + potential space)
+    const allCurrentLetters = currentWordWrapper.querySelectorAll('.letter');
+
+    // Reset all letter classes for the current word to handle backspaces
+    allCurrentLetters.forEach(charSpan => {
+        charSpan.classList.remove('correct', 'incorrect', 'current', 'extra', 'missing');
     });
 
-    for (let i = 0; i < targetWordWithSpace.length; i++) {
-        const charSpan = currentLetters[i];
-        if (!charSpan) continue;
+    let currentWordTypedChars = 0; // Chars typed for this specific word/sequence
 
+    // Compare typed characters with target sequence
+    for (let i = 0; i < allCurrentLetters.length; i++) {
+        const charSpan = allCurrentLetters[i];
         if (i < typedText.length) {
-            if (typedText[i] === targetWordWithSpace[i]) {
+            currentWordTypedChars++;
+            if (typedText[i] === targetSequence[i]) {
                 charSpan.classList.add('correct');
             } else {
                 charSpan.classList.add('incorrect');
@@ -295,62 +347,92 @@ textInput.addEventListener('input', (e) => {
         }
     }
 
-    if (typedText.length > targetWordWithSpace.length) {
-        for (let i = targetWordWithSpace.length; i < typedText.length; i++) {
+    // Handle "extra" characters
+    // Create new spans for characters typed beyond the target sequence length
+    if (typedText.length > targetSequence.length) {
+        // Remove any previous extra spans before adding new ones
+        currentWordWrapper.querySelectorAll('.extra').forEach(el => el.remove());
+
+        for (let i = targetSequence.length; i < typedText.length; i++) {
+            const extraCharSpan = document.createElement('span');
+            extraCharSpan.classList.add('letter', 'extra');
+            extraCharSpan.textContent = typedText[i];
+            currentWordWrapper.appendChild(extraCharSpan); // Append outside the wordSpan but inside wrapper
         }
+    } else {
+         // If backspacing and typedText length is <= targetSequence length, remove all extra spans
+        currentWordWrapper.querySelectorAll('.extra').forEach(el => el.remove());
     }
 
+    // Update currentCharIndex based on typedText length
     currentCharIndex = typedText.length;
 
-    if (currentCharIndex < currentLetters.length) {
-        currentLetters[currentCharIndex].classList.add('current');
-    } else if (currentLetters.length > 0) {
-        currentLetters[currentLetters.length - 1].classList.add('current');
+    // Apply current-char highlight
+    if (currentCharIndex < allCurrentLetters.length) {
+        allCurrentLetters[currentCharIndex].classList.add('current');
+    } else {
+        // If typing beyond target, highlight the last character of the word (or the last extra char)
+        const lastChar = allCurrentLetters[allCurrentLetters.length - 1];
+        if (lastChar) {
+            lastChar.classList.add('current');
+        } else {
+            // Edge case: empty word or first word has no letters
+            // This case might need a blinking bar at the start of the current word wrapper.
+        }
     }
 
 
+    // Logic for advancing to the next word (on space)
     if (e.data === ' ') {
-        const typedWordWithoutSpace = typedText.trim();
-        const actualTargetWord = currentTestWords[currentWordIndex];
+        const typedWordWithTrailingSpace = typedText;
+        const actualTargetWord = currentTestContent[currentWordIndex];
+        const actualTargetSequence = actualTargetWord + (currentWordIndex < currentTestContent.length - 1 ? ' ' : '');
 
-        for (let i = 0; i < typedWordWithoutSpace.length; i++) {
-            if (i < actualTargetWord.length && typedWordWithoutSpace[i] === actualTargetWord[i]) {
+        // Calculate correct/incorrect chars for this word
+        let wordCorrectCount = 0;
+        let wordIncorrectCount = 0;
+        let wordTypedCorrectlyOnceFlag = true;
+
+        for(let i = 0; i < typedWordWithTrailingSpace.length; i++) {
+            totalTypedChars++; // Total characters typed in the test
+            if(i < actualTargetSequence.length && typedWordWithTrailingSpace[i] === actualTargetSequence[i]) {
                 correctChars++;
+                wordCorrectCount++;
             } else {
                 incorrectChars++;
+                wordIncorrectCount++;
+                wordTypedCorrectlyOnceFlag = false; // Mark word as incorrect
             }
         }
-        if (typedWordWithoutSpace.length < actualTargetWord.length) {
-            incorrectChars += (actualTargetWord.length - typedWordWithoutSpace.length);
-            for (let i = typedWordWithoutSpace.length; i < actualTargetWord.length; i++) {
-                if(currentLetters[i]) {
-                    currentLetters[i].classList.add('missing');
-                    currentLetters[i].textContent = '_';
-                }
-            }
-        }
-        if (typedWordWithoutSpace.length > actualTargetWord.length) {
-            incorrectChars += (typedWordWithoutSpace.length - actualTargetWord.length);
+
+        // Account for missing characters
+        if (typedWordWithTrailingSpace.length < actualTargetSequence.length) {
+            incorrectChars += (actualTargetSequence.length - typedWordWithTrailingSpace.length);
+            wordTypedCorrectlyOnceFlag = false; // Mark word as incorrect
         }
 
-        if (typedWordWithoutSpace === actualTargetWord) {
-            typedCorrectlyOnce += actualTargetWord.length + 1;
-        } else {
-            typedCorrectlyOnce += correctChars;
+        // If the word was typed perfectly until the space (and no extra chars)
+        if (wordTypedCorrectlyOnceFlag && typedWordWithTrailingSpace.length === actualTargetSequence.length) {
+            typedCorrectlyOnce += actualTargetSequence.length;
         }
 
-
+        // Clear input for next word
         textInput.value = '';
-        currentWordElement.classList.remove('active');
+
+        // Deactivate current word, move to next
+        currentWordSpan.classList.remove('active');
         currentWordIndex++;
         currentCharIndex = 0;
 
-        if (currentWordIndex < currentTestWords.length) {
-            const nextWordElement = wordsDisplay.children[currentWordIndex];
-            nextWordElement.classList.add('active');
-            if (nextWordElement.children.length > 0) {
-                nextWordElement.querySelector('.letter').classList.add('current');
-            }
+        // Move to the next word or end test
+        if (currentWordIndex < currentTestContent.length) {
+            const nextWordWrapper = wordsDisplay.children[currentWordIndex];
+            const nextWordSpan = nextWordWrapper.querySelector('.word');
+            const nextFirstLetter = nextWordWrapper.querySelector('.letter');
+
+            if (nextWordSpan) nextWordSpan.classList.add('active');
+            if (nextFirstLetter) nextFirstLetter.classList.add('current');
+
             scrollWordsDisplay();
         } else {
             endTest();
@@ -359,25 +441,67 @@ textInput.addEventListener('input', (e) => {
 });
 
 function scrollWordsDisplay() {
-    const activeWord = wordsDisplay.querySelector('.word.active');
-    if (!activeWord) return;
+    const activeWordWrapper = wordsDisplay.querySelector('.word-wrapper .word.active');
+    if (!activeWordWrapper) return;
 
     const displayRect = wordsDisplay.getBoundingClientRect();
-    const activeWordRect = activeWord.getBoundingClientRect();
+    const activeWordRect = activeWordWrapper.getBoundingClientRect();
 
-    if (activeWordRect.bottom > displayRect.bottom) {
-        wordsDisplay.scrollTop += activeWordRect.height + 10;
+    // Check if the current word's bottom is below the display's bottom
+    // Or if the current word's top is above the display's top (e.g., after a restart and we want to align)
+    if (activeWordRect.bottom > displayRect.bottom || activeWordRect.top < displayRect.top) {
+        // Calculate the target scroll position: try to put the active word at the top of the display area,
+        // or a bit higher to reveal the next line fully.
+        wordsDisplay.scrollTop = activeWordRect.top - wordsDisplay.getBoundingClientRect().top + wordsDisplay.scrollTop - (wordsDisplay.offsetHeight / 4); // Adjust this offset as needed
     }
 }
 
+// Event listeners for flexible mode selection
 modeSelector.addEventListener('click', (e) => {
     if (e.target.classList.contains('mode-button')) {
-        modeSelector.querySelectorAll('.mode-button').forEach(btn => btn.classList.remove('active'));
-        e.target.classList.add('active');
-        currentMode = e.target.dataset.mode;
-        initializeTest();
+        const mode = e.target.dataset.mode;
+        // Toggle the mode state
+        activeModes[mode] = !activeModes[mode];
+
+        // Ensure at least one mode is always active. If all are deactivating, re-activate 'words'.
+        if (!activeModes.words && !activeModes.numbers && !activeModes.punctuation) {
+            activeModes.words = true; // Default to words if all are deselected
+        }
+
+        // Apply active classes based on current state
+        modeSelector.querySelectorAll('.mode-button').forEach(btn => {
+            if (activeModes[btn.dataset.mode]) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        localStorage.setItem(LOCAL_STORAGE_ACTIVE_MODES_KEY, JSON.stringify(activeModes)); // Save modes
+        initializeTest(); // Restart test with new modes
     }
 });
+
+// Load active modes from local storage
+function loadActiveModes() {
+    const savedModes = localStorage.getItem(LOCAL_STORAGE_ACTIVE_MODES_KEY);
+    if (savedModes) {
+        activeModes = JSON.parse(savedModes);
+    } else {
+        // Default modes if nothing saved
+        activeModes = { words: true, numbers: false, punctuation: false };
+    }
+
+    // Apply active classes to buttons on load
+    modeSelector.querySelectorAll('.mode-button').forEach(btn => {
+        if (activeModes[btn.dataset.mode]) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+}
+
 
 timeSelector.addEventListener('click', (e) => {
     if (e.target.classList.contains('time-button')) {
@@ -394,13 +518,18 @@ retryButton.addEventListener('click', () => {
 });
 
 restartButton.addEventListener('click', () => {
-    currentMode = 'words';
+    // Reset modes to default 'words' and time to '60'
+    activeModes = { words: true, numbers: false, punctuation: false };
     currentTime = 60;
     initialTestTime = 60;
+
+    // Update button active states
     modeSelector.querySelector('[data-mode="words"]').classList.add('active');
     modeSelector.querySelectorAll('.mode-button:not([data-mode="words"])').forEach(btn => btn.classList.remove('active'));
     timeSelector.querySelector('[data-time="60"]').classList.add('active');
     timeSelector.querySelectorAll('.time-button:not([data-time="60"])').forEach(btn => btn.classList.remove('active'));
+
+    localStorage.setItem(LOCAL_STORAGE_ACTIVE_MODES_KEY, JSON.stringify(activeModes)); // Save default modes
     initializeTest();
 });
 
@@ -438,12 +567,10 @@ function updateHighScores(wpm, accuracy) {
         localStorage.setItem(LOCAL_STORAGE_MAX_WPM_KEY, wpm);
         maxWPM.textContent = wpm;
     }
-    if (wpm >= currentMaxWPM && accuracy > currentBestAccuracy) {
+    // Only update accuracy if WPM is equal or higher AND accuracy is better OR if it's the first test
+    if (wpm >= currentMaxWPM && accuracy > currentBestAccuracy || (currentMaxWPM === 0 && wpm > 0)) {
         localStorage.setItem(LOCAL_STORAGE_BEST_ACCURACY_KEY, accuracy);
         bestAccuracy.textContent = `${accuracy}%`;
-    } else if (currentMaxWPM === 0) {
-         localStorage.setItem(LOCAL_STORAGE_BEST_ACCURACY_KEY, accuracy);
-         bestAccuracy.textContent = `${accuracy}%`;
     }
 }
 
@@ -520,4 +647,3 @@ function updateTabTitle() {
         document.title = `SwiftType by bit2swaz`;
     }
 }
-
