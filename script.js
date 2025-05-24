@@ -360,3 +360,15 @@ textInput.addEventListener('input', (e) => {
     }
 });
 
+function scrollWordsDisplay() {
+    const activeWord = wordsDisplay.querySelector('.word.active');
+    if (!activeWord) return;
+
+    const displayRect = wordsDisplay.getBoundingClientRect();
+    const activeWordRect = activeWord.getBoundingClientRect();
+
+    if (activeWordRect.bottom > displayRect.bottom) {
+        wordsDisplay.scrollTop += activeWordRect.height + 10;
+    }
+}
+
