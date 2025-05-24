@@ -1,5 +1,7 @@
+/* Import Google Fonts - Roboto as per spec */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
+/* Basic Reset & Box Sizing */
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -7,6 +9,7 @@
 }
 
 :root {
+    /* --- Light Theme Colors (Default) --- */
     --background-color: #f0f2f5;
     --text-color: #333;
     --accent-color: #007bff;
@@ -16,27 +19,31 @@
     --button-active-text: #fff;
     --border-color: #ccc;
 
-     --correct-char-color: #28a745;
-    --incorrect-char-color: #dc3545;
-    --current-char-color: var(--accent-color);
-    --extra-char-color: #ffc107;
+    /* Typing Test Colors */
+    --correct-char-color: #28a745; /* Green */
+    --incorrect-char-color: #dc3545; /* Red */
+    --current-char-color: var(--accent-color); /* Blue for underline */
+    --extra-char-color: #ffc107; /* Yellow */
 }
 
+/* --- Dark Theme Colors (Applied via .dark-mode class on body) --- */
 body.dark-mode {
-    --background-color: #2c3e50;
-    --text-color: #ecf0f1; 
-    --accent-color: #3498db;
+    --background-color: #2c3e50; /* Darker blue-grey */
+    --text-color: #ecf0f1; /* Light grey */
+    --accent-color: #3498db; /* Brighter blue */
     --button-bg: #4e6e8e;
     --button-text: #ecf0f1;
     --button-active-bg: var(--accent-color);
     --button-active-text: #fff;
     --border-color: #555;
 
-    --correct-char-color: #2ecc71;
-    --incorrect-char-color: #e74c3c; 
+    /* Typing Test Colors */
+    --correct-char-color: #2ecc71; /* Brighter green */
+    --incorrect-char-color: #e74c3c; /* Brighter red */
     --current-char-color: var(--accent-color);
-    --extra-char-color: #f1c40f;
+    --extra-char-color: #f1c40f; /* Brighter yellow */
 }
+
 
 body {
     font-family: 'Roboto', sans-serif;
@@ -45,22 +52,24 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh; /* Full viewport height */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transition */
 }
 
+/* App Container Styling */
 #app-container {
     width: 90%;
-    max-width: 960px;
+    max-width: 960px; /* Monkeytype's common width */
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 20px; /* Spacing between sections */
     padding: 20px;
-    background-color: var(--background-color); 
+    background-color: var(--background-color); /* Ensure container matches body for now */
     border-radius: 8px;
-    /* Add a subtle shadow later*/
+    /* Optional: Add a subtle shadow later if desired */
 }
 
+/* Header Styling */
 .header {
     display: flex;
     justify-content: space-between;
@@ -86,23 +95,22 @@ body {
     background-color: var(--button-bg);
 }
 
+/* Controls (Mode & Time Selectors) */
 .controls {
     display: flex;
     justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
+    gap: 20px; /* Space between mode and time selectors */
+    flex-wrap: wrap; /* Allow wrapping on small screens */
 }
 
-.mode-selector,
-.time-selector {
+.mode-selector, .time-selector {
     display: flex;
     border: 1px solid var(--border-color);
     border-radius: 5px;
-    overflow: hidden;
+    overflow: hidden; /* For rounded corners on buttons */
 }
 
-.mode-button,
-.time-button {
+.mode-button, .time-button {
     background-color: var(--button-bg);
     color: var(--button-text);
     border: none;
@@ -112,82 +120,82 @@ body {
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.mode-button:hover,
-.time-button:hover {
+.mode-button:hover, .time-button:hover {
     background-color: var(--accent-color);
     color: var(--button-active-text);
 }
 
-.mode-button:active,
-.time-button:active {
+.mode-button.active, .time-button.active {
     background-color: var(--button-active-bg);
     color: var(--button-active-text);
     font-weight: bold;
 }
 
+/* Typing Test Area */
 .typing-test-area {
-    position: relative;
-    min-height: 200px;
+    position: relative; /* Needed for absolute positioning of input/stats if we go that route */
+    min-height: 200px; /* Give it some space */
     padding: 20px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    align-items: center; /* Center horizontally */
+    justify-content: center; /* Center vertically */
 }
 
 .words-display {
-    font-family: monospace;
-    font-size: 1.8rem;
+    font-family: monospace; /* Monospaced font for consistent character width */
+    font-size: 1.8rem; /* Large enough for typing */
     line-height: 1.6;
     letter-spacing: 0.05em;
-    text-align: justify;
-    max-height: 150px;
-    overflow: hidden;
-    user-select: none;
-    cursor: text;
+    text-align: justify; /* Distribute words evenly */
+    max-height: 150px; /* Limit height to show 2-3 lines initially */
+    overflow: hidden; /* Hide overflow before auto-scroll */
+    user-select: none; /* Prevent text selection */
+    cursor: text; /* Indicate it's a typing area */
 }
 
+/* Individual character styling (will be added by JS) */
 .words-display .correct {
     color: var(--correct-char-color);
 }
-
 .words-display .incorrect {
     color: var(--incorrect-char-color);
 }
-
 .words-display .current {
+    /* Underline effect for current character */
     text-decoration: underline;
     text-decoration-color: var(--current-char-color);
     text-decoration-thickness: 2px;
 }
-
 .words-display .extra {
     color: var(--extra-char-color);
     text-decoration: underline dotted var(--extra-char-color);
 }
-
 .words-display .missing {
-    background-color: var(--incorrect-char-color);
-    display: inline-block;
-    width: 0.5ch;
-    height: 1.2em;
-    vertical-align: middle;
-    margin-right: -0.5ch;
+    background-color: var(--incorrect-char-color); /* Highlight missing with a background */
+    display: inline-block; /* To allow background on non-existent character */
+    width: 0.5ch; /* A small visual indicator for missing */
+    height: 1.2em; /* Height similar to a character */
+    vertical-align: middle; /* Align with text */
+    margin-right: -0.5ch; /* Adjust spacing */
 }
 
+
+/* Invisible Input Field */
 .text-input {
-    position: absolute; 
+    position: absolute; /* Position over the words display */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0;
-    cursor: default;
-    z-index: 10;
+    opacity: 0; /* Make it invisible */
+    cursor: default; /* Keep cursor default, not text cursor */
+    z-index: 10; /* Ensure it's on top to capture events */
 }
 
+/* Live Stats */
 .live-stats {
     position: absolute;
     bottom: 10px;
@@ -195,18 +203,19 @@ body {
     transform: translateX(-50%);
     font-size: 1rem;
     color: var(--accent-color);
-    opacity: 0;
+    opacity: 0; /* Hidden by default, shown by JS when typing starts */
     transition: opacity 0.3s ease;
 }
 
-.live-stats .visible {
+.live-stats.visible {
     opacity: 1;
 }
 
+/* Results Screen */
 .results-screen {
     text-align: center;
     padding: 40px 20px;
-    border: 1px solid var(--border-radius);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
 }
 
@@ -239,20 +248,23 @@ body {
 }
 
 .action-button:hover {
-    background-color: var(--incorrect-char-color);
+    background-color: var(--incorrect-char-color); /* A bit of a subtle red for hover, or just a darker accent */
     transform: translateY(-2px);
 }
 
+/* Hidden Utility Class */
 .hidden {
     display: none !important;
 }
 
+/* High Score Tracker */
 .high-score-tracker {
     text-align: center;
     font-size: 1.1rem;
     color: var(--accent-color);
 }
 
+/* Typing History */
 .typing-history {
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -263,7 +275,7 @@ body {
 
 .typing-history h3 {
     margin-bottom: 10px;
-    cursor: pointer;
+    cursor: pointer; /* Indicate it's collapsible */
     color: var(--accent-color);
     display: flex;
     justify-content: center;
@@ -279,15 +291,16 @@ body {
     cursor: pointer;
     transition: transform 0.2s ease;
 }
-
+/* Rotate the arrow when history is visible */
 .history-list:not(.hidden) + h3 #toggle-history {
     transform: rotate(180deg);
 }
 
+
 .history-list {
     margin-top: 10px;
-    max-height: 300px;
-    overflow-y: auto;
+    max-height: 300px; /* Limit history list height */
+    overflow-y: auto; /* Scroll if too many items */
 }
 
 .history-item {
@@ -300,6 +313,7 @@ body {
     font-size: 0.95rem;
 }
 
+/* Footer */
 .footer {
     text-align: center;
     padding: 20px 0 10px;
@@ -317,7 +331,12 @@ body {
     text-decoration: underline;
 }
 
+/* Initial Dark Mode for now */
 body {
     background-color: var(--background-color);
     color: var(--text-color);
 }
+/* Apply dark mode by default if not set in local storage initially */
+/* This will be handled by JavaScript to read localStorage */
+/* For now, just uncomment the next line to see dark mode */
+body.dark-mode { }
