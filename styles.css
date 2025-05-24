@@ -125,3 +125,14 @@ body {
     font-weight: bold;
 }
 
+.typing-test-area {
+    position: relative;
+    min-height: 200px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
