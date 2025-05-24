@@ -381,3 +381,17 @@ modeSelector.addEventListener('click', (e) => {
     }
 });
 
+timeSelector.addEventListener('click', (e) => {
+    if (e.target.classList.contains('time-button')) {
+        timeSelector.querySelectorAll('.time-button').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        currentTime = parseInt(e.target.dataset.time);
+        initialTestTime = currentTime;
+        initializeTest();
+    }
+});
+
+retryButton.addEventListener('click', () => {
+    initializeTest();
+});
+
