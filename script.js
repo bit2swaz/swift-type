@@ -372,3 +372,12 @@ function scrollWordsDisplay() {
     }
 }
 
+modeSelector.addEventListener('click', (e) => {
+    if (e.target.classList.contains('mode-button')) {
+        modeSelector.querySelectorAll('.mode-button').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        currentMode = e.target.dataset.mode;
+        initializeTest();
+    }
+});
+
