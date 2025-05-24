@@ -68,3 +68,8 @@ body {
     font-size: 1.2rem;
     font-weight: 700;
 }
+
+.timer {
+    font-size: 1.8rem;
+    color: var(--accent-color);
+}
