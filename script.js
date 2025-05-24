@@ -53,3 +53,7 @@ const LOCAL_STORAGE_MAX_WPM_KEY = 'monkeytypeCloneMaxWPM';
 const LOCAL_STORAGE_BEST_ACCURACY_KEY = 'monkeytypeCloneBestAccuracy';
 const LOCAL_STORAGE_HISTORY_KEY = 'monkeytypeCloneHistory';
 
+for (let i = 1; i <= 1000; i++) {
+    numbers.push(i.toString());
+}
+
