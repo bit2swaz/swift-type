@@ -395,3 +395,14 @@ retryButton.addEventListener('click', () => {
     initializeTest();
 });
 
+restartButton.addEventListener('click', () => {
+    currentMode = 'words';
+    currentTime = 60;
+    initialTestTime = 60;
+    modeSelector.querySelector('[data-mode="words"]').classList.add('active');
+    modeSelector.querySelectorAll('.mode-button:not([data-mode="words"])').forEach(btn => btn.classList.remove('active'));
+    timeSelector.querySelector('[data-time="60"]').classList.add('active');
+    timeSelector.querySelectorAll('.time-button:not([data-time="60"])').forEach(btn => btn.classList.remove('active'));
+    initializeTest();
+});
+
