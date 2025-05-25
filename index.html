@@ -1,79 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SwiftType (MonkeyType Clone)</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftType (MonkeyType Clone)</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
-<body class="dark-theme"> <div class="container">
-        <header class="header">
-            <div class="header-left">
-                <span class="logo">SwiftType</span>
-                <div class="timer" id="timer">60</div>
-                <div class="live-stats">
-                    <span id="live-wpm">WPM: 0</span>
-                    <span id="live-accuracy">Acc: 0%</span>
-                </div>
-            </div>
-            <div class="header-right">
-                <div class="theme-switch">
-                    <input type="checkbox" id="theme-toggle" class="theme-toggle-checkbox">
-                    <label for="theme-toggle" class="theme-toggle-label"></label>
-                </div>
-            </div>
-        </header>
+<body class="dark-theme"> 
+    <div class="container">
+                <header class="header">
+            <div class="header-left">
+                <span class="logo">SwiftType</span>
+                <div class="timer" id="timer">60</div>
+                <div class="live-stats">
+                    <span id="live-wpm">WPM: 0</span>
+                    <span id="live-accuracy">Acc: 0%</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="theme-switch">
+                    <input type="checkbox" id="theme-toggle" class="theme-toggle-checkbox">
+                    <label for="theme-toggle" class="theme-toggle-label"></label>
+                </div>
+            </div>
+        </header>
 
-        <main class="typing-test">
-            <div class="test-controls">
-                <div class="time-modes">
-                    <button class="time-btn active" data-time="15">15</button>
-                    <button class="time-btn" data-time="30">30</button>
-                    <button class="time-btn" data-time="60">60</button>
-                    <button class="time-btn" data-time="120">120</button>
-                </div>
-                <div class="word-types">
-                    <button class="type-btn" id="include-numbers-btn" data-type="numbers">Numbers</button>
-                    <button class="type-btn" id="include-punctuation-btn" data-type="punctuation">Punctuation</button>
-                </div>
-            </div>
+                <main class="typing-test">
+            <div class="test-controls">
+                <div class="time-modes">
+                    <button class="time-btn active" data-time="15">15</button>
+                    <button class="time-btn" data-time="30">30</button>
+                    <button class="time-btn" data-time="60">60</button>
+                    <button class="time-btn" data-time="120">120</button>
+                </div>
+                <div class="word-types">
+                    <button class="type-btn" id="include-numbers-btn" data-type="numbers">Numbers</button>
+                    <button class="type-btn" id="include-punctuation-btn" data-type="punctuation">Punctuation</button>
+                </div>
+            </div>
 
-            <div id="words-container" class="words-container">
-                <div id="words-display" class="words-display">
-                    <div id="caret" class="caret"></div>
-                    </div>
-            </div>
-            <input type="text" id="text-input" class="text-input" autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <div id="words-container" class="words-container">
+                <div id="words-display" class="words-display">
+                    <div id="caret" class="caret"></div>
+                    </div>
+            </div>
+            <input type="text" id="text-input" class="text-input" autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
 
-            <div id="results-screen" class="results-screen hidden">
-                <h2>Test Results</h2>
-                <div class="result-stats">
-                    <div class="stat-item">
-                        <span class="stat-label">WPM</span>
-                        <span class="stat-value" id="wpm-value">0</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Accuracy</span>
-                        <span class="stat-value" id="accuracy-value">0%</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Raw WPM</span>
-                        <span class="stat-value" id="raw-wpm-value">0</span>
-                    </div>
-                </div>
-                <button id="restart-btn" class="restart-btn">Restart</button>
-            </div>
-        </main>
+            <div id="results-screen" class="results-screen hidden">
+                <h2>Test Results</h2>
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">WPM</span>
+                        <span class="stat-value" id="wpm-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Accuracy</span>
+                        <span class="stat-value" id="accuracy-value">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Raw WPM</span>
+                        <span class="stat-value" id="raw-wpm-value">0</span>
+                    </div>
+                </div>
+                <button id="restart-btn" class="restart-btn">Restart</button>
+            </div>
+        </main>
+    </div>
 
-        <footer class="footer">
-            <a href="#" target="_blank">About</a>
-            <a href="#" target="_blank">Contact</a>
-            <a href="https://github.com/bit2swaz" target="_blank">GitHub</a>
-            <span>&copy; 2025 SwiftType</span>
-        </footer>
-    </div>
-
-    <script src="script.js"></script>
+    <footer class="footer">
+        <p>Made with ❤️ by <a href="https://github.com/bit2swaz" target="_blank">bit2swaz</a></p>
+    </footer>
+        <script src="script.js"></script>
 </body>
 </html>
