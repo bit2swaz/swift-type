@@ -1,566 +1,116 @@
-/* Basic Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* Explicitly set html and body height and overflow properties */
-html, body {
-    height: 100%; /* Ensure html and body take full viewport height */
-    /* overflow: hidden; Removed to allow scrolling if content exceeds height */
-}
-
+/* Theme Variables */
 :root {
-    --line-height-factor: 1.5; /* Factor for line-height in em */
-    --font-size-words: 1.8em;
-    --calculated-line-height: calc(var(--font-size-words) * var(--line-height-factor)); /* Calculate line height explicitly */
-
-    /* Dark Theme Variables */
-    --bg-color-primary: #282c34; /* Main background */
-    --bg-color-secondary: #3e4451; /* Elements background (input, buttons) */
-    --text-color-primary: #abb2bf; /* Main text color */
-    --text-color-secondary: #5c6370; /* Muted text (footer, unhighlighted) */
-    --accent-color: #61afef; /* Blue accent */
-    --correct-char: #98c379; /* Green for correct */
-    --incorrect-char: #e06c75; /* Red for incorrect */
-    --current-char-underline: #e06c75; /* Red underline for current */
-    --input-focus-shadow: #61afef;
-    --btn-active-text: #fff;
-    --completed-word-fade: rgba(153, 153, 153, 0.2); /* Faded color for typed words */
-    --results-bg-overlay: rgba(40, 44, 52, 0.95);
+  --bg: #fdfdfd;
+  --text: #111;
+  --primary: #ffce00;
+  --secondary: #444;
+  --accent: #ffce00;
 }
 
-body { /* Apply base font family here, it's global */
-    font-family: 'Roboto Mono', monospace; /* Ensure this applies consistently */
-    transition: background-color 0.3s ease, color 0.3s ease;
-    display: flex; /* Make body a flex container */
-    flex-direction: column; /* Stack children vertically */
-    min-height: 100vh; /* Ensure body takes full viewport height */
-    padding-bottom: 60px; /* Space for the fixed footer at the bottom */
+body.dark {
+  --bg: #0d0d0d;
+  --text: #fdfdfd;
+  --primary: #ffce00;
+  --secondary: #aaa;
+  --accent: #ffce00;
 }
 
-body.dark-theme {
-    background-color: var(--bg-color-primary);
-    color: var(--text-color-primary);
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Light Theme Variables - REVISED for proper contrast and visibility */
-body.light-theme {
-    --bg-color-primary: #f0f2f5; /* Light background */
-    --bg-color-secondary: #e9ecef; /* Lighter elements background */
-    --text-color-primary: #333; /* Dark text for contrast */
-    --text-color-secondary: #6c757d;
-    --accent-color: #007bff; /* Blue accent - Will now also apply to footer link in light mode */
-    --correct-char: #28a745; /* Green */
-    --incorrect-char: #dc3545; /* Red */
-    --current-char-underline: #dc3545; /* Red */
-    --input-focus-shadow: #007bff;
-    --btn-active-text: #fff;
-    --completed-word-fade: rgba(51, 51, 51, 0.1); /* Faded color for typed words */
-    --results-bg-overlay: rgba(240, 242, 245, 0.95);
-
-    /* Explicitly apply light theme background and make sure it's centered */
-    background-color: var(--bg-color-primary); /* Apply background here directly */
-    color: var(--text-color-primary); /* Apply text color directly */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-/* Main Container - Ensure it centers correctly in both themes */
-.container {
-    display: flex;
-    flex-direction: column;
-    width: 90%;
-    max-width: 1000px;
-    min-height: 80vh; /* This needs careful thought if content is too short/long */
-    padding: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    background-color: var(--bg-color-primary); /* Ensure container has its own background */
-    transition: background-color 0.3s ease;
-    margin: auto; /* Center the container within the body's flex layout */
+#app {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 2rem;
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    margin-bottom: 30px;
+#words-container {
+  font-size: 2rem;
+  max-width: 80ch;
+  line-height: 1.5;
+  text-align: center;
 }
 
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+#input {
+  padding: 0.5rem 1rem;
+  font-size: 1.2rem;
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--text);
+  outline: none;
+  border-radius: 6px;
+  transition: border 0.3s ease;
 }
 
-.logo {
-    font-size: var(--font-size-words);
-    font-weight: bold;
-    color: var(--accent-color);
+/* Theme Toggle */
+.theme-toggle-wrapper {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
 }
 
-.timer {
-    font-size: var(--font-size-words);
-    font-weight: bold;
-    color: var(--accent-color);
-    padding: 5px 10px;
-    border: 2px solid var(--accent-color);
-    border-radius: 5px;
+.theme-toggle {
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+  padding: 0.25rem;
+  font-size: 1.5rem;
 }
 
-.live-stats {
-    font-size: 1.2em;
-    color: var(--text-color-primary);
-    display: flex;
-    gap: 15px;
-    margin-left: 20px;
+.theme-toggle span {
+  pointer-events: none;
 }
 
-/* Theme Toggle Switch (Keep this) */
-.theme-switch {
-    position: relative;
-    width: 60px;
-    height: 34px;
+#theme-toggle {
+  display: none;
 }
 
-.theme-toggle-checkbox {
-    opacity: 0;
-    width: 0;
-    height: 0;
+#theme-toggle + .theme-toggle .sun {
+  display: inline;
+}
+#theme-toggle:checked + .theme-toggle .sun {
+  display: none;
+}
+#theme-toggle:checked + .theme-toggle .moon {
+  display: inline;
+}
+.theme-toggle .moon {
+  display: none;
 }
 
-.theme-toggle-label {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--text-color-secondary); /* Adjusted to match light/dark theme toggle background */
-    transition: .4s;
-    border-radius: 34px;
-}
-
-.theme-toggle-label:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-.theme-toggle-checkbox:checked + .theme-toggle-label {
-    background-color: var(--accent-color); /* Matches accent for checked state */
-}
-
-.theme-toggle-checkbox:checked + .theme-toggle-label:before {
-    transform: translateX(26px);
-}
-
-
-.typing-test {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Center items in the typing test container */
-    position: relative;
-    width: 100%; /* Ensure this takes full width of its parent */
-}
-
-/* Test Controls */
-.test-controls {
-    display: flex;
-    flex-direction: row; /* Changed to row for side-by-side arrangement */
-    gap: 15px;
-    margin-bottom: 30px;
-    justify-content: center; /* Center the groups within controls */
-    width: 100%;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-}
-
-.time-modes, .word-types {
-    display: flex;
-    gap: 10px;
-    border-radius: 5px;
-    background-color: var(--bg-color-secondary);
-    padding: 5px 10px;
-}
-
-.time-btn, .type-btn { /* Apply same button style to both sets of buttons */
-    background-color: transparent;
-    color: var(--text-color-primary);
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    font-size: 1em;
-    cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
-    white-space: nowrap; /* Prevent text wrapping inside buttons */
-}
-
-.time-btn:hover, .type-btn:hover {
-    background-color: rgba(97, 175, 239, 0.1);
-}
-
-.time-btn.active, .type-btn.active { /* Both time and type buttons will use this */
-    background-color: var(--accent-color);
-    color: var(--btn-active-text);
-}
-
-.words-container {
-    width: 100%;
-    max-height: calc(var(--calculated-line-height) * 3); /* Show 3 full lines */
-    overflow: hidden;
-    position: relative; /* Needed for absolute positioning of caret */
-    margin-bottom: 30px;
-    line-height: var(--line-height-factor);
-}
-
-.words-display {
-    font-size: var(--font-size-words);
-    line-height: var(--line-height-factor);
-    word-spacing: 8px;
-    text-align: center;
-    white-space: normal;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    transform: translateY(0);
-    transition: transform 0.2s ease-out;
-}
-
-/* ADDED: Custom caret styling */
-.caret {
-    position: absolute; /* Position relative to words-container */
-    width: 2px; /* Standard caret width */
-    height: var(--font-size-words); /* Height of the character */
-    background-color: var(--accent-color); /* Caret color */
-    left: 0; /* Initial left position */
-    top: 0; /* Initial top position */
-    transform: translateY(0); /* For smooth animation */
-    transition: left 0.05s ease-out, top 0.05s ease-out; /* Smooth movement */
-    animation: blink 1s infinite; /* Blinking animation */
-    z-index: 5; /* Ensure it's above the text */
-    pointer-events: none; /* Make sure it doesn't block clicks */
-    display: none; /* Hidden by default, shown when typing starts */
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-}
-
-.word {
-    display: inline-block;
-    margin-right: 8px;
-    white-space: pre;
-    transition: opacity 0.3s ease, color 0.3s ease, background-color 0.2s ease; /* Added background-color transition */
-}
-
-.word.typed {
-    opacity: 0.4;
-    color: var(--completed-word-fade);
-}
-
-/* ADDED: Highlight for the current word */
-.word.current-word-highlight {
-    background-color: rgba(97, 175, 239, 0.1); /* Subtle highlight */
-    border-radius: 3px;
-    padding: 0 2px; /* Small padding to make highlight visible */
-}
-
-.char {
-    display: inline-block;
-    opacity: 0.7;
-    transition: opacity 0.1s ease, color 0.1s ease, background-color 0.1s ease; /* Removed border-bottom transition */
-}
-
-.char.current {
-    /* Removed border-bottom; caret will handle the cursor */
-    color: var(--text-color-primary); /* Ensure current char has primary text color */
-    opacity: 1;
-    /* We will use the custom caret for the blinking cursor */
-}
-
-.char.correct {
-    color: var(--correct-char);
-    opacity: 1;
-}
-
-.char.incorrect {
-    color: var(--incorrect-char);
-    background-color: rgba(224, 108, 117, 0.3);
-    opacity: 1;
-}
-
-.char.extra {
-    color: var(--incorrect-char);
-    background-color: rgba(224, 108, 117, 0.5);
-    opacity: 1;
-}
-
-
-.text-input {
-    background-color: var(--bg-color-secondary);
-    border: none;
-    outline: none;
-    color: var(--text-color-primary);
-    font-size: var(--font-size-words);
-    padding: 15px 20px;
-    border-radius: 8px;
-    width: 70%;
-    text-align: center;
-    /* REMOVED: caret-color as we have a custom caret */
-    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.text-input:focus {
-    box-shadow: 0 0 0 3px var(--input-focus-shadow);
-}
-
-.text-input:disabled {
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-/* Results Screen (Keep this) */
-.results-screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--results-bg-overlay);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 30px;
-    z-index: 10;
-    transition: opacity 0.3s ease;
-}
-
-.results-screen.hidden {
-    display: none;
-    opacity: 0;
-}
-
-.results-screen h2 {
-    font-size: 2.5em;
-    color: var(--accent-color);
-    margin-bottom: 20px;
-}
-
-.result-stats {
-    display: flex;
-    gap: 50px;
-    text-align: center;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    justify-content: center;
-}
-
-.stat-item {
-    display: flex;
-    flex-direction: column;
-}
-
-.stat-label {
-    font-size: 1.2em;
-    color: var(--text-color-primary);
-    opacity: 0.8;
-}
-
-.stat-value {
-    font-size: 3em;
-    font-weight: bold;
-    color: var(--correct-char);
-}
-
-/* NEW: Style for accuracy breakdown */
-.accuracy-details {
-    display: flex;
-    gap: 20px;
-    font-size: 1.1em;
-    color: var(--text-color-primary);
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.accuracy-details .detail-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.accuracy-details .detail-label {
-    opacity: 0.7;
-}
-
-.accuracy-details .detail-value {
-    font-weight: bold;
-}
-
-/* Specific colors for accuracy breakdown values */
-.accuracy-details .detail-value.correct {
-    color: var(--correct-char);
-}
-.accuracy-details .detail-value.incorrect {
-    color: var(--incorrect-char);
-}
-.accuracy-details .detail-value.extra {
-    color: var(--incorrect-char);
-}
-
-
-.restart-btn {
-    background-color: var(--accent-color);
-    color: var(--btn-active-text);
-    border: none;
-    padding: 15px 30px;
-    border-radius: 8px;
-    font-size: 1.5em;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-}
-
-.restart-btn:hover {
-    background-color: var(--input-focus-shadow);
-    transform: translateY(-2px);
-}
-
-/* --- FOOTER (AuraCalc Styling, now theme-aware for link) --- */
+/* Footer */
 .footer {
-    position: fixed; /* Stays at the bottom of the viewport */
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 20px 0; /* AuraCalc's specific padding */
-    text-align: center;
-    background-color: #2b2d30; /* AuraCalc's specific footer background (fixed dark) */
-    color: #ffffff; /* AuraCalc's specific footer text color (fixed white) */
-    font-size: 1.1rem; /* Matched AuraCalc's font size */
-    font-weight: 300; /* AuraCalc's lighter font weight */
-    z-index: 999; /* Ensure it's on top */
-}
-
-.footer p {
-    margin: 0; /* Remove default paragraph margin */
-    padding: 0; /* Remove default paragraph padding */
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: var(--secondary);
+  background: transparent;
 }
 
 .footer a {
-    color: var(--accent-color); /* NOW USES ACCENT COLOR FOR THEME ADAPTATION */
-    text-decoration: none;
-    position: relative;
-    transition: color 0.3s ease;
-}
-
-.footer a::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    display: block;
-    margin-top: 5px; /* Space below the link text before the underline */
-    left: 0;
-    background: var(--accent-color); /* NOW USES ACCENT COLOR FOR THEME ADAPTATION */
-    transition: width 0.3s ease;
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .footer a:hover {
-    color: var(--accent-color); /* Keep link color same on hover */
-}
-
-.footer a:active {
-    color: var(--accent-color); /* Just ensure it stays the same color */
-}
-
-.footer a:hover::after {
-    width: 100%; /* Expands to 100% on hover */
-}
-/* --- END FOOTER --- */
-
-
-/* Media Queries - Keep these as they are for responsiveness */
-@media (max-width: 768px) {
-    .header {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .header-left {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .live-stats {
-        margin-left: 0;
-        justify-content: center;
-    }
-
-    .test-controls {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .time-modes, .word-types {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .text-input {
-        width: 90%;
-    }
-
-    .words-container {
-        max-height: calc(var(--calculated-line-height) * 4); /* Adjust for smaller screens if needed */
-    }
-
-    .result-stats {
-        flex-direction: column;
-        gap: 20px;
-    }
-}
-
-@media (max-width: 480px) {
-    .logo, .timer {
-        font-size: 1.5em;
-    }
-
-    .live-stats {
-        font-size: 1em;
-    }
-
-    .time-btn, .type-btn {
-        padding: 6px 10px;
-        font-size: 0.9em;
-    }
-
-    .words-display {
-        font-size: 1.5em;
-    }
-
-    .text-input {
-        font-size: 1.5em;
-        padding: 10px 15px;
-    }
-
-    .results-screen h2 {
-        font-size: 2em;
-    }
-
-    .stat-value {
-        font-size: 2.5em;
-    }
-
-    .restart-btn {
-        font-size: 1.2em;
-        padding: 12px 25px;
-    }
+  color: var(--text);
 }
