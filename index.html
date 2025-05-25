@@ -13,12 +13,24 @@
     </button>
   </div>
 
-  <main class="main-container">
-    <h1 class="title">SwiftType</h1>
-    <div class="typing-box">
-      <!-- Words will be injected here -->
-    </div>
-  </main>
+<main class="main-container">
+  <h1 class="title">SwiftType</h1>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="mode-btn" data-mode="time" data-value="30">30s</button>
+    <button class="mode-btn" data-mode="time" data-value="60">60s</button>
+    <button class="mode-btn" data-mode="words" data-value="25">25 words</button>
+    <button id="restart-btn" title="Restart">🔄</button>
+  </div>
+
+  <!-- Typing box -->
+  <div class="typing-box" id="typing-box"></div>
+
+  <!-- Input box (invisible) -->
+  <input type="text" id="hidden-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+</main>
+
 
   <footer class="footer">
     <p>made with <span class="heart">❤️</span> by <a href="https://github.com/bit2swaz" target="_blank">bit2swaz</a></p>
