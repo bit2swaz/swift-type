@@ -51,7 +51,7 @@ body.light-theme {
     --bg-color-secondary: #e9ecef; /* Lighter elements background */
     --text-color-primary: #333; /* Dark text for contrast */
     --text-color-secondary: #6c757d;
-    --accent-color: #007bff; /* Blue accent */
+    --accent-color: #007bff; /* Blue accent - Will now also apply to footer link in light mode */
     --correct-char: #28a745; /* Green */
     --incorrect-char: #dc3545; /* Red */
     --current-char-underline: #dc3545; /* Red */
@@ -434,7 +434,7 @@ body.light-theme {
     transform: translateY(-2px);
 }
 
-/* --- FOOTER (AuraCalc EXACT Replica) --- */
+/* --- FOOTER (AuraCalc Styling, now theme-aware for link) --- */
 .footer {
     position: fixed; /* Stays at the bottom of the viewport */
     bottom: 0;
@@ -442,12 +442,11 @@ body.light-theme {
     width: 100%;
     padding: 20px 0; /* AuraCalc's specific padding */
     text-align: center;
-    background-color: #2b2d30; /* AuraCalc's specific footer background */
-    color: #ffffff; /* AuraCalc's specific footer text color */
+    background-color: #2b2d30; /* AuraCalc's specific footer background (fixed dark) */
+    color: #ffffff; /* AuraCalc's specific footer text color (fixed white) */
     font-size: 1.1rem; /* Matched AuraCalc's font size */
     font-weight: 300; /* AuraCalc's lighter font weight */
     z-index: 999; /* Ensure it's on top */
-    /* No border-top as AuraCalc doesn't have it */
 }
 
 .footer p {
@@ -456,7 +455,7 @@ body.light-theme {
 }
 
 .footer a {
-    color: #61DAFB; /* AuraCalc's specific link color */
+    color: var(--accent-color); /* NOW USES ACCENT COLOR FOR THEME ADAPTATION */
     text-decoration: none;
     position: relative;
     transition: color 0.3s ease;
@@ -470,30 +469,98 @@ body.light-theme {
     display: block;
     margin-top: 5px; /* Space below the link text before the underline */
     left: 0;
-    background: #61DAFB; /* AuraCalc's specific link underline color */
+    background: var(--accent-color); /* NOW USES ACCENT COLOR FOR THEME ADAPTATION */
     transition: width 0.3s ease;
 }
 
 .footer a:hover {
-    color: #61DAFB; /* Keep link color same on hover as AuraCalc */
+    color: var(--accent-color); /* Keep link color same on hover */
+}
+
+.footer a:active {
+    color: var(--accent-color); /* Just ensure it stays the same color */
 }
 
 .footer a:hover::after {
     width: 100%; /* Expands to 100% on hover */
-}
-
-.footer a:active {
-    /* AuraCalc doesn't have a distinct :active style for the link itself, keep it clean */
-    color: #61DAFB; /* Just ensure it stays the same color */
 }
 /* --- END FOOTER --- */
 
 
 /* Media Queries - Keep these as they are for responsiveness */
 @media (max-width: 768px) {
-    /* ... existing media queries ... */
+    .header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .header-left {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .live-stats {
+        margin-left: 0;
+        justify-content: center;
+    }
+
+    .test-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .time-modes, .word-types {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .text-input {
+        width: 90%;
+    }
+
+    .words-container {
+        max-height: calc(var(--calculated-line-height) * 4); /* Adjust for smaller screens if needed */
+    }
+
+    .result-stats {
+        flex-direction: column;
+        gap: 20px;
+    }
 }
 
 @media (max-width: 480px) {
-    /* ... existing media queries ... */
+    .logo, .timer {
+        font-size: 1.5em;
+    }
+
+    .live-stats {
+        font-size: 1em;
+    }
+
+    .time-btn, .type-btn {
+        padding: 6px 10px;
+        font-size: 0.9em;
+    }
+
+    .words-display {
+        font-size: 1.5em;
+    }
+
+    .text-input {
+        font-size: 1.5em;
+        padding: 10px 15px;
+    }
+
+    .results-screen h2 {
+        font-size: 2em;
+    }
+
+    .stat-value {
+        font-size: 2.5em;
+    }
+
+    .restart-btn {
+        font-size: 1.2em;
+        padding: 12px 25px;
+    }
 }
