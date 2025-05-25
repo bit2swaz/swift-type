@@ -8,17 +8,19 @@
 </head>
 <body class="dark">
   <div class="container">
-    <!-- Header -->
+    <!-- Title -->
     <header class="title-header">
       SwiftType
     </header>
 
-    <!-- Theme Toggle -->
+    <!-- Theme Toggle (Commented Out) -->
+    <!--
     <div class="theme-toggle">
       <button id="theme-toggle-btn">
         <span id="theme-icon">🌙</span>
       </button>
     </div>
+    -->
 
     <!-- Button Row -->
     <div class="button-row">
@@ -31,20 +33,21 @@
         <button class="btn" id="mode-words">Words</button>
       </div>
       <div class="button-section" id="right-buttons">
-        <button class="btn">15s</button>
-        <button class="btn">30s</button>
-        <button class="btn">60s</button>
+        <button class="btn" data-time="15">15s</button>
+        <button class="btn active" data-time="30">30s</button>
+        <button class="btn" data-time="60">60s</button>
       </div>
     </div>
 
-    <!-- Text Display Area -->
-    <div class="text-display">
-      <p id="text-content">the quick brown fox jumps over the lazy dog</p>
-    </div>
+    <!-- Text Display -->
+    <div class="text-display" id="text-display"></div>
+
+    <!-- Typing Input (hidden but necessary) -->
+    <input type="text" id="hidden-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
 
     <!-- Restart Button -->
     <div class="restart">
-      <button class="btn restart-btn">⟳ Restart</button>
+      <button class="btn restart-btn" id="restart-btn">⟳ Restart</button>
     </div>
   </div>
 
