@@ -119,6 +119,7 @@ footer .bit {
   color: #facc15;
   text-decoration: none;
   transition: all 0.2s ease-in-out;
+  font-weight: bold;
 }
 footer .bit:hover {
   color: #fbbf24;

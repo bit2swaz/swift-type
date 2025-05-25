@@ -9,33 +9,27 @@
 <body class="dark">
   <div class="container">
     <!-- Title -->
-    <header class="title-header">
-      SwiftType
-    </header>
-
-    <!-- Theme Toggle (Commented Out) -->
-    <!--
-    <div class="theme-toggle">
-      <button id="theme-toggle-btn">
-        <span id="theme-icon">🌙</span>
-      </button>
-    </div>
-    -->
+    <header class="title-header">SwiftType</header>
 
     <!-- Button Row -->
     <div class="button-row">
       <div class="button-section" id="left-buttons">
-        <button class="btn">Numbers</button>
-        <button class="btn">Punctuation</button>
+        <button class="btn toggle-btn" id="numbers-btn">Numbers</button>
+        <button class="btn toggle-btn" id="punctuation-btn">Punctuation</button>
       </div>
       <div class="button-section" id="middle-buttons">
-        <button class="btn active" id="mode-time">Time</button>
-        <button class="btn" id="mode-words">Words</button>
+        <button class="btn mode-btn active" id="mode-time">Time</button>
+        <button class="btn mode-btn" id="mode-words">Words</button>
       </div>
       <div class="button-section" id="right-buttons">
-        <button class="btn" data-time="15">15s</button>
-        <button class="btn active" data-time="30">30s</button>
-        <button class="btn" data-time="60">60s</button>
+        <!-- Time Buttons -->
+        <button class="btn time-btn active" data-time="30">30s</button>
+        <button class="btn time-btn" data-time="60">60s</button>
+        <!-- Word Count Buttons -->
+        <button class="btn word-btn hidden" data-count="10">10</button>
+        <button class="btn word-btn hidden" data-count="25">25</button>
+        <button class="btn word-btn hidden" data-count="50">50</button>
+        <button class="btn word-btn hidden" data-count="100">100</button>
       </div>
     </div>
 
