@@ -1,33 +1,28 @@
 :root {
-  --bg-light: #ffffff;
   --bg-dark: #0f0f0f;
-  --text-light: #0f0f0f;
   --text-dark: #f1f5f9;
   --primary: #facc15;
-  --secondary: #e2e8f0;
+  --primary-dark: #e6b800;
+  --secondary: #1a1a1a;
   --accent: #64748b;
+  --press-move: translateY(2px);
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 
 body {
   font-family: 'Segoe UI', sans-serif;
   min-height: 100vh;
-  background-color: var(--bg-light);
-  color: var(--text-light);
+  background-color: var(--bg-dark);
+  color: var(--text-dark);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-}
-
-body.dark {
-  background-color: var(--bg-dark);
-  color: var(--text-dark);
 }
 
 .container {
@@ -49,7 +44,7 @@ body.dark {
   background: none;
   border: none;
   cursor: pointer;
-  color: inherit;
+  color: var(--text-dark);
 }
 
 /* Button Row */
@@ -69,15 +64,21 @@ body.dark {
   padding: 0.6rem 1rem;
   border: 1px solid var(--accent);
   background-color: transparent;
-  color: inherit;
+  color: var(--text-dark);
   cursor: pointer;
   border-radius: 5px;
   font-size: 0.95rem;
+  transition: all 0.2s ease;
 }
 
 .btn:hover {
-  background-color: var(--accent);
-  color: var(--bg-light);
+  background-color: var(--primary);
+  color: var(--bg-dark);
+}
+
+.btn:active {
+  background-color: var(--primary-dark);
+  transform: var(--press-move);
 }
 
 .btn.active {
@@ -93,7 +94,7 @@ body.dark {
   border: 1px solid var(--accent);
   padding: 1.5rem;
   border-radius: 6px;
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* Restart */
@@ -108,23 +109,25 @@ body.dark {
 /* Footer */
 footer {
   text-align: center;
-  padding: 1rem;
+  padding: 1.2rem;
   font-size: 0.85rem;
+  background-color: var(--secondary);
+  border-top: 1px solid #1e293b;
   color: var(--accent);
 }
 
-footer .bit {
+footer a.bit {
   color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-footer:hover .bit {
-  color: var(--text-light);
+footer a.bit:hover {
+  color: var(--primary-dark);
 }
 
-body.dark footer .bit {
-  color: var(--primary);
-}
-
-body.dark footer:hover .bit {
-  color: var(--text-dark);
+footer a.bit:active {
+  color: var(--primary-dark);
+  transform: var(--press-move);
 }
