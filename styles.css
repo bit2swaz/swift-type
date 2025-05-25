@@ -1,155 +1,130 @@
 :root {
-  --light-bg: #f5f5f5;
-  --light-text: #1a1a1a;
-  --light-accent: #4a4a4a;
+  --bg-light: #ffffff;
+  --bg-dark: #0f0f0f;
+  --text-light: #0f0f0f;
+  --text-dark: #f1f5f9;
+  --primary: #facc15;
+  --secondary: #e2e8f0;
+  --accent: #64748b;
+}
 
-  --dark-bg: #121212;
-  --dark-text: #f1f1f1;
-  --dark-accent: #f5d742;
-
-  --transition-fast: 0.3s ease;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transition: all 0.25s ease;
 }
 
 body {
-  margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  transition: background-color var(--transition-fast), color var(--transition-fast);
+  min-height: 100vh;
+  background-color: var(--bg-light);
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.light {
-  background-color: var(--light-bg);
-  color: var(--light-text);
+body.dark {
+  background-color: var(--bg-dark);
+  color: var(--text-dark);
 }
 
-.dark {
-  background-color: var(--dark-bg);
-  color: var(--dark-text);
+.container {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  flex-grow: 1;
 }
 
-#theme-toggle {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
+/* Theme Toggle */
+.theme-toggle {
+  display: flex;
+  justify-content: flex-end;
 }
 
-#toggle-btn {
+#theme-toggle-btn {
+  font-size: 1.25rem;
   background: none;
   border: none;
-  font-size: 1.5rem;
   cursor: pointer;
-  transition: transform var(--transition-fast);
+  color: inherit;
 }
 
-#toggle-btn:hover {
-  transform: scale(1.2);
-}
-
-.main-container {
-  text-align: center;
-  margin-top: 5rem;
-  padding: 0 1rem;
-}
-
-.title {
-  font-size: 3rem;
-  margin-bottom: 2rem;
-}
-
-.typing-box {
-  border: 2px dashed currentColor;
-  padding: 2rem;
-  border-radius: 12px;
-  font-size: 1.5rem;
-  min-height: 150px;
-  margin: auto;
-  max-width: 700px;
-}
-
-.controls {
+/* Button Row */
+.button-row {
   display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  justify-content: space-between;
   flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.mode-btn, #restart-btn {
-  background: none;
-  border: 2px solid currentColor;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
+.button-section {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn {
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--accent);
+  background-color: transparent;
+  color: inherit;
   cursor: pointer;
-  border-radius: 8px;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  border-radius: 5px;
+  font-size: 0.95rem;
 }
 
-.mode-btn:hover, #restart-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  transform: scale(1.05);
+.btn:hover {
+  background-color: var(--accent);
+  color: var(--bg-light);
 }
 
-.word {
-  margin-right: 0.5rem;
-  display: inline-block;
+.btn.active {
+  background-color: var(--primary);
+  color: var(--bg-dark);
 }
 
-.char {
-  display: inline-block;
+/* Text Display */
+.text-display {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  min-height: 6rem;
+  border: 1px solid var(--accent);
+  padding: 1.5rem;
+  border-radius: 6px;
+  background-color: rgba(0, 0, 0, 0.03);
 }
 
-.correct {
-  color: limegreen;
-}
-
-.incorrect {
-  color: red;
-}
-
-.active-word {
-  border-bottom: 2px solid currentColor;
-}
-
-.footer {
+/* Restart */
+.restart {
   text-align: center;
-  padding: 2rem 0;
-  margin-top: 4rem;
+}
+
+.restart-btn {
   font-size: 1rem;
-  color: inherit;
-  border-top: 1px solid currentColor;
-  transition: color var(--transition-fast);
 }
 
-.footer a {
-  color: inherit;
-  text-decoration: none;
-  font-weight: bold;
-  position: relative;
-  transition: color var(--transition-fast);
+/* Footer */
+footer {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.85rem;
+  color: var(--accent);
 }
 
-.footer a::after {
-  content: '';
-  display: block;
-  width: 100%;
-  height: 2px;
-  background: currentColor;
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--transition-fast);
+footer .bit {
+  color: var(--primary);
 }
 
-.footer a:hover::after {
-  transform: scaleX(1);
+footer:hover .bit {
+  color: var(--text-light);
 }
 
-.heart {
-  animation: pulse 1.5s infinite;
+body.dark footer .bit {
+  color: var(--primary);
 }
 
-/* @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-} */
+body.dark footer:hover .bit {
+  color: var(--text-dark);
+}
