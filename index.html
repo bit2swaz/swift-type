@@ -6,26 +6,22 @@
   <title>SwiftType</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-
-  <!-- Theme Toggle -->
-  <div class="theme-toggle-wrapper">
-    <input type="checkbox" id="theme-toggle" />
-    <label for="theme-toggle" class="theme-toggle">
-      <span class="sun">☀️</span>
-      <span class="moon">🌙</span>
-    </label>
+<body class="light">
+  <div id="theme-toggle">
+    <button id="toggle-btn" aria-label="Toggle Theme">
+      <span id="icon">🌞</span>
+    </button>
   </div>
 
-  <!-- Typing Area -->
-  <main id="app">
-    <div id="words-container"></div>
-    <input type="text" id="input" autocomplete="off" autofocus />
+  <main class="main-container">
+    <h1 class="title">SwiftType</h1>
+    <div class="typing-box">
+      <!-- Words will be injected here -->
+    </div>
   </main>
 
-  <!-- Footer -->
   <footer class="footer">
-    <p>Built by <a href="https://github.com/bit2swaz" target="_blank">bit2swaz</a> | Inspired by Monkeytype</p>
+    <p>made with <span class="heart">❤️</span> by <a href="https://github.com/bit2swaz" target="_blank">bit2swaz</a></p>
   </footer>
 
   <script src="script.js"></script>
