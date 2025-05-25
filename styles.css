@@ -65,6 +65,50 @@ body {
   max-width: 700px;
 }
 
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.mode-btn, #restart-btn {
+  background: none;
+  border: 2px solid currentColor;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.mode-btn:hover, #restart-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.word {
+  margin-right: 0.5rem;
+  display: inline-block;
+}
+
+.char {
+  display: inline-block;
+}
+
+.correct {
+  color: limegreen;
+}
+
+.incorrect {
+  color: red;
+}
+
+.active-word {
+  border-bottom: 2px solid currentColor;
+}
+
 .footer {
   text-align: center;
   padding: 2rem 0;
