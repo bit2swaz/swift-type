@@ -86,17 +86,6 @@ body {
   color: var(--bg-dark);
 }
 
-/* Text Display */
-.text-display {
-  font-size: 1.5rem;
-  line-height: 2rem;
-  min-height: 6rem;
-  border: 1px solid var(--accent);
-  padding: 1.5rem;
-  border-radius: 6px;
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
 /* Restart */
 .restart {
   text-align: center;
@@ -119,26 +108,70 @@ body {
 /* Footer */
 footer {
   text-align: center;
-  padding: 2rem 1rem; /* increased height */
-  font-size: 0.9rem;
+  padding: 2.5rem 1rem;
+  font-size: 1.1rem; /* bigger */
   background-color: var(--secondary);
   border-top: 1px solid #1e293b;
-  color: var(--accent);
+  color: #dcdcdc; /* off white */
   margin-top: 2rem;
 }
-
-footer a.bit {
-  color: var(--primary);
+footer .bit {
+  color: #facc15;
   text-decoration: none;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  transition: all 0.2s ease-in-out;
+}
+footer .bit:hover {
+  color: #fbbf24;
+}
+footer .bit:active {
+  transform: translateY(2px);
+  color: #eab308;
 }
 
-footer a.bit:hover {
-  color: var(--primary-dark);
+/* Text Display */
+.text-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 1.7rem;
+  font-family: 'Courier New', monospace;
+  color: #555;
+  padding: 2rem;
+  min-height: 100px;
+  justify-content: center;
+  text-align: left;
+  user-select: none;
 }
 
-footer a.bit:active {
-  color: var(--primary-dark);
-  transform: var(--press-move);
+/* Word States */
+.word {
+  opacity: 0.35;
+}
+.word.correct {
+  color: #fefefe;
+  opacity: 1;
+}
+.word.incorrect {
+  color: #f87171;
+  opacity: 1;
+}
+.word.extra {
+  color: #dc2626;
+  opacity: 1;
+}
+.word.current {
+  border-bottom: 2px solid #facc15;
+}
+
+/* Hidden Typing Input */
+#hidden-input {
+  position: absolute;
+  top: -9999px;
+}
+
+/* Caret - Blinking */
+@keyframes caret-blink {
+  0% { border-color: #facc15; }
+  50% { border-color: transparent; }
+  100% { border-color: #facc15; }
 }
