@@ -272,3 +272,8 @@ textInput.addEventListener('input', (e) => {
         calculateMetrics();
     }
 });
+
+restartBtn.addEventListener('click', resetGame);
+
+// --- Initialize the game on load ---
+resetGame();
