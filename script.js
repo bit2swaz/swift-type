@@ -206,7 +206,12 @@ function updateTimer() {
     const currentTime = new Date().getTime();
     const elapsedTime = Math.floor((currentTime - startTime) / 1000);
     timerDisplay.textContent = `Time: ${elapsedTime}s`;
-    calculateMetrics(); // Update WPM and accuracy continuously
+
+    if (currentTestMode === 'time' && elapsedTime >= currentTestDuration) {
+        endTest();
+    } else {
+        calculateMetrics();
+    }
 }
 
 function stopTimer() {
