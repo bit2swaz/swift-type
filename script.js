@@ -42,7 +42,7 @@ let correctCharactersTyped = 0; // This variable tracks characters that form cor
 let testStarted = false;
 let testFinished = false;
 
-// Test settings
+// Test settings - Initial defaults (will be overwritten by localStorage if values exist)
 let currentTestMode = 'time'; // 'time' or 'words'
 let currentTestDuration = 30; // default to 30 seconds (in seconds)
 let currentWordCount = 50; // default to 50 words
@@ -352,7 +352,6 @@ function resetGame() {
     wordsDisplay.scrollTop = 0;
 
     hideResultsScreen();
-    // showTypingInterface() will now call textInput.focus() after the transition
     showTypingInterface();
 
     generateWords();
@@ -436,27 +435,105 @@ function hideResultsScreen() {
 }
 
 function showTypingInterface() {
-    // FIX: Delay focus call to ensure the UI is ready after transition
-    // and explicitly disable and then re-enable the input to force a focus state.
     setTimeout(() => {
         settingsPanel.classList.remove('hidden');
         testArea.classList.remove('hidden');
         liveResults.classList.remove('hidden');
         restartBtn.classList.remove('hidden');
         
-        // --- START FIX for focus issue ---
-        // Temporarily disable, then re-enable and focus
-        // This often helps browsers re-evaluate focus state after complex DOM changes/transitions.
-        textInput.disabled = true; // Briefly disable
-        textInput.focus(); // Attempt to focus while disabled (might not work, but sets intent)
+        textInput.disabled = true;
+        textInput.focus();
         setTimeout(() => {
-            textInput.disabled = false; // Re-enable
-            textInput.focus(); // Re-focus once enabled
-            textInput.value = ''; // Ensure it's clear
-        }, 100); // A small delay after the main transition delay
-        // --- END FIX for focus issue ---
+            textInput.disabled = false;
+            textInput.focus();
+            textInput.value = '';
+        }, 100);
+    }, 500);
+}
 
-    }, 500); // This is the main transition delay
+
+// --- Local Storage Functions ---
+
+function saveSettings() {
+    localStorage.setItem('typingTestMode', currentTestMode);
+    localStorage.setItem('typingTestDuration', currentTestDuration.toString()); // Store as string
+    localStorage.setItem('typingWordCount', currentWordCount.toString());     // Store as string
+    localStorage.setItem('typingIncludeNumbers', includeNumbers.toString());   // Store as string
+    localStorage.setItem('typingIncludePunctuation', includePunctuation.toString()); // Store as string
+    console.log("Settings saved to localStorage.");
+}
+
+function loadSettings() {
+    console.log("Loading settings from localStorage...");
+    const savedMode = localStorage.getItem('typingTestMode');
+    const savedDuration = localStorage.getItem('typingTestDuration');
+    const savedWordCount = localStorage.getItem('typingWordCount');
+    const savedNumbers = localStorage.getItem('typingIncludeNumbers');
+    const savedPunctuation = localStorage.getItem('typingIncludePunctuation');
+
+    // Apply saved mode or default
+    if (savedMode === 'time' || savedMode === 'words') {
+        currentTestMode = savedMode;
+    } else {
+        currentTestMode = 'time'; // Default if no valid setting found
+    }
+
+    // Apply saved duration or default, and update UI
+    if (savedDuration && !isNaN(parseInt(savedDuration))) {
+        const parsedDuration = parseInt(savedDuration);
+        // Check if the parsed duration is one of our valid options
+        const validTimeOptions = [15, 30, 60, 120]; // Assuming these are your options
+        if (validTimeOptions.includes(parsedDuration)) {
+            currentTestDuration = parsedDuration;
+        } else {
+            currentTestDuration = 30; // Fallback to default
+        }
+    } else {
+        currentTestDuration = 30; // Default
+    }
+    // Update UI for time options
+    timeOptionsDiv.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+    const activeTimeBtn = timeOptionsDiv.querySelector(`.option-btn[data-value="${currentTestDuration}"]`);
+    if (activeTimeBtn) activeTimeBtn.classList.add('active');
+
+
+    // Apply saved word count or default, and update UI
+    if (savedWordCount && !isNaN(parseInt(savedWordCount))) {
+        const parsedWordCount = parseInt(savedWordCount);
+        const validWordOptions = [10, 25, 50, 100]; // Assuming these are your options
+        if (validWordOptions.includes(parsedWordCount)) {
+            currentWordCount = parsedWordCount;
+        } else {
+            currentWordCount = 50; // Fallback to default
+        }
+    } else {
+        currentWordCount = 50; // Default
+    }
+    // Update UI for word options
+    wordsOptionsDiv.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+    const activeWordBtn = wordsOptionsDiv.querySelector(`.option-btn[data-value="${currentWordCount}"]`);
+    if (activeWordBtn) activeWordBtn.classList.add('active');
+
+
+    // Apply saved checkboxes or default, and update UI
+    includeNumbers = (savedNumbers === 'true');
+    includePunctuation = (savedPunctuation === 'true');
+    includeNumbersCheckbox.checked = includeNumbers;
+    includePunctuationCheckbox.checked = includePunctuation;
+
+    // Update active mode button UI
+    if (currentTestMode === 'time') {
+        modeTimeBtn.classList.add('active');
+        modeWordsBtn.classList.remove('active');
+        timeOptionsDiv.classList.remove('hidden');
+        wordsOptionsDiv.classList.add('hidden');
+    } else {
+        modeWordsBtn.classList.add('active');
+        modeTimeBtn.classList.remove('active');
+        wordsOptionsDiv.classList.remove('hidden');
+        timeOptionsDiv.classList.add('hidden');
+    }
+    console.log("Settings loaded. Current state:", { currentTestMode, currentTestDuration, currentWordCount, includeNumbers, includePunctuation });
 }
 
 
@@ -465,11 +542,13 @@ function showTypingInterface() {
 // Settings Listeners
 includeNumbersCheckbox.addEventListener('change', () => {
     includeNumbers = includeNumbersCheckbox.checked;
+    saveSettings(); // Save setting on change
     resetGame();
 });
 
 includePunctuationCheckbox.addEventListener('change', () => {
     includePunctuation = includePunctuationCheckbox.checked;
+    saveSettings(); // Save setting on change
     resetGame();
 });
 
@@ -480,12 +559,14 @@ modeTimeBtn.addEventListener('click', () => {
         modeWordsBtn.classList.remove('active');
         timeOptionsDiv.classList.remove('hidden');
         wordsOptionsDiv.classList.add('hidden');
+        // Ensure an option is active after switching mode, in case user didn't select one
         if (!timeOptionsDiv.querySelector('.option-btn.active')) {
             timeOptionsDiv.querySelector('.option-btn[data-value="30"]').classList.add('active');
             currentTestDuration = 30;
         } else {
             currentTestDuration = parseInt(timeOptionsDiv.querySelector('.option-btn.active').dataset.value);
         }
+        saveSettings(); // Save setting on change
         resetGame();
     }
 });
@@ -497,12 +578,14 @@ modeWordsBtn.addEventListener('click', () => {
         modeTimeBtn.classList.remove('active');
         wordsOptionsDiv.classList.remove('hidden');
         timeOptionsDiv.classList.add('hidden');
+        // Ensure an option is active after switching mode
         if (!wordsOptionsDiv.querySelector('.option-btn.active')) {
             wordsOptionsDiv.querySelector('.option-btn[data-value="50"]').classList.add('active');
             currentWordCount = 50;
         } else {
             currentWordCount = parseInt(wordsOptionsDiv.querySelector('.option-btn.active').dataset.value);
         }
+        saveSettings(); // Save setting on change
         resetGame();
     }
 });
@@ -512,6 +595,7 @@ timeOptionsDiv.addEventListener('click', (e) => {
         timeOptionsDiv.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
         e.target.classList.add('active');
         currentTestDuration = parseInt(e.target.dataset.value);
+        saveSettings(); // Save setting on change
         resetGame();
     }
 });
@@ -521,6 +605,7 @@ wordsOptionsDiv.addEventListener('click', (e) => {
         wordsOptionsDiv.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
         e.target.classList.add('active');
         currentWordCount = parseInt(e.target.dataset.value);
+        saveSettings(); // Save setting on change
         resetGame();
     }
 });
@@ -651,8 +736,10 @@ resultsRestartBtn.addEventListener('click', resetGame);
 
 
 // --- Initialize the game on load ---
-document.querySelector('#time-options .option-btn[data-value="30"]').classList.add('active');
-document.querySelector('#mode-time').classList.add('active');
+// First, load settings from localStorage
+loadSettings(); 
+// Then, based on the loaded settings, set initial active states and start the game
+// (The loadSettings() function now handles setting the 'active' classes for buttons based on loaded values)
 resetGame();
 
 window.addEventListener('load', () => {
