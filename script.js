@@ -129,10 +129,21 @@ function generateWords() {
 }
 
 function renderWords() {
-    // Clear previous words and re-add caret at the beginning
-    wordsDisplay.innerHTML = '';
-    wordsDisplay.appendChild(caret); // Ensure caret is appended first if it was removed
+    // 1. Remove all existing word spans, but keep the caret
+    // Iterate in reverse to avoid issues with live NodeList updates
+    const existingWordSpans = wordsDisplay.querySelectorAll('.word');
+    for (let i = existingWordSpans.length - 1; i >= 0; i--) {
+        existingWordSpans[i].remove();
+    }
 
+    // 2. Ensure caret is the first child (if it somehow got moved)
+    // This makes sure the caret is always at the top of the words-display's children
+    // for correct positioning and z-indexing.
+    if (wordsDisplay.firstChild !== caret) {
+        wordsDisplay.prepend(caret);
+    }
+
+    // 3. Append new words
     words.forEach((word, wordIndex) => {
         const wordSpan = document.createElement('span');
         wordSpan.classList.add('word');
@@ -142,19 +153,20 @@ function renderWords() {
             charSpan.textContent = char;
             wordSpan.appendChild(charSpan);
         });
-        wordsDisplay.appendChild(wordSpan);
+        wordsDisplay.appendChild(wordSpan); // Append the word span
 
         // Add a space span after each word, except the last one
         if (wordIndex < words.length - 1) {
             const spaceSpan = document.createElement('span');
-            spaceSpan.classList.add('character', 'space'); // Add 'space' class for potential future styling
+            spaceSpan.classList.add('character', 'space');
             spaceSpan.textContent = ' ';
             wordSpan.appendChild(spaceSpan);
         }
     });
 
-    updateCaretPosition(); // Position the caret
+    updateCaretPosition(); // Position the caret after words are rendered
 }
+
 
 function updateCaretPosition() {
     const allWordElements = wordsDisplay.querySelectorAll('.word');
