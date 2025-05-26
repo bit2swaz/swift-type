@@ -52,7 +52,9 @@ h1 {
 }
 
 .word {
-    white-space: nowrap; /* Prevent words from breaking */
+    display: inline-block; /* Treat words as blocks for better wrapping and positioning */
+    margin-right: 8px; /* Space between words */
+    white-space: nowrap; /* Prevent words from breaking lines */
 }
 
 .character {
