@@ -8,64 +8,57 @@
 </head>
 <body>
     <div class="container">
+        <h1>SwiftType</h1>
 
-        <!-- UI that should hide on typing -->
-        <div id="uiWrapper">
-            <h1>SwiftType</h1>
+        <div class="settings-panel">
+            <div class="settings-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="include-numbers">
+                    <span class="checkmark"></span>
+                    Numbers
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="include-punctuation">
+                    <span class="checkmark"></span>
+                    Punctuation
+                </label>
+            </div>
 
-            <div class="settings-panel">
-                <div class="settings-group">
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="include-numbers">
-                        <span class="checkmark"></span>
-                        Numbers
-                    </label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="include-punctuation">
-                        <span class="checkmark"></span>
-                        Punctuation
-                    </label>
-                </div>
-
-                <div class="settings-group">
-                    <div class="mode-selector">
-                        <button class="mode-btn active" id="mode-time" data-mode="time">Time</button>
-                        <button class="mode-btn" id="mode-words" data-mode="words">Words</button>
-                    </div>
-                </div>
-
-                <div class="settings-group options-group" id="time-options">
-                    <button class="option-btn" data-value="15">15s</button>
-                    <button class="option-btn" data-value="30">30s</button>
-                    <button class="option-btn" data-value="60">60s</button>
-                    <button class="option-btn" data-value="120">120s</button>
-                </div>
-                <div class="settings-group options-group hidden" id="words-options">
-                    <button class="option-btn" data-value="10">10</button>
-                    <button class="option-btn" data-value="25">25</button>
-                    <button class="option-btn" data-value="50">50</button>
-                    <button class="option-btn" data-value="100">100</button>
+            <div class="settings-group">
+                <div class="mode-selector">
+                    <button class="mode-btn active" id="mode-time" data-mode="time">Time</button>
+                    <button class="mode-btn" id="mode-words" data-mode="words">Words</button>
                 </div>
             </div>
 
-            <div class="results">
-                <div id="timer" class="metric">Time: 0s</div>
-                <div id="wpm" class="metric">WPM: 0</div>
-                <div id="accuracy" class="metric">Accuracy: 0%</div>
+            <div class="settings-group options-group" id="time-options">
+                <button class="option-btn" data-value="15">15s</button>
+                <button class="option-btn" data-value="30">30s</button>
+                <button class="option-btn" data-value="60">60s</button>
+                <button class="option-btn" data-value="120">120s</button>
+            </div>
+            <div class="settings-group options-group hidden" id="words-options">
+                <button class="option-btn" data-value="10">10</button>
+                <button class="option-btn" data-value="25">25</button>
+                <button class="option-btn" data-value="50">50</button>
+                <button class="option-btn" data-value="100">100</button>
             </div>
         </div>
 
-        <!-- Test Area (Always Visible) -->
         <div class="test-area">
             <div id="words-display" class="words-display">
                 <div id="caret" class="caret"></div>
-            </div>
+                </div>
             <input type="text" id="text-input" class="text-input" autofocus>
         </div>
 
-        <!-- Restart Button (🔁) -->
-        <button id="restart-btn" class="restart-btn hidden">🔁</button>
+        <div class="results">
+            <div id="timer" class="metric">Time: 0s</div>
+            <div id="wpm" class="metric">WPM: 0</div>
+            <div id="accuracy" class="metric">Accuracy: 0%</div>
+        </div>
 
+        <button id="restart-btn" class="restart-btn">Restart Test</button>
     </div>
 
     <script src="script.js"></script>
