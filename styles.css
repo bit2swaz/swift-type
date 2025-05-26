@@ -1,3 +1,8 @@
+/* Ensure proper box model for easier layout calculations */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #282c34; /* Dark background */
@@ -7,10 +12,9 @@ body {
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    padding: 20px;
+    padding: 20px; /* Base padding */
     box-sizing: border-box;
-    overflow: hidden; /* Prevent body scroll if test area scrolls */
-    /* Added for fading transition */
+    /* Removed overflow: hidden from body. Let the container handle it. */
     position: relative; /* Needed for absolute positioning of results screen */
 }
 
@@ -20,34 +24,34 @@ body {
     padding: 30px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     text-align: center;
-    width: 100%;
-    max-width: 800px;
-    /* Added for absolute positioning of results screen within container */
+    width: 100%; /* Always take full width minus padding on smaller screens */
+    max-width: 800px; /* Max width for larger screens */
     position: relative;
     overflow: hidden; /* Hide content that goes beyond its bounds */
     min-height: 500px; /* Give it some height so results screen doesn't collapse */
-    display: flex; /* Use flex to arrange content vertically */
+    display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Distribute space */
+    justify-content: space-between;
 }
 
 h1 {
     color: #61afef;
     margin-bottom: 30px;
+    font-size: 2.5em; /* Default font size */
 }
 
 .settings-panel {
     display: flex;
-    justify-content: space-between; /* Distribute sections horizontally */
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
     background-color: #21252b;
     border-radius: 8px;
     padding: 15px 20px;
     box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    gap: 15px; /* Space between groups */
-    transition: opacity 0.5s ease-in-out; /* For fading out */
+    flex-wrap: wrap;
+    gap: 15px;
+    transition: opacity 0.5s ease-in-out;
 }
 
 .settings-group {
@@ -119,7 +123,7 @@ h1 {
 .mode-selector {
     display: flex;
     border-radius: 5px;
-    overflow: hidden; /* For rounded edges of active button */
+    overflow: hidden;
     border: 1px solid #4b5263;
 }
 
@@ -166,18 +170,17 @@ h1 {
 }
 
 .option-btn.active {
-    background-color: #c678dd; /* Different active color for options */
+    background-color: #c678dd;
     color: white;
     font-weight: bold;
 }
 
 /* Utility Class for hiding elements */
 .hidden {
-    /* Updated for fading effect */
     opacity: 0;
-    pointer-events: none; /* Make it non-interactive when hidden */
-    visibility: hidden; /* For screen readers and general hiding */
-    transform: scale(0.95); /* Slight scale down for fade out effect */
+    pointer-events: none;
+    visibility: hidden;
+    transform: scale(0.95);
 }
 
 /* Elements that transition their display properties */
@@ -188,7 +191,6 @@ h1 {
 
 .test-area {
     margin-bottom: 30px;
-    /* Added for fading transition */
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, visibility 0.5s;
 }
 
@@ -198,66 +200,65 @@ h1 {
     border-radius: 5px;
     padding: 20px;
     margin-bottom: 20px;
-    font-size: 1.8em;
-    line-height: 1.6em; /* Adjust this to control line height */
-    height: 120px; /* Fixed height for ~3 lines (adjust based on font-size/line-height) */
-    overflow: hidden; /* Hide overflow, JavaScript will manage scroll */
-    position: relative; /* Crucial for positioning the caret */
-    text-align: left; /* Align words to the left */
-    user-select: none; /* Prevent text selection in the words display */
+    font-size: 1.8em; /* Base font size, will adjust for mobile */
+    line-height: 1.6em;
+    height: 120px;
+    overflow: hidden;
+    position: relative;
+    text-align: left;
+    user-select: none;
 }
 
 .word {
-    display: inline-block; /* Treat words as blocks for better wrapping and positioning */
-    margin-right: 8px; /* Space between words */
+    display: inline-block;
+    margin-right: 8px;
     white-space: nowrap; /* Prevent words from breaking lines */
 }
 
 .character {
-    display: inline-block; /* Allows individual character styling */
-    padding: 1px 0; /* Minimal padding */
+    display: inline-block;
+    padding: 1px 0;
     transition: background-color 0.1s ease, color 0.1s ease;
-    /* Current character will be highlighted by the caret, not background color */
 }
 
 .character.correct {
-    color: #98c379; /* Green for correct */
+    color: #98c379;
 }
 
 .character.incorrect {
-    color: #e06c75; /* Red for incorrect */
+    color: #e06c75;
 }
 
 .character.extra {
-    color: #e06c75; /* Red for extra characters */
-    text-decoration: underline wavy #e06c75 1px; /* Wavy underline for incorrect */
+    color: #e06c75;
+    text-decoration: underline wavy #e06c75 1px;
 }
 
 /* Hide the actual text input field visually */
 .text-input {
-    position: absolute; /* Take it out of flow */
-    left: -9999px; /* Move it far off-screen */
-    opacity: 0; /* Make it completely transparent */
-    pointer-events: none; /* Make it non-interactive for mouse events */
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    pointer-events: none;
     width: 1px;
     height: 1px;
     overflow: hidden;
     white-space: nowrap;
-    z-index: -1; /* Ensure it's behind everything */
+    z-index: -1;
 }
 
 /* Custom Caret Styling */
 .caret {
     position: absolute;
     height: 1.6em; /* Match line height of words-display font, line-height 1.6em */
-    width: 2px; /* Thickness of the caret */
-    background-color: #61afef; /* Caret color */
+    width: 2px;
+    background-color: #61afef;
     animation: blink 1s infinite;
-    top: 0; /* Will be set by JS */
-    left: 0; /* Will be set by JS */
-    transition: transform 0.05s ease-out; /* Smooth movement */
-    pointer-events: none; /* Ensure it doesn't block clicks */
-    z-index: 10; /* Ensure it's above words */
+    top: 0;
+    left: 0;
+    transition: transform 0.05s ease-out;
+    pointer-events: none;
+    z-index: 10;
 }
 
 @keyframes blink {
@@ -265,19 +266,11 @@ h1 {
     50% { opacity: 0; }
 }
 
-/* Remove current class from character */
-.character.current {
-    /* No longer needed, caret handles this */
-    background-color: transparent; /* Ensure it's transparent */
-}
-
-
 .results {
     display: flex;
     justify-content: space-around;
     margin-bottom: 30px;
     flex-wrap: wrap;
-    /* Added for fading transition */
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, visibility 0.5s;
 }
 
@@ -299,7 +292,6 @@ h1 {
     font-size: 1.2em;
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
-    /* Added for fading transition */
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, visibility 0.5s;
 }
 
@@ -313,32 +305,30 @@ h1 {
 
 /* NEW: Styles for the Results Screen */
 #results-screen {
-    position: absolute; /* Position over the typing area */
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #3e4451; /* Match container background for seamless transition */
-    border-radius: 8px; /* Match container border-radius */
+    background-color: #3e4451;
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 25px; /* Space between sections */
+    gap: 25px;
     padding: 20px;
     box-sizing: border-box;
-    z-index: 50; /* Ensure it's above other elements during transition */
+    z-index: 50;
     
-    /* Fading transition properties */
     opacity: 0;
-    pointer-events: none; /* Make it non-interactive when hidden */
-    visibility: hidden; /* For screen readers and general hiding */
-    transform: scale(0.95); /* Start slightly smaller for a nice zoom effect */
+    pointer-events: none;
+    visibility: hidden;
+    transform: scale(0.95);
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, visibility 0.5s;
 }
 
-/* When .results-screen is NOT hidden, it becomes visible */
-#results-screen.show { /* We will toggle this class in JS instead of 'hidden' */
+#results-screen.show {
     opacity: 1;
     pointer-events: all;
     visibility: visible;
@@ -346,7 +336,7 @@ h1 {
 }
 
 #results-screen h2 {
-    color: #61afef; /* Match h1 color */
+    color: #61afef;
     margin-bottom: 15px;
     font-size: 2.5em;
     font-weight: bold;
@@ -359,38 +349,37 @@ h1 {
     max-width: 700px;
     margin-bottom: 20px;
     gap: 20px;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    flex-wrap: wrap;
 }
 
 .main-results-summary .metric-item {
-    background-color: #21252b; /* Darker background for main metrics */
+    background-color: #21252b;
     padding: 20px 30px;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    flex-grow: 1; /* Allow items to grow */
-    min-width: 150px; /* Ensure minimum width */
+    flex-grow: 1;
+    min-width: 150px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.main-results-summary .metric-item span:first-child { /* The big number */
-    font-size: 3.5em; /* Very big */
+.main-results-summary .metric-item span:first-child {
+    font-size: 3.5em;
     font-weight: bold;
-    color: #a9b9d3; /* Slightly brighter text */
+    color: #a9b9d3;
     margin-bottom: 5px;
 }
 
 .main-results-summary .metric-label {
-    font-size: 0.9em; /* Smaller label */
-    color: #7f848e; /* Subdued color */
+    font-size: 0.9em;
+    color: #7f848e;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
-/* Restart button specific to results screen */
 #results-restart-btn.new-test-btn {
-    background-color: #61afef; /* Different color for results restart */
+    background-color: #61afef;
     color: white;
     padding: 18px 40px;
     font-size: 1.4em;
@@ -433,15 +422,15 @@ h1 {
 .detailed-results .detail-value {
     font-size: 1.5em;
     font-weight: bold;
-    color: #98c379; /* Greenish for positive values */
+    color: #98c379;
     margin-bottom: 5px;
 }
 
-.detailed-results .detail-item:nth-child(2) .detail-value { /* Incorrect letters value */
-    color: #e06c75; /* Reddish for negative/incorrect */
+.detailed-results .detail-item:nth-child(2) .detail-value {
+    color: #e06c75;
 }
-.detailed-results .detail-item:nth-child(3) .detail-value { /* Extra letters value */
-    color: #c678dd; /* Purple for extra */
+.detailed-results .detail-item:nth-child(3) .detail-value {
+    color: #c678dd;
 }
 
 
@@ -453,45 +442,223 @@ h1 {
 }
 
 
-/* Responsive adjustments for settings panel */
+/* --- Responsive Adjustments --- */
+
+/* Base adjustments for smaller screens (up to 768px for tablets/laptops in portrait) */
+@media (max-width: 768px) {
+    body {
+        padding: 15px; /* Slightly less padding on body */
+    }
+
+    .container {
+        padding: 20px; /* Reduce container padding */
+        min-height: 400px; /* Potentially reduce minimum height on smaller devices */
+    }
+
+    h1 {
+        font-size: 2em; /* Smaller heading */
+        margin-bottom: 20px;
+    }
+
+    .settings-panel {
+        padding: 10px 15px; /* Smaller padding */
+        gap: 10px; /* Reduce gap */
+    }
+
+    .checkbox-container {
+        font-size: 1em; /* Slightly smaller checkbox label */
+        margin-right: 10px;
+    }
+
+    .mode-btn, .option-btn {
+        padding: 8px 12px; /* Smaller button padding */
+        font-size: 1em; /* Smaller button font size */
+    }
+
+    .words-display {
+        font-size: 1.5em; /* Adjust font size for words display */
+        line-height: 1.5em; /* Adjust line height accordingly */
+        height: 100px; /* Adjust height to fit roughly 3 lines at new font size */
+        padding: 15px;
+    }
+
+    .caret {
+        height: 1.5em; /* Match new line height */
+    }
+
+    .metric {
+        padding: 10px 15px; /* Smaller padding for live metrics */
+        font-size: 1.1em; /* Smaller font size for live metrics */
+        margin: 5px; /* Reduce margin */
+    }
+
+    .restart-btn {
+        padding: 12px 25px; /* Smaller padding for restart button */
+        font-size: 1.1em; /* Smaller font size */
+    }
+
+    /* Results Screen specific adjustments */
+    #results-screen h2 {
+        font-size: 2.2em;
+    }
+
+    .main-results-summary {
+        gap: 15px;
+        width: 95%; /* Take more width */
+    }
+    .main-results-summary .metric-item {
+        padding: 15px 20px;
+        min-width: unset; /* Let flex-grow handle it, no rigid min-width */
+        flex-basis: calc(50% - 15px); /* On 2 columns, take half minus gap */
+    }
+    .main-results-summary .metric-item span:first-child {
+        font-size: 3em; /* Smaller WPM/Accuracy on results screen */
+    }
+
+    .detailed-results {
+        gap: 10px;
+        width: 95%; /* Take more width */
+    }
+    .detailed-results .detail-item {
+        padding: 10px 15px;
+        min-width: unset;
+        flex-basis: calc(33.33% - 10px); /* On 3 columns, take third minus gap */
+    }
+    .detailed-results .detail-value {
+        font-size: 1.3em;
+    }
+    .detail-label {
+        font-size: 0.8em;
+    }
+
+    #results-restart-btn.new-test-btn {
+        padding: 15px 30px;
+        font-size: 1.2em;
+    }
+}
+
+
+/* Existing and refined media query for max-width: 600px (phones) */
 @media (max-width: 600px) {
+    body {
+        padding: 10px; /* Even less padding on very small screens */
+    }
+
+    .container {
+        padding: 15px; /* Even less container padding */
+        min-height: 380px; /* Adjust min height again */
+    }
+
+    h1 {
+        font-size: 1.8em; /* Even smaller heading */
+    }
+
     .settings-panel {
         flex-direction: column;
         align-items: stretch;
         gap: 10px;
+        padding: 10px;
     }
     .settings-group {
         justify-content: center;
-        flex-wrap: wrap;
+        flex-wrap: wrap; /* Ensure checkboxes/mode/options wrap */
+        width: 100%; /* Take full width of panel */
+        gap: 8px; /* Slightly reduce gap within groups */
     }
     .mode-selector, .options-group {
         width: 100%;
         justify-content: center;
     }
     .mode-btn, .option-btn {
-        flex-grow: 1; /* Make buttons expand to fill width */
+        flex-grow: 1;
+        padding: 10px 8px; /* Slightly more vertical padding, less horizontal */
+        font-size: 0.95em; /* Slightly smaller text in buttons */
+    }
+
+    .checkbox-container {
+        font-size: 0.9em; /* Smaller checkbox label */
+        padding-left: 25px;
+    }
+    .checkmark {
+        height: 18px;
+        width: 18px;
+    }
+    .checkbox-container .checkmark:after {
+        left: 6px;
+        top: 2px;
+        width: 4px;
+        height: 8px;
+        border-width: 0 2px 2px 0;
+    }
+
+    .words-display {
+        font-size: 1.3em; /* Smaller font for words */
+        line-height: 1.4em;
+        height: 80px; /* Adjust height for fewer lines/smaller font */
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+    .caret {
+        height: 1.4em; /* Match new line height */
+    }
+    .word {
+        margin-right: 6px; /* Slightly less space between words */
+    }
+
+    .results {
+        flex-direction: column; /* Stack live metrics vertically */
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .metric {
+        width: 80%; /* Metrics take more width when stacked */
+        max-width: 250px; /* Prevent them from becoming too wide */
+        font-size: 1.2em; /* Slightly larger for emphasis */
+        padding: 12px 20px;
+    }
+
+    .restart-btn {
+        padding: 12px 25px;
+        font-size: 1.1em;
     }
 
     /* Results screen responsive adjustments */
     #results-screen h2 {
-        font-size: 2em;
+        font-size: 1.8em; /* Even smaller heading on results */
+        margin-bottom: 10px;
     }
     .main-results-summary {
-        flex-direction: column;
+        flex-direction: column; /* Stack main results vertically */
         width: 95%;
+        gap: 10px;
     }
     .main-results-summary .metric-item {
         width: 100%;
-        padding: 15px 20px;
+        padding: 12px 15px;
+        font-size: 0.9em; /* Reduce overall font size for item */
     }
     .main-results-summary .metric-item span:first-child {
-        font-size: 2.8em;
+        font-size: 2.5em; /* Smaller WPM/Accuracy on results screen */
     }
     .detailed-results {
-        flex-direction: column;
+        flex-direction: column; /* Stack detailed results vertically */
         width: 95%;
+        gap: 8px;
     }
     .detailed-results .detail-item {
         width: 100%;
+        padding: 10px 15px;
+    }
+    .detailed-results .detail-value {
+        font-size: 1.2em;
+    }
+    .detail-label {
+        font-size: 0.75em;
+    }
+
+    #results-restart-btn.new-test-btn {
+        padding: 12px 25px;
+        font-size: 1.1em;
     }
 }
