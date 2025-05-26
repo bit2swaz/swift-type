@@ -77,20 +77,46 @@ h1 {
     text-decoration: underline wavy #e06c75 1px; /* Wavy underline for incorrect */
 }
 
+/* Remove current class from character */
+.character.current {
+    /* No longer needed, caret handles this */
+    background-color: transparent; /* Ensure it's transparent */
+}
+
 .text-input {
-    width: calc(100% - 40px); /* Account for padding */
-    padding: 15px 20px;
-    font-size: 1.5em;
-    border: 1px solid #4b5263;
-    border-radius: 5px;
-    background-color: #21252b;
-    color: #abb2bf;
-    outline: none;
-    transition: border-color 0.2s ease;
+    position: absolute; /* Take it out of flow */
+    left: -9999px; /* Move it far off-screen */
+    opacity: 0; /* Make it completely transparent */
+    pointer-events: none; /* Make it non-interactive for mouse events */
+    /* Maintain width/height for autofocus to work if needed, but not strictly necessary for off-screen */
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+    z-index: -1; /* Ensure it's behind everything */
 }
 
 .text-input:focus {
     border-color: #61afef;
+}
+
+/* Custom Caret Styling */
+.caret {
+    position: absolute;
+    height: 1.8em; /* Match line height of words-display font */
+    width: 2px; /* Thickness of the caret */
+    background-color: #61afef; /* Caret color */
+    animation: blink 1s infinite;
+    top: 0; /* Will be set by JS */
+    left: 0; /* Will be set by JS */
+    transition: transform 0.05s ease-out; /* Smooth movement */
+    pointer-events: none; /* Ensure it doesn't block clicks */
+    z-index: 10; /* Ensure it's above words */
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
 }
 
 .results {
