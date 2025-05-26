@@ -68,3 +68,32 @@ function renderWords() {
     // Highlight the first character of the first word
     highlightCurrentCharacter();
 }
+
+function highlightCurrentCharacter() {
+    const allCharacters = wordsDisplay.querySelectorAll('.character');
+    // Remove 'current' from previously highlighted character
+    const previouslyCurrent = wordsDisplay.querySelector('.character.current');
+    if (previouslyCurrent) {
+        previouslyCurrent.classList.remove('current');
+    }
+
+    // Determine the character to highlight
+    let charToHighlight = null;
+    let charCount = 0;
+
+    for (let i=0; i < currentWordIndex; i++) {
+        charCount += words[i].length + 1; // +1 for the space after each word
+    }
+    charCount += currentCharIndex;
+
+    if (charCount < allCharacters.length) {
+        charToHighlight = allCharacters[charCount];
+    }
+
+    if (charToHighlight) {
+        charToHighlight.classList.add('current');
+        // Scroll the view to keep current word visible
+        scrollWordsDisplay();
+    }
+}
+
