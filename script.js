@@ -22,6 +22,8 @@ let timerInterval;
 let totalCharactersTyped = 0;
 let correctCharactersTyped = 0;
 let testStarted = false;
+let testFinished = false; // New flag to prevent input after test ends
+
 
 // --- Word List (significantly expanded) ---
 const commonWords = [
