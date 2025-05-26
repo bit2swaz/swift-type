@@ -10,6 +10,41 @@
     <div class="container">
         <h1>SwiftType</h1>
 
+        <div class="settings-panel">
+            <div class="settings-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="include-numbers">
+                    <span class="checkmark"></span>
+                    Numbers
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="include-punctuation">
+                    <span class="checkmark"></span>
+                    Punctuation
+                </label>
+            </div>
+
+            <div class="settings-group">
+                <div class="mode-selector">
+                    <button class="mode-btn active" id="mode-time" data-mode="time">Time</button>
+                    <button class="mode-btn" id="mode-words" data-mode="words">Words</button>
+                </div>
+            </div>
+
+            <div class="settings-group options-group" id="time-options">
+                <button class="option-btn active" data-value="15">15s</button>
+                <button class="option-btn" data-value="30">30s</button>
+                <button class="option-btn" data-value="60">60s</button>
+                <button class="option-btn" data-value="120">120s</button>
+            </div>
+            <div class="settings-group options-group hidden" id="words-options">
+                <button class="option-btn" data-value="10">10</button>
+                <button class="option-btn" data-value="25">25</button>
+                <button class="option-btn" data-value="50">50</button>
+                <button class="option-btn" data-value="100">100</button>
+            </div>
+        </div>
+
         <div class="test-area">
             <div id="words-display" class="words-display">
                 </div>
