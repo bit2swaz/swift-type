@@ -1,83 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SwiftType</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftType</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
-    <h1 class="title">SwiftType</h1>
+    <div class="container">
+        <h1>SwiftType</h1>
 
-    <!-- Settings Panel -->
-    <div class="settings-panel">
-      <!-- Left Shelf -->
-      <div class="settings-group shelf-left">
-        <button class="toggle-btn" id="toggle-numbers">Numbers</button>
-        <button class="toggle-btn" id="toggle-punctuation">Punctuation</button>
-      </div>
+        <div class="settings-panel">
+            <div class="settings-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="include-numbers">
+                    <span class="checkmark"></span>
+                    Numbers
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="include-punctuation">
+                    <span class="checkmark"></span>
+                    Punctuation
+                </label>
+            </div>
 
-      <span class="divider">||</span>
+            <div class="settings-group">
+                <div class="mode-selector">
+                    <button class="mode-btn active" id="mode-time" data-mode="time">Time</button>
+                    <button class="mode-btn" id="mode-words" data-mode="words">Words</button>
+                </div>
+            </div>
 
-      <!-- Center Shelf -->
-      <div class="settings-group shelf-center">
-        <button class="mode-btn active" data-mode="time" id="mode-time">Time</button>
-        <button class="mode-btn" data-mode="words" id="mode-words">Words</button>
-        <button class="mode-btn" id="mode-custom">Custom</button>
-      </div>
-
-      <span class="divider">||</span>
-
-      <!-- Right Shelf -->
-      <div class="settings-group shelf-right" id="mode-options">
-        <!-- Time Options (default visible) -->
-        <div class="options-group" id="time-options">
-          <button class="option-btn" data-value="15">15s</button>
-          <button class="option-btn" data-value="30">30s</button>
-          <button class="option-btn" data-value="60">60s</button>
-          <button class="option-btn" data-value="120">120s</button>
+            <div class="settings-group options-group" id="time-options">
+                <button class="option-btn" data-value="15">15s</button>
+                <button class="option-btn" data-value="30">30s</button>
+                <button class="option-btn" data-value="60">60s</button>
+                <button class="option-btn" data-value="120">120s</button>
+            </div>
+            <div class="settings-group options-group hidden" id="words-options">
+                <button class="option-btn" data-value="10">10</button>
+                <button class="option-btn" data-value="25">25</button>
+                <button class="option-btn" data-value="50">50</button>
+                <button class="option-btn" data-value="100">100</button>
+            </div>
         </div>
 
-        <!-- Words Options (hidden by default) -->
-        <div class="options-group hidden" id="words-options">
-          <button class="option-btn" data-value="10">10</button>
-          <button class="option-btn" data-value="25">25</button>
-          <button class="option-btn" data-value="50">50</button>
-          <button class="option-btn" data-value="100">100</button>
+        <div class="test-area">
+            <div id="words-display" class="words-display">
+                <div id="caret" class="caret"></div>
+                </div>
+            <input type="text" id="text-input" class="text-input" autofocus>
         </div>
-      </div>
+
+        <div class="results">
+            <div id="timer" class="metric">Time: 0s</div>
+            <div id="wpm" class="metric">WPM: 0</div>
+            <div id="accuracy" class="metric">Accuracy: 0%</div>
+        </div>
+
+        <button id="restart-btn" class="restart-btn">Restart Test</button>
     </div>
 
-    <!-- Typing Test Area -->
-    <div class="test-area">
-      <div id="words-display" class="words-display">
-        <!-- Words will be rendered here with caret inside -->
-      </div>
-      <input type="text" id="text-input" class="text-input" autofocus />
-    </div>
-
-    <!-- Restart Button -->
-    <div class="restart-wrapper">
-      <button id="restart-btn" class="restart-btn">🔁</button>
-    </div>
-
-    <!-- Results Pane -->
-    <div class="results hidden" id="results-pane">
-      <div class="primary-stats">
-        <div id="final-wpm" class="stat-large">WPM: 0</div>
-        <div id="final-accuracy" class="stat-large">Accuracy: 0%</div>
-        <div id="final-raw-wpm" class="stat-large">Raw WPM: 0</div>
-      </div>
-      <button class="restart-btn" id="final-restart">🔁</button>
-      <div class="secondary-stats">
-        <div id="correct-count">Correct: 0</div>
-        <div id="incorrect-count">Incorrect: 0</div>
-        <div id="extra-count">Extra: 0</div>
-      </div>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
