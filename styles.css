@@ -103,3 +103,21 @@ h1 {
     margin: 10px;
 }
 
+.restart-btn {
+    background-color: #c678dd;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.restart-btn:hover {
+    background-color: #9f60b6;
+}
+
+.restart-btn:active {
+    transform: translateY(1px);
+}
