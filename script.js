@@ -130,3 +130,18 @@ function updateTimer() {
 function stopTimer() {
     clearInterval(timerInterval);
 }
+
+function calculateMetrics() {
+    const currentTime = new Date().getTime();
+    const elapsedTimeInMinutes = (currentTime - startTime) / 1000 / 60; // in minutes
+
+    // WPM calculation: (correct characters / 5) / time in minutes
+    // A "word" is typically considered 5 characters (including spaces)
+    const wpm = elapsedTimeInMinutes > 0 ? Math.round((correctCharactersTyped / 5) / elapsedTimeInMinutes) : 0;
+    wpmDisplay.textContent = `WPM: ${wpm}`;
+
+    // Accuracy calculation
+    const accuracy = totalCharactersTyped > 0 ? Math.round((correctCharactersTyped / totalCharactersTyped) * 100) : 0;
+    accuracyDisplay.textContent = `Accuracy: ${accuracy}%`;
+}
+
