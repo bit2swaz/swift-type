@@ -26,8 +26,8 @@ body {
     width: 100%;
     max-width: 800px;
     position: relative;
-    overflow: hidden;
-    min-height: 500px;
+    overflow: hidden; /* Keep this for transitions, we'll manage height better */
+    min-height: 500px; /* Base min-height for larger screens */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -308,14 +308,14 @@ h1 {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 100%; /* Height is 100% of parent .container */
     background-color: #3e4451;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: center; /* Center content vertically */
     align-items: center;
-    gap: 25px;
+    gap: 25px; /* Base gap, will reduce for mobile */
     padding: 20px;
     box-sizing: border-box;
     z-index: 50;
@@ -451,7 +451,8 @@ h1 {
 
     .container {
         padding: 20px;
-        min-height: 400px;
+        /* min-height: 400px; REMOVED or reduced for more flexibility */
+        min-height: auto; /* Allow container to shrink/grow based on content */
     }
 
     h1 {
@@ -497,37 +498,39 @@ h1 {
     }
 
     /* Results Screen specific adjustments for 768px and below */
+    #results-screen {
+        gap: 15px; /* Reduce gap on results screen */
+        padding: 15px; /* Reduce overall padding as well */
+        justify-content: flex-start; /* Start content from top on smaller screens to maximize space */
+    }
+
     #results-screen h2 {
         font-size: 2.2em;
     }
 
     .main-results-summary {
-        flex-direction: column; /* FORCE stacking on smaller screens */
-        align-items: center; /* Center the stacked items */
-        width: 95%; /* Take more width */
-        gap: 15px;
+        flex-direction: column;
+        align-items: center;
+        width: 95%;
+        gap: 10px; /* Reduce gap between main metrics */
     }
     .main-results-summary .metric-item {
-        width: 100%; /* Each item takes full width */
-        padding: 15px 20px;
-        min-width: unset;
-        flex-basis: auto; /* Reset flex-basis when stacking */
+        width: 100%;
+        padding: 12px 15px; /* Reduce padding for main metrics */
     }
     .main-results-summary .metric-item span:first-child {
         font-size: 3em;
     }
 
     .detailed-results {
-        flex-direction: column; /* FORCE stacking on smaller screens */
-        align-items: center; /* Center the stacked items */
+        flex-direction: column;
+        align-items: center;
         width: 95%;
-        gap: 10px;
+        gap: 8px; /* Reduce gap between detailed metrics */
     }
     .detailed-results .detail-item {
-        width: 100%; /* Each item takes full width */
-        padding: 10px 15px;
-        min-width: unset;
-        flex-basis: auto; /* Reset flex-basis when stacking */
+        width: 100%;
+        padding: 10px 15px; /* Reduce padding for detailed metrics */
     }
     .detailed-results .detail-value {
         font-size: 1.3em;
@@ -551,7 +554,8 @@ h1 {
 
     .container {
         padding: 15px;
-        min-height: 380px;
+        /* min-height: 380px; REMOVED or reduced */
+        min-height: auto; /* Ensure flexibility here too */
     }
 
     h1 {
@@ -629,43 +633,46 @@ h1 {
     }
 
     /* Results screen responsive adjustments (even more aggressive for tiny phones) */
+    #results-screen {
+        gap: 10px; /* Further reduce gap for tiny screens */
+        padding: 10px; /* Even less padding */
+    }
+
     #results-screen h2 {
         font-size: 1.8em;
         margin-bottom: 10px;
     }
     .main-results-summary {
-        /* Already handled by 768px, but ensure overrides are robust */
         flex-direction: column;
         width: 95%;
-        gap: 10px;
+        gap: 8px; /* Further reduce gap between main metrics */
     }
     .main-results-summary .metric-item {
         width: 100%;
-        padding: 12px 15px;
+        padding: 10px 12px; /* Further reduce padding for main metrics */
         font-size: 0.9em;
     }
     .main-results-summary .metric-item span:first-child {
-        font-size: 2.5em;
+        font-size: 2.2em; /* Smaller WPM/Accuracy on results screen */
     }
     .detailed-results {
-        /* Already handled by 768px, but ensure overrides are robust */
         flex-direction: column;
         width: 95%;
-        gap: 8px;
+        gap: 6px; /* Further reduce gap between detailed metrics */
     }
     .detailed-results .detail-item {
         width: 100%;
-        padding: 10px 15px;
+        padding: 8px 12px; /* Further reduce padding for detailed metrics */
     }
     .detailed-results .detail-value {
-        font-size: 1.2em;
+        font-size: 1.1em;
     }
     .detail-label {
-        font-size: 0.75em;
+        font-size: 0.7em;
     }
 
     #results-restart-btn.new-test-btn {
-        padding: 12px 25px;
-        font-size: 1.1em;
+        padding: 10px 20px;
+        font-size: 1em;
     }
 }
