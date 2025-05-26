@@ -261,6 +261,7 @@ function resetGame() {
     generateWords(); // Regenerate words based on current settings
     renderWords();
 }
+
 // --- Event Listeners ---
 
 textInput.addEventListener('keydown', (e) => {
