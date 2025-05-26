@@ -1,34 +1,34 @@
 // --- DOM Elements ---
-const wordsDisplay = document.getElementById('words-display');
-const textInput = document.getElementById('text-input');
-const timerDisplay = document.getElementById('timer');
-const wpmDisplay = document.getElementById('wpm');
-const accuracyDisplay = document.getElementById('accuracy');
-const restartBtn = document.getElementById('restart-btn'); // Main restart button
+const wordsDisplay = document.getElementById('wordsDisplay'); // Corrected
+const textInput = document.getElementById('textInput');       // Corrected
+const timerDisplay = document.getElementById('timer');       // NOW PRESENT IN HTML AGAIN
+const wpmDisplay = document.getElementById('wpm');           // NOW PRESENT IN HTML AGAIN
+const accuracyDisplay = document.getElementById('accuracy');   // NOW PRESENT IN HTML AGAIN
+const restartBtn = document.getElementById('restartButton'); // Corrected
 
-const includeNumbersCheckbox = document.getElementById('include-numbers');
-const includePunctuationCheckbox = document.getElementById('include-punctuation');
-const modeTimeBtn = document.getElementById('mode-time');
-const modeWordsBtn = document.getElementById('mode-words');
-const timeOptionsDiv = document.getElementById('time-options');
-const wordsOptionsDiv = document.getElementById('words-options');
+const includeNumbersCheckbox = document.getElementById('numbersToggle');     // Corrected
+const includePunctuationCheckbox = document.getElementById('punctuationToggle'); // Corrected
+const modeTimeBtn = document.getElementById('timeModeBtn');         // Corrected
+const modeWordsBtn = document.getElementById('wordsModeBtn');       // Corrected
+const timeOptionsDiv = document.getElementById('timeOptions');     // Corrected
+const wordsOptionsDiv = document.getElementById('wordsOptions');   // Corrected
 
 const caret = document.getElementById('caret');
 
-// NEW: Results Screen DOM Elements
+// NEW: Results Screen DOM Elements - Corrected IDs
 const resultsScreen = document.getElementById('results-screen');
-const finalWpmDisplay = document.getElementById('final-wpm-display');
-const finalAccuracyDisplay = document.getElementById('final-accuracy-display');
-const finalRawWpmDisplay = document.getElementById('final-raw-wpm-display');
-const correctLettersDisplay = document.getElementById('correct-letters-display');
-const incorrectLettersDisplay = document.getElementById('incorrect-letters-display');
-const extraLettersDisplay = document.getElementById('extra-letters-display');
-const resultsRestartBtn = document.getElementById('results-restart-btn'); // New test button on results screen
+const finalWpmDisplay = document.getElementById('wpmResult'); // Corrected
+const finalAccuracyDisplay = document.getElementById('accuracyResult'); // Corrected
+const finalRawWpmDisplay = document.getElementById('rawWpmResult'); // Corrected
+const correctLettersDisplay = document.getElementById('correctLettersCount'); // Corrected
+const incorrectLettersDisplay = document.getElementById('incorrectLettersCount'); // Corrected
+const extraLettersDisplay = document.getElementById('extraLettersCount'); // Corrected
+const resultsRestartBtn = document.getElementById('results-restart-btn'); // Corrected
 
 // Existing DOM Elements that need to be hidden/shown
 const settingsPanel = document.querySelector('.settings-panel');
 const testArea = document.querySelector('.test-area');
-const liveResults = document.querySelector('.results');
+const liveMetricsPanel = document.querySelector('.live-metrics'); // New selector for the live metrics container
 
 
 // --- Game State Variables ---
@@ -315,7 +315,10 @@ function updateTimer() {
         displayTime = elapsedTimeInSeconds;
     }
 
-    timerDisplay.textContent = `Time: ${displayTime}s`;
+    // Check if timerDisplay exists before trying to update its textContent
+    if (timerDisplay) {
+        timerDisplay.textContent = `Time: ${displayTime}s`;
+    }
     calculateMetrics();
 }
 
@@ -344,9 +347,17 @@ function resetGame() {
     testStarted = false;
     testFinished = false;
 
-    timerDisplay.textContent = `Time: ${currentTestMode === 'time' ? currentTestDuration : 0}s`;
-    wpmDisplay.textContent = 'WPM: 0';
-    accuracyDisplay.textContent = 'Accuracy: 0%';
+    // Check if timerDisplay, wpmDisplay, accuracyDisplay exist before updating
+    if (timerDisplay) {
+        timerDisplay.textContent = `Time: ${currentTestMode === 'time' ? currentTestDuration : 0}s`;
+    }
+    if (wpmDisplay) {
+        wpmDisplay.textContent = 'WPM: 0';
+    }
+    if (accuracyDisplay) {
+        accuracyDisplay.textContent = 'Accuracy: 0%';
+    }
+    
     textInput.value = '';
     textInput.disabled = false;
     wordsDisplay.scrollTop = 0;
@@ -388,15 +399,21 @@ function calculateMetrics() {
     }
 
     const liveTotalCharsTyped = rawCorrectCharacters + rawIncorrectCharacters + rawExtraCharacters +
-                                currentWordCorrectChars + currentWordIncorrectChars + currentWordExtraChars;
+                                 currentWordCorrectChars + currentWordIncorrectChars + currentWordExtraChars;
 
     const liveCorrectChars = rawCorrectCharacters + currentWordCorrectChars;
 
     const liveGrossWPM = elapsedTimeInMinutes > 0 ? Math.round((liveTotalCharsTyped / 5) / elapsedTimeInMinutes) : 0;
-    wpmDisplay.textContent = `WPM: ${liveGrossWPM}`;
+    // Check if wpmDisplay exists before trying to update it
+    if (wpmDisplay) {
+        wpmDisplay.textContent = `WPM: ${liveGrossWPM}`;
+    }
 
     const liveAccuracy = liveTotalCharsTyped > 0 ? Math.round((liveCorrectChars / liveTotalCharsTyped) * 100) : 0;
-    accuracyDisplay.textContent = `Accuracy: ${liveAccuracy}%`;
+    // Check if accuracyDisplay exists before trying to update it
+    if (accuracyDisplay) {
+        accuracyDisplay.textContent = `Accuracy: ${liveAccuracy}%`;
+    }
 }
 
 
@@ -411,19 +428,21 @@ function calculateFinalMetrics() {
     const finalTotalTypedCharacters = rawCorrectCharacters + rawIncorrectCharacters + rawExtraCharacters;
     const finalAccuracy = finalTotalTypedCharacters > 0 ? Math.round((rawCorrectCharacters / finalTotalTypedCharacters) * 100) : 0;
 
-    finalWpmDisplay.textContent = netWPM;
-    finalAccuracyDisplay.textContent = `${finalAccuracy}%`;
-    finalRawWpmDisplay.textContent = finalGrossWPM;
-    correctLettersDisplay.textContent = rawCorrectCharacters;
-    incorrectLettersDisplay.textContent = rawIncorrectCharacters;
-    extraLettersDisplay.textContent = rawExtraCharacters;
+    // Check if elements exist before updating them
+    if (finalWpmDisplay) finalWpmDisplay.textContent = netWPM;
+    if (finalAccuracyDisplay) finalAccuracyDisplay.textContent = `${finalAccuracy}%`;
+    if (finalRawWpmDisplay) finalRawWpmDisplay.textContent = finalGrossWPM;
+    if (correctLettersDisplay) correctLettersDisplay.textContent = rawCorrectCharacters;
+    if (incorrectLettersDisplay) incorrectLettersDisplay.textContent = rawIncorrectCharacters;
+    if (extraLettersDisplay) extraLettersDisplay.textContent = rawExtraCharacters;
 }
 
 function showResultsScreen() {
     settingsPanel.classList.add('hidden');
     testArea.classList.add('hidden');
-    liveResults.classList.add('hidden');
-    restartBtn.classList.add('hidden');
+    // Hide the live metrics panel as well
+    if (liveMetricsPanel) liveMetricsPanel.classList.add('hidden'); 
+    if (restartBtn) restartBtn.classList.add('hidden'); // Check before trying to hide
 
     setTimeout(() => {
         resultsScreen.classList.add('show');
@@ -438,10 +457,11 @@ function showTypingInterface() {
     setTimeout(() => {
         settingsPanel.classList.remove('hidden');
         testArea.classList.remove('hidden');
-        liveResults.classList.remove('hidden');
-        restartBtn.classList.remove('hidden');
+        // Show the live metrics panel again
+        if (liveMetricsPanel) liveMetricsPanel.classList.remove('hidden'); 
+        if (restartBtn) restartBtn.classList.remove('hidden'); // Check before trying to show
         
-        textInput.disabled = true;
+        textInput.disabled = true; // Disable temporarily to allow focus to apply correctly
         textInput.focus();
         setTimeout(() => {
             textInput.disabled = false;
@@ -492,9 +512,11 @@ function loadSettings() {
         currentTestDuration = 30; // Default
     }
     // Update UI for time options
-    timeOptionsDiv.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
-    const activeTimeBtn = timeOptionsDiv.querySelector(`.option-btn[data-value="${currentTestDuration}"]`);
-    if (activeTimeBtn) activeTimeBtn.classList.add('active');
+    if (timeOptionsDiv) { // Ensure timeOptionsDiv exists before querying it
+        timeOptionsDiv.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+        const activeTimeBtn = timeOptionsDiv.querySelector(`.option-btn[data-value="${currentTestDuration}"]`);
+        if (activeTimeBtn) activeTimeBtn.classList.add('active');
+    }
 
 
     // Apply saved word count or default, and update UI
@@ -510,28 +532,31 @@ function loadSettings() {
         currentWordCount = 50; // Default
     }
     // Update UI for word options
-    wordsOptionsDiv.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
-    const activeWordBtn = wordsOptionsDiv.querySelector(`.option-btn[data-value="${currentWordCount}"]`);
-    if (activeWordBtn) activeWordBtn.classList.add('active');
+    if (wordsOptionsDiv) { // Ensure wordsOptionsDiv exists before querying it
+        wordsOptionsDiv.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+        const activeWordBtn = wordsOptionsDiv.querySelector(`.option-btn[data-value="${currentWordCount}"]`);
+        if (activeWordBtn) activeWordBtn.classList.add('active');
+    }
 
 
     // Apply saved checkboxes or default, and update UI
     includeNumbers = (savedNumbers === 'true');
     includePunctuation = (savedPunctuation === 'true');
-    includeNumbersCheckbox.checked = includeNumbers;
-    includePunctuationCheckbox.checked = includePunctuation;
+    // Check if checkboxes exist before updating
+    if (includeNumbersCheckbox) includeNumbersCheckbox.checked = includeNumbers;
+    if (includePunctuationCheckbox) includePunctuationCheckbox.checked = includePunctuation;
 
     // Update active mode button UI
     if (currentTestMode === 'time') {
-        modeTimeBtn.classList.add('active');
-        modeWordsBtn.classList.remove('active');
-        timeOptionsDiv.classList.remove('hidden');
-        wordsOptionsDiv.classList.add('hidden');
+        if (modeTimeBtn) modeTimeBtn.classList.add('active');
+        if (modeWordsBtn) modeWordsBtn.classList.remove('active');
+        if (timeOptionsDiv) timeOptionsDiv.classList.remove('hidden');
+        if (wordsOptionsDiv) wordsOptionsDiv.classList.add('hidden');
     } else {
-        modeWordsBtn.classList.add('active');
-        modeTimeBtn.classList.remove('active');
-        wordsOptionsDiv.classList.remove('hidden');
-        timeOptionsDiv.classList.add('hidden');
+        if (modeWordsBtn) modeWordsBtn.classList.add('active');
+        if (modeTimeBtn) modeTimeBtn.classList.remove('active');
+        if (wordsOptionsDiv) wordsOptionsDiv.classList.remove('hidden');
+        if (timeOptionsDiv) timeOptionsDiv.classList.add('hidden');
     }
     console.log("Settings loaded. Current state:", { currentTestMode, currentTestDuration, currentWordCount, includeNumbers, includePunctuation });
 }
@@ -540,199 +565,214 @@ function loadSettings() {
 // --- Event Listeners ---
 
 // Settings Listeners
-includeNumbersCheckbox.addEventListener('change', () => {
-    includeNumbers = includeNumbersCheckbox.checked;
-    saveSettings(); // Save setting on change
-    resetGame();
-});
-
-includePunctuationCheckbox.addEventListener('change', () => {
-    includePunctuation = includePunctuationCheckbox.checked;
-    saveSettings(); // Save setting on change
-    resetGame();
-});
-
-modeTimeBtn.addEventListener('click', () => {
-    if (currentTestMode === 'words') {
-        currentTestMode = 'time';
-        modeTimeBtn.classList.add('active');
-        modeWordsBtn.classList.remove('active');
-        timeOptionsDiv.classList.remove('hidden');
-        wordsOptionsDiv.classList.add('hidden');
-        // Ensure an option is active after switching mode, in case user didn't select one
-        if (!timeOptionsDiv.querySelector('.option-btn.active')) {
-            timeOptionsDiv.querySelector('.option-btn[data-value="30"]').classList.add('active');
-            currentTestDuration = 30;
-        } else {
-            currentTestDuration = parseInt(timeOptionsDiv.querySelector('.option-btn.active').dataset.value);
-        }
+// Check before adding event listeners to ensure elements exist
+if (includeNumbersCheckbox) {
+    includeNumbersCheckbox.addEventListener('change', () => {
+        includeNumbers = includeNumbersCheckbox.checked;
         saveSettings(); // Save setting on change
         resetGame();
-    }
-});
+    });
+}
 
-modeWordsBtn.addEventListener('click', () => {
-    if (currentTestMode === 'time') {
-        currentTestMode = 'words';
-        modeWordsBtn.classList.add('active');
-        modeTimeBtn.classList.remove('active');
-        wordsOptionsDiv.classList.remove('hidden');
-        timeOptionsDiv.classList.add('hidden');
-        // Ensure an option is active after switching mode
-        if (!wordsOptionsDiv.querySelector('.option-btn.active')) {
-            wordsOptionsDiv.querySelector('.option-btn[data-value="50"]').classList.add('active');
-            currentWordCount = 50;
-        } else {
-            currentWordCount = parseInt(wordsOptionsDiv.querySelector('.option-btn.active').dataset.value);
-        }
+if (includePunctuationCheckbox) {
+    includePunctuationCheckbox.addEventListener('change', () => {
+        includePunctuation = includePunctuationCheckbox.checked;
         saveSettings(); // Save setting on change
         resetGame();
-    }
-});
+    });
+}
 
-timeOptionsDiv.addEventListener('click', (e) => {
-    if (e.target.classList.contains('option-btn')) {
-        timeOptionsDiv.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
-        e.target.classList.add('active');
-        currentTestDuration = parseInt(e.target.dataset.value);
-        saveSettings(); // Save setting on change
-        resetGame();
-    }
-});
-
-wordsOptionsDiv.addEventListener('click', (e) => {
-    if (e.target.classList.contains('option-btn')) {
-        wordsOptionsDiv.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
-        e.target.classList.add('active');
-        currentWordCount = parseInt(e.target.dataset.value);
-        saveSettings(); // Save setting on change
-        resetGame();
-    }
-});
-
-
-textInput.addEventListener('keydown', (e) => {
-    if (testFinished) {
-        e.preventDefault();
-        return;
-    }
-
-    if (e.key === ' ' && textInput.value.length === 0) {
-        e.preventDefault();
-        return;
-    }
-
-    if (!testStarted && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && !e.repeat) {
-        testStarted = true;
-        startTimer();
-    }
-});
-
-textInput.addEventListener('input', (e) => {
-    if (!testStarted || testFinished) return;
-
-    const typedText = textInput.value;
-    const currentWordElement = wordsDisplay.querySelectorAll('.word')[currentWordIndex];
-    const targetWord = words[currentWordIndex];
-
-    if (!currentWordElement || !targetWord) {
-        if (currentTestMode === 'words' && currentWordIndex >= words.length && !testFinished) {
-            endTest();
+if (modeTimeBtn) {
+    modeTimeBtn.addEventListener('click', () => {
+        if (currentTestMode === 'words') {
+            currentTestMode = 'time';
+            modeTimeBtn.classList.add('active');
+            modeWordsBtn.classList.remove('active');
+            timeOptionsDiv.classList.remove('hidden');
+            wordsOptionsDiv.classList.add('hidden');
+            // Ensure an option is active after switching mode, in case user didn't select one
+            if (!timeOptionsDiv.querySelector('.option-btn.active')) {
+                timeOptionsDiv.querySelector('.option-btn[data-value="30"]').classList.add('active');
+                currentTestDuration = 30;
+            } else {
+                currentTestDuration = parseInt(timeOptionsDiv.querySelector('.option-btn.active').dataset.value);
+            }
+            saveSettings(); // Save setting on change
+            resetGame();
         }
-        return;
-    }
+    });
+}
 
-    const targetWordLength = targetWord.length;
-
-    Array.from(currentWordElement.querySelectorAll('.character.extra')).forEach(span => span.remove());
-
-    for (let i = 0; i < targetWordLength; i++) {
-        const targetChar = targetWord[i];
-        const typedChar = typedText[i];
-        const charSpan = currentWordElement.children[i];
-
-        charSpan.classList.remove('correct', 'incorrect');
-
-        if (typedChar === undefined) {
-        } else if (typedChar === targetChar) {
-            charSpan.classList.add('correct');
-        } else {
-            charSpan.classList.add('incorrect');
+if (modeWordsBtn) {
+    modeWordsBtn.addEventListener('click', () => {
+        if (currentTestMode === 'time') {
+            currentTestMode = 'words';
+            modeWordsBtn.classList.add('active');
+            modeTimeBtn.classList.remove('active');
+            wordsOptionsDiv.classList.remove('hidden');
+            timeOptionsDiv.classList.add('hidden');
+            // Ensure an option is active after switching mode
+            if (!wordsOptionsDiv.querySelector('.option-btn.active')) {
+                wordsOptionsDiv.querySelector('.option-btn[data-value="50"]').classList.add('active');
+                currentWordCount = 50;
+            } else {
+                currentWordCount = parseInt(wordsOptionsDiv.querySelector('.option-btn.active').dataset.value);
+            }
+            saveSettings(); // Save setting on change
+            resetGame();
         }
-    }
+    });
+}
 
-    if (typedText.length > targetWordLength) {
-        for (let i = targetWordLength; i < typedText.length; i++) {
-            const extraCharSpan = document.createElement('span');
-            extraCharSpan.classList.add('character', 'extra', 'incorrect');
-            extraCharSpan.textContent = typedText[i];
-            currentWordElement.appendChild(extraCharSpan);
+if (timeOptionsDiv) {
+    timeOptionsDiv.addEventListener('click', (e) => {
+        if (e.target.classList.contains('option-btn')) {
+            timeOptionsDiv.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            currentTestDuration = parseInt(e.target.dataset.value);
+            saveSettings(); // Save setting on change
+            resetGame();
         }
-    }
+    });
+}
 
-    if (currentTestMode === 'words' && 
-        currentWordIndex === words.length - 1 &&
-        typedText.length === targetWordLength &&
-        e.inputType !== 'deleteContentBackward'
-    ) {
+if (wordsOptionsDiv) {
+    wordsOptionsDiv.addEventListener('click', (e) => {
+        if (e.target.classList.contains('option-btn')) {
+            wordsOptionsDiv.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            currentWordCount = parseInt(e.target.dataset.value);
+            saveSettings(); // Save setting on change
+            resetGame();
+        }
+    });
+}
+
+// Ensure textInput and restartBtn exist before adding listeners
+if (textInput) {
+    textInput.addEventListener('keydown', (e) => {
+        if (testFinished) {
+            e.preventDefault();
+            return;
+        }
+
+        if (e.key === ' ' && textInput.value.length === 0) {
+            e.preventDefault();
+            return;
+        }
+
+        if (!testStarted && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && !e.repeat) {
+            testStarted = true;
+            startTimer();
+        }
+    });
+
+    textInput.addEventListener('input', (e) => {
+        if (!testStarted || testFinished) return;
+
+        const typedText = textInput.value;
+        const currentWordElement = wordsDisplay.querySelectorAll('.word')[currentWordIndex];
+        const targetWord = words[currentWordIndex];
+
+        if (!currentWordElement || !targetWord) {
+            if (currentTestMode === 'words' && currentWordIndex >= words.length && !testFinished) {
+                endTest();
+            }
+            return;
+        }
+
+        const targetWordLength = targetWord.length;
+
+        Array.from(currentWordElement.querySelectorAll('.character.extra')).forEach(span => span.remove());
+
         for (let i = 0; i < targetWordLength; i++) {
             const targetChar = targetWord[i];
             const typedChar = typedText[i];
-            if (typedChar === targetChar) {
-                rawCorrectCharacters++;
-            } else {
-                rawIncorrectCharacters++;
-            }
-        }
-        endTest();
-        return;
-    }
+            const charSpan = currentWordElement.children[i];
 
-    if (e.inputType === 'insertText' && typedText.endsWith(' ')) {
-        e.preventDefault();
-
-        const finalTypedWordForCurrentWord = typedText.trim();
-        const currentTargetWord = words[currentWordIndex];
-
-        for (let i = 0; i < Math.max(finalTypedWordForCurrentWord.length, currentTargetWord.length); i++) {
-            const typedChar = finalTypedWordForCurrentWord[i];
-            const targetChar = currentTargetWord[i];
+            charSpan.classList.remove('correct', 'incorrect');
 
             if (typedChar === undefined) {
-            } else if (targetChar === undefined) {
-                rawExtraCharacters++;
             } else if (typedChar === targetChar) {
-                rawCorrectCharacters++;
+                charSpan.classList.add('correct');
             } else {
-                rawIncorrectCharacters++;
+                charSpan.classList.add('incorrect');
             }
         }
-        
-        if (finalTypedWordForCurrentWord === currentTargetWord) {
-            correctCharactersTyped += currentTargetWord.length + 1;
-        } else {
-            totalCharactersTyped += finalTypedWordForCurrentWord.length + 1;
+
+        if (typedText.length > targetWordLength) {
+            for (let i = targetWordLength; i < typedText.length; i++) {
+                const extraCharSpan = document.createElement('span');
+                extraCharSpan.classList.add('character', 'extra', 'incorrect');
+                extraCharSpan.textContent = typedText[i];
+                currentWordElement.appendChild(extraCharSpan);
+            }
         }
 
-        currentWordIndex++;
-        currentCharIndex = 0;
-        textInput.value = '';
-
-        if (currentTestMode === 'words' && currentWordIndex >= words.length) {
+        if (currentTestMode === 'words' && 
+            currentWordIndex === words.length - 1 &&
+            typedText.length === targetWordLength &&
+            e.inputType !== 'deleteContentBackward'
+        ) {
+            for (let i = 0; i < targetWordLength; i++) {
+                const targetChar = targetWord[i];
+                const typedChar = typedText[i];
+                if (typedChar === targetChar) {
+                    rawCorrectCharacters++;
+                } else {
+                    rawIncorrectCharacters++;
+                }
+            }
             endTest();
-        } else if (currentWordIndex < words.length) {
-            updateCaretPosition();
+            return;
         }
-    } else {
-        currentCharIndex = typedText.length;
-        updateCaretPosition();
-        calculateMetrics();
-    }
-});
+
+        if (e.inputType === 'insertText' && typedText.endsWith(' ')) {
+            e.preventDefault();
+
+            const finalTypedWordForCurrentWord = typedText.trim();
+            const currentTargetWord = words[currentWordIndex];
+
+            for (let i = 0; i < Math.max(finalTypedWordForCurrentWord.length, currentTargetWord.length); i++) {
+                const typedChar = finalTypedWordForCurrentWord[i];
+                const targetChar = currentTargetWord[i];
+
+                if (typedChar === undefined) {
+                } else if (targetChar === undefined) {
+                    rawExtraCharacters++;
+                } else if (typedChar === targetChar) {
+                    rawCorrectCharacters++;
+                } else {
+                    rawIncorrectCharacters++;
+                }
+            }
+            
+            if (finalTypedWordForCurrentWord === currentTargetWord) {
+                correctCharactersTyped += currentTargetWord.length + 1;
+            } else {
+                totalCharactersTyped += finalTypedWordForCurrentWord.length + 1;
+            }
+
+            currentWordIndex++;
+            currentCharIndex = 0;
+            textInput.value = '';
+
+            if (currentTestMode === 'words' && currentWordIndex >= words.length) {
+                endTest();
+            } else if (currentWordIndex < words.length) {
+                updateCaretPosition();
+            }
+        } else {
+            currentCharIndex = typedText.length;
+            updateCaretPosition();
+            calculateMetrics();
+        }
+    });
+}
 
 
-restartBtn.addEventListener('click', resetGame);
-resultsRestartBtn.addEventListener('click', resetGame);
+if (restartBtn) restartBtn.addEventListener('click', resetGame);
+if (resultsRestartBtn) resultsRestartBtn.addEventListener('click', resetGame);
 
 
 // --- Initialize the game on load ---
@@ -747,18 +787,26 @@ window.addEventListener('load', () => {
 });
 
 document.addEventListener('click', (e) => {
+    // Only focus if the click was *not* on the text input, any button, or the settings/results panel
     if (!textInput.contains(e.target) &&
-        !restartBtn.contains(e.target) &&
-        !resultsRestartBtn.contains(e.target) &&
+        (!restartBtn || !restartBtn.contains(e.target)) && // Check if button exists
+        (!resultsRestartBtn || !resultsRestartBtn.contains(e.target)) && // Check if button exists
         !wordsDisplay.contains(e.target) &&
         !settingsPanel.contains(e.target) &&
-        !liveResults.contains(e.target) &&
-        !resultsScreen.contains(e.target)
+        !resultsScreen.contains(e.target) &&
+        (!modeTimeBtn || !modeTimeBtn.contains(e.target)) && // Specific mode buttons
+        (!modeWordsBtn || !modeWordsBtn.contains(e.target)) &&
+        (!timeOptionsDiv || !timeOptionsDiv.contains(e.target)) && // Specific option divs
+        (!wordsOptionsDiv || !wordsOptionsDiv.contains(e.target)) &&
+        (!includeNumbersCheckbox || !includeNumbersCheckbox.contains(e.target)) && // Checkbox labels/inputs
+        (!includePunctuationCheckbox || !includePunctuationCheckbox.contains(e.target))
         ) {
         textInput.focus();
     }
 });
 
-wordsDisplay.addEventListener('click', () => {
-    textInput.focus();
-});
+if (wordsDisplay) {
+    wordsDisplay.addEventListener('click', () => {
+        textInput.focus();
+    });
+}
