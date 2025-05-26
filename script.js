@@ -400,6 +400,73 @@ textInput.addEventListener('input', (e) => {
     }
 });
 
+// Settings Listeners
+includeNumbersCheckbox.addEventListener('change', () => {
+    includeNumbers = includeNumbersCheckbox.checked;
+    resetGame();
+});
+
+includePunctuationCheckbox.addEventListener('change', () => {
+    includePunctuation = includePunctuationCheckbox.checked;
+    resetGame();
+});
+
+modeTimeBtn.addEventListener('click', () => {
+    if (currentTestMode === 'words') { // Only change if different
+        currentTestMode = 'time';
+        modeTimeBtn.classList.add('active');
+        modeWordsBtn.classList.remove('active');
+        timeOptionsDiv.classList.remove('hidden');
+        wordsOptionsDiv.classList.add('hidden');
+        // Set default time option if none is active
+        if (!timeOptionsDiv.querySelector('.option-btn.active')) {
+            timeOptionsDiv.querySelector('.option-btn[data-value="60"]').classList.add('active');
+            currentTestDuration = 60;
+        } else {
+            currentTestDuration = parseInt(timeOptionsDiv.querySelector('.option-btn.active').dataset.value);
+        }
+        resetGame();
+    }
+});
+
+modeWordsBtn.addEventListener('click', () => {
+    if (currentTestMode === 'time') { // Only change if different
+        currentTestMode = 'words';
+        modeWordsBtn.classList.add('active');
+        modeTimeBtn.classList.remove('active');
+        wordsOptionsDiv.classList.remove('hidden');
+        timeOptionsDiv.classList.add('hidden');
+        // Set default word option if none is active
+        if (!wordsOptionsDiv.querySelector('.option-btn.active')) {
+            wordsOptionsDiv.querySelector('.option-btn[data-value="50"]').classList.add('active');
+            currentWordCount = 50;
+        } else {
+            currentWordCount = parseInt(wordsOptionsDiv.querySelector('.option-btn.active').dataset.value);
+        }
+        resetGame();
+    }
+});
+
+// Generic handler for time options
+timeOptionsDiv.addEventListener('click', (e) => {
+    if (e.target.classList.contains('option-btn')) {
+        timeOptionsDiv.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        currentTestDuration = parseInt(e.target.dataset.value);
+        resetGame();
+    }
+});
+
+// Generic handler for word options
+wordsOptionsDiv.addEventListener('click', (e) => {
+    if (e.target.classList.contains('option-btn')) {
+        wordsOptionsDiv.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        currentWordCount = parseInt(e.target.dataset.value);
+        resetGame();
+    }
+});
+
 restartBtn.addEventListener('click', resetGame);
 
 // --- Initialize the game on load ---
