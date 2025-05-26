@@ -21,3 +21,7 @@ body {
     max-width: 800px;
 }
 
+h1 {
+    color: #61afef;
+    margin-bottom: 30px;
+}
