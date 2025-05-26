@@ -59,13 +59,9 @@ h1 {
 
 .character {
     display: inline-block; /* Allows individual character styling */
-    padding: 1px 0;
-    transition: background-color 0.1s ease;
-}
-
-.character.current {
-    background-color: #56b6c2; /* Highlight current character */
-    border-radius: 2px;
+    padding: 1px 0; /* Minimal padding */
+    transition: background-color 0.1s ease, color 0.1s ease;
+    /* Current character will be highlighted by the caret, not background color */
 }
 
 .character.correct {
@@ -74,7 +70,11 @@ h1 {
 
 .character.incorrect {
     color: #e06c75; /* Red for incorrect */
-    text-decoration: underline wavy #e06c75; /* Wavy underline for incorrect */
+}
+
+.character.extra {
+    color: #e06c75; /* Red for extra characters */
+    text-decoration: underline wavy #e06c75 1px; /* Wavy underline for incorrect */
 }
 
 .text-input {
