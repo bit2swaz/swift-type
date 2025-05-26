@@ -70,3 +70,20 @@ h1 {
     color: #e06c75; /* Red for incorrect */
     text-decoration: underline wavy #e06c75; /* Wavy underline for incorrect */
 }
+
+.text-input {
+    width: calc(100% - 40px); /* Account for padding */
+    padding: 15px 20px;
+    font-size: 1.5em;
+    border: 1px solid #4b5263;
+    border-radius: 5px;
+    background-color: #21252b;
+    color: #abb2bf;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.text-input:focus {
+    border-color: #61afef;
+}
+
