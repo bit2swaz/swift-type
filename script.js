@@ -33,3 +33,13 @@ const commonWords = [
     "big", "small", "word", "sentence", "paragraph", "type", "keyboard", "display", "speed", "accuracy",
     "challenge", "program", "code", "developer", "javascript", "html", "css", "website", "application", "data"
 ];
+
+// Functions
+function generateWords() {
+    words = [];
+    // Shuffle the commonWords array and pick a subset
+    const shuffledWords = commonWords.sort(() => 0.5 - Math.random());
+    // Pick around 50 to 70 words for a standard test
+    const numWords = Math.floor(Math.random() * (70 - 50 + 1)) + 50;
+    words = shuffledWords.slice(0, numWords);
+}
