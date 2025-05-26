@@ -9,7 +9,7 @@ body {
     margin: 0;
     padding: 20px;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: hidden; /* Prevent body scroll if test area scrolls */
 }
 
 .container {
@@ -25,133 +25,6 @@ body {
 h1 {
     color: #61afef;
     margin-bottom: 30px;
-}
-
-.test-area {
-    margin-bottom: 30px;
-}
-
-.words-display {
-    background-color: #21252b;
-    border: 1px solid #4b5263;
-    border-radius: 5px;
-    padding: 20px;
-    margin-bottom: 20px;
-    font-size: 1.8em;
-    line-height: 1.6em;
-    min-height: 120px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px; /* Space between words */
-    justify-content: center;
-    align-items: flex-start;
-    height: 120px; /* Fixed height for ~3 lines (adjust based on font-size/line-height) */
-    overflow: hidden; /* Hide overflow, JavaScript will manage scroll */
-    position: relative; /* Crucial for positioning the caret */
-    text-align: left; /* Align words to the left */
-}
-
-.word {
-    display: inline-block; /* Treat words as blocks for better wrapping and positioning */
-    margin-right: 8px; /* Space between words */
-    white-space: nowrap; /* Prevent words from breaking lines */
-}
-
-.character {
-    display: inline-block; /* Allows individual character styling */
-    padding: 1px 0; /* Minimal padding */
-    transition: background-color 0.1s ease, color 0.1s ease;
-    /* Current character will be highlighted by the caret, not background color */
-}
-
-.character.correct {
-    color: #98c379; /* Green for correct */
-}
-
-.character.incorrect {
-    color: #e06c75; /* Red for incorrect */
-}
-
-.character.extra {
-    color: #e06c75; /* Red for extra characters */
-    text-decoration: underline wavy #e06c75 1px; /* Wavy underline for incorrect */
-}
-
-/* Remove current class from character */
-.character.current {
-    /* No longer needed, caret handles this */
-    background-color: transparent; /* Ensure it's transparent */
-}
-
-.text-input {
-    position: absolute; /* Take it out of flow */
-    left: -9999px; /* Move it far off-screen */
-    opacity: 0; /* Make it completely transparent */
-    pointer-events: none; /* Make it non-interactive for mouse events */
-    /* Maintain width/height for autofocus to work if needed, but not strictly necessary for off-screen */
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    white-space: nowrap;
-    z-index: -1; /* Ensure it's behind everything */
-}
-
-.text-input:focus {
-    border-color: #61afef;
-}
-
-/* Custom Caret Styling */
-.caret {
-    position: absolute;
-    height: 1.8em; /* Match line height of words-display font */
-    width: 2px; /* Thickness of the caret */
-    background-color: #61afef; /* Caret color */
-    animation: blink 1s infinite;
-    top: 0; /* Will be set by JS */
-    left: 0; /* Will be set by JS */
-    transition: transform 0.05s ease-out; /* Smooth movement */
-    pointer-events: none; /* Ensure it doesn't block clicks */
-    z-index: 10; /* Ensure it's above words */
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-}
-
-.results {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-
-.metric {
-    background-color: #4b5263;
-    padding: 15px 25px;
-    border-radius: 5px;
-    font-size: 1.3em;
-    font-weight: bold;
-    margin: 10px;
-}
-
-.restart-btn {
-    background-color: #c678dd;
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    border-radius: 5px;
-    font-size: 1.2em;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-}
-
-.restart-btn:hover {
-    background-color: #9f60b6;
-}
-
-.restart-btn:active {
-    transform: translateY(1px);
 }
 
 .settings-panel {
@@ -293,9 +166,123 @@ h1 {
     display: none !important;
 }
 
-/* Adjust words-display min-height if needed to accommodate settings panel */
+.test-area {
+    margin-bottom: 30px;
+}
+
 .words-display {
-    min-height: 120px; /* Keep this to ensure consistent height */
+    background-color: #21252b;
+    border: 1px solid #4b5263;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    line-height: 1.6em; /* Adjust this to control line height */
+    height: 120px; /* Fixed height for ~3 lines (adjust based on font-size/line-height) */
+    overflow: hidden; /* Hide overflow, JavaScript will manage scroll */
+    position: relative; /* Crucial for positioning the caret */
+    text-align: left; /* Align words to the left */
+    user-select: none; /* Prevent text selection in the words display */
+}
+
+.word {
+    display: inline-block; /* Treat words as blocks for better wrapping and positioning */
+    margin-right: 8px; /* Space between words */
+    white-space: nowrap; /* Prevent words from breaking lines */
+}
+
+.character {
+    display: inline-block; /* Allows individual character styling */
+    padding: 1px 0; /* Minimal padding */
+    transition: background-color 0.1s ease, color 0.1s ease;
+    /* Current character will be highlighted by the caret, not background color */
+}
+
+.character.correct {
+    color: #98c379; /* Green for correct */
+}
+
+.character.incorrect {
+    color: #e06c75; /* Red for incorrect */
+}
+
+.character.extra {
+    color: #e06c75; /* Red for extra characters */
+    text-decoration: underline wavy #e06c75 1px; /* Wavy underline for incorrect */
+}
+
+/* Hide the actual text input field visually */
+.text-input {
+    position: absolute; /* Take it out of flow */
+    left: -9999px; /* Move it far off-screen */
+    opacity: 0; /* Make it completely transparent */
+    pointer-events: none; /* Make it non-interactive for mouse events */
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+    z-index: -1; /* Ensure it's behind everything */
+}
+
+/* Custom Caret Styling */
+.caret {
+    position: absolute;
+    height: 1.6em; /* Match line height of words-display font, line-height 1.6em */
+    width: 2px; /* Thickness of the caret */
+    background-color: #61afef; /* Caret color */
+    animation: blink 1s infinite;
+    top: 0; /* Will be set by JS */
+    left: 0; /* Will be set by JS */
+    transition: transform 0.05s ease-out; /* Smooth movement */
+    pointer-events: none; /* Ensure it doesn't block clicks */
+    z-index: 10; /* Ensure it's above words */
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Remove current class from character */
+.character.current {
+    /* No longer needed, caret handles this */
+    background-color: transparent; /* Ensure it's transparent */
+}
+
+
+.results {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.metric {
+    background-color: #4b5263;
+    padding: 15px 25px;
+    border-radius: 5px;
+    font-size: 1.3em;
+    font-weight: bold;
+    margin: 10px;
+}
+
+.restart-btn {
+    background-color: #c678dd;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.restart-btn:hover {
+    background-color: #9f60b6;
+}
+
+.restart-btn:active {
+    transform: translateY(1px);
 }
 
 /* Responsive adjustments for settings panel */
