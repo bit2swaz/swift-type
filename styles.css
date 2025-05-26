@@ -10,3 +10,14 @@ body {
     padding: 20px;
     box-sizing: border-box;
 }
+
+.container {
+    background-color: #3e4451;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    width: 100%;
+    max-width: 800px;
+}
+
