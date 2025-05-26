@@ -145,3 +145,22 @@ function calculateMetrics() {
     accuracyDisplay.textContent = `Accuracy: ${accuracy}%`;
 }
 
+function resetGame() {
+    stopTimer();
+    currentWordIndex = 0;
+    currentCharIndex = 0;
+    totalCharactersTyped = 0;
+    correctCharactersTyped = 0;
+    testStarted = false;
+
+    timerDisplay.textContent = 'Time: 0s';
+    wpmDisplay.textContent = 'WPM: 0';
+    accuracyDisplay.textContent = 'Accuracy: 0%';
+    textInput.value = '';
+    textInput.disabled = false; // Enable input
+    textInput.focus(); // Focus the input again
+
+    generateWords();
+    renderWords();
+}
+
