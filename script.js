@@ -164,3 +164,17 @@ function resetGame() {
     renderWords();
 }
 
+// --- Event Listeners ---
+
+textInput.addEventListener('keydown', (e) => {
+    // Prevent spacebar from triggering default browser scroll
+    if (e.key === ' ' && textInput.value.length === 0 && !testStarted) {
+        e.preventDefault();
+        return; // Don't start if first character is space
+    }
+
+    if (!testStarted && e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Meta' && e.key !== 'CapsLock' && e.key !== 'Tab' && e.key !== 'Escape') {
+        testStarted = true;
+        startTimer();
+    }
+});
