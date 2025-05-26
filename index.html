@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SwiftType</title>
-    <link rel="stylesheet" href="styles.css"> </head>
+    <link rel="stylesheet" href="styles.css">
+</head>
 <body>
     <div class="container">
         <h1>SwiftType</h1>
@@ -12,12 +13,12 @@
         <div class="settings-panel">
             <div class="settings-group">
                 <label class="checkbox-container">Numbers
-                <input type="checkbox" id="numbersToggle">
-                <span class="checkmark"></span>
+                    <input type="checkbox" id="numbersToggle">
+                    <span class="checkmark"></span>
                 </label>
                 <label class="checkbox-container">Punctuation
-                <input type="checkbox" id="punctuationToggle">
-                <span class="checkmark"></span>
+                    <input type="checkbox" id="punctuationToggle">
+                    <span class="checkmark"></span>
                 </label>
             </div>
 
@@ -44,55 +45,47 @@
         </div>
 
         <div class="test-area">
-            <div id="words-display" class="words-display">
-                <div id="caret" class="caret"></div>
-            </div>
-            <input type="text" id="text-input" class="text-input" autofocus autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false">
+            <div class="words-display" id="wordsDisplay"></div>
+            <input type="text" class="text-input" id="textInput" autofocus>
+            <div class="caret" id="caret"></div>
         </div>
 
-        <div class="results">
-            <div id="timer" class="metric">Time: 0s</div>
-            <div id="wpm" class="metric">WPM: 0</div>
-            <div id="accuracy" class="metric">Accuracy: 0%</div>
-        </div>
+        <button class="restart-btn" id="restartButton">Restart Test</button>
 
-        <button id="restart-btn" class="restart-btn">Restart Test</button>
-
-        <div id="results-screen" class="hidden">
+        <div id="results-screen">
             <h2>Test Results</h2>
             <div class="main-results-summary">
                 <div class="metric-item">
-                    <span id="final-wpm-display">0</span>
+                    <span id="wpmResult">0</span>
                     <span class="metric-label">WPM</span>
                 </div>
                 <div class="metric-item">
-                    <span id="final-accuracy-display">0%</span>
+                    <span id="accuracyResult">0%</span>
                     <span class="metric-label">Accuracy</span>
                 </div>
                 <div class="metric-item">
-                    <span id="final-raw-wpm-display">0</span>
+                    <span id="rawWpmResult">0</span>
                     <span class="metric-label">Raw WPM</span>
                 </div>
             </div>
-            
-            <button id="results-restart-btn" class="restart-btn new-test-btn">New Test</button>
-            
+            <button class="restart-btn new-test-btn" id="results-restart-btn">New Test</button>
             <div class="detailed-results">
                 <div class="detail-item">
-                    <span id="correct-letters-display" class="detail-value">0</span>
+                    <span class="detail-value" id="correctLettersCount">0</span>
                     <span class="detail-label">Correct Letters</span>
                 </div>
                 <div class="detail-item">
-                    <span id="incorrect-letters-display" class="detail-value">0</span>
-                    <span class="detail-label">Incorrect Letters</span> </div>
+                    <span class="detail-value" id="incorrectLettersCount">0</span>
+                    <span class="detail-label">Incorrect Letters</span>
+                </div>
                 <div class="detail-item">
-                    <span id="extra-letters-display" class="detail-value">0</span>
+                    <span class="detail-value" id="extraLettersCount">0</span>
                     <span class="detail-label">Extra Letters</span>
                 </div>
             </div>
         </div>
-    </div>
 
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
