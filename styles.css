@@ -87,3 +87,9 @@ h1 {
     border-color: #61afef;
 }
 
+.results {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
