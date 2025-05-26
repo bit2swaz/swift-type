@@ -97,3 +97,20 @@ function highlightCurrentCharacter() {
     }
 }
 
+function scrollWordsDisplay() {
+    const currentWordElement = wordsDisplay.querySelectorAll('.word')[currentWordIndex];
+    if (currentWordElement) {
+        const wordDisplayRect = wordsDisplay.getBoundingClientRect();
+        const currentWordRect = currentWordElement.getBoundingClientRect();
+
+        // If the current word is below the visible area
+        if (currentWordRect.bottom > wordsDisplayRect.bottom) {
+            wordsDisplay.scrollTop += currentWordRect.bottom - wordsDisplay.bottom + 20; // +20 for some padding
+        }
+        // If the current word is above the visible area (less likely in typing tests)
+        else if (currentWordRect.top < wordsDisplayRect.Top) {
+            wordsDisplay.scrollTop += wordsDisplayRect.top - currentWordRect.top + 20; 
+        }
+    }
+}
+
