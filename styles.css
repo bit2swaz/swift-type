@@ -14,8 +14,7 @@ body {
     margin: 0;
     padding: 20px; /* Base padding */
     box-sizing: border-box;
-    /* Removed overflow: hidden from body. Let the container handle it. */
-    position: relative; /* Needed for absolute positioning of results screen */
+    position: relative;
 }
 
 .container {
@@ -24,11 +23,11 @@ body {
     padding: 30px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     text-align: center;
-    width: 100%; /* Always take full width minus padding on smaller screens */
-    max-width: 800px; /* Max width for larger screens */
+    width: 100%;
+    max-width: 800px;
     position: relative;
-    overflow: hidden; /* Hide content that goes beyond its bounds */
-    min-height: 500px; /* Give it some height so results screen doesn't collapse */
+    overflow: hidden;
+    min-height: 500px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -37,7 +36,7 @@ body {
 h1 {
     color: #61afef;
     margin-bottom: 30px;
-    font-size: 2.5em; /* Default font size */
+    font-size: 2.5em;
 }
 
 .settings-panel {
@@ -200,7 +199,7 @@ h1 {
     border-radius: 5px;
     padding: 20px;
     margin-bottom: 20px;
-    font-size: 1.8em; /* Base font size, will adjust for mobile */
+    font-size: 1.8em;
     line-height: 1.6em;
     height: 120px;
     overflow: hidden;
@@ -212,7 +211,7 @@ h1 {
 .word {
     display: inline-block;
     margin-right: 8px;
-    white-space: nowrap; /* Prevent words from breaking lines */
+    white-space: nowrap;
 }
 
 .character {
@@ -250,7 +249,7 @@ h1 {
 /* Custom Caret Styling */
 .caret {
     position: absolute;
-    height: 1.6em; /* Match line height of words-display font, line-height 1.6em */
+    height: 1.6em;
     width: 2px;
     background-color: #61afef;
     animation: blink 1s infinite;
@@ -447,82 +446,88 @@ h1 {
 /* Base adjustments for smaller screens (up to 768px for tablets/laptops in portrait) */
 @media (max-width: 768px) {
     body {
-        padding: 15px; /* Slightly less padding on body */
+        padding: 15px;
     }
 
     .container {
-        padding: 20px; /* Reduce container padding */
-        min-height: 400px; /* Potentially reduce minimum height on smaller devices */
+        padding: 20px;
+        min-height: 400px;
     }
 
     h1 {
-        font-size: 2em; /* Smaller heading */
+        font-size: 2em;
         margin-bottom: 20px;
     }
 
     .settings-panel {
-        padding: 10px 15px; /* Smaller padding */
-        gap: 10px; /* Reduce gap */
+        padding: 10px 15px;
+        gap: 10px;
     }
 
     .checkbox-container {
-        font-size: 1em; /* Slightly smaller checkbox label */
+        font-size: 1em;
         margin-right: 10px;
     }
 
     .mode-btn, .option-btn {
-        padding: 8px 12px; /* Smaller button padding */
-        font-size: 1em; /* Smaller button font size */
+        padding: 8px 12px;
+        font-size: 1em;
     }
 
     .words-display {
-        font-size: 1.5em; /* Adjust font size for words display */
-        line-height: 1.5em; /* Adjust line height accordingly */
-        height: 100px; /* Adjust height to fit roughly 3 lines at new font size */
+        font-size: 1.5em;
+        line-height: 1.5em;
+        height: 100px;
         padding: 15px;
     }
 
     .caret {
-        height: 1.5em; /* Match new line height */
+        height: 1.5em;
     }
 
     .metric {
-        padding: 10px 15px; /* Smaller padding for live metrics */
-        font-size: 1.1em; /* Smaller font size for live metrics */
-        margin: 5px; /* Reduce margin */
+        padding: 10px 15px;
+        font-size: 1.1em;
+        margin: 5px;
     }
 
     .restart-btn {
-        padding: 12px 25px; /* Smaller padding for restart button */
-        font-size: 1.1em; /* Smaller font size */
+        padding: 12px 25px;
+        font-size: 1.1em;
     }
 
-    /* Results Screen specific adjustments */
+    /* Results Screen specific adjustments for 768px and below */
     #results-screen h2 {
         font-size: 2.2em;
     }
 
     .main-results-summary {
-        gap: 15px;
+        flex-direction: column; /* FORCE stacking on smaller screens */
+        align-items: center; /* Center the stacked items */
         width: 95%; /* Take more width */
+        gap: 15px;
     }
     .main-results-summary .metric-item {
+        width: 100%; /* Each item takes full width */
         padding: 15px 20px;
-        min-width: unset; /* Let flex-grow handle it, no rigid min-width */
-        flex-basis: calc(50% - 15px); /* On 2 columns, take half minus gap */
+        min-width: unset;
+        flex-basis: auto; /* Reset flex-basis when stacking */
     }
     .main-results-summary .metric-item span:first-child {
-        font-size: 3em; /* Smaller WPM/Accuracy on results screen */
+        font-size: 3em;
     }
 
     .detailed-results {
+        flex-direction: column; /* FORCE stacking on smaller screens */
+        align-items: center; /* Center the stacked items */
+        width: 95%;
         gap: 10px;
-        width: 95%; /* Take more width */
     }
     .detailed-results .detail-item {
+        width: 100%; /* Each item takes full width */
         padding: 10px 15px;
         min-width: unset;
-        flex-basis: calc(33.33% - 10px); /* On 3 columns, take third minus gap */
+        flex-basis: auto; /* Reset flex-basis when stacking */
     }
     .detailed-results .detail-value {
         font-size: 1.3em;
@@ -541,16 +546,16 @@ h1 {
 /* Existing and refined media query for max-width: 600px (phones) */
 @media (max-width: 600px) {
     body {
-        padding: 10px; /* Even less padding on very small screens */
+        padding: 10px;
     }
 
     .container {
-        padding: 15px; /* Even less container padding */
-        min-height: 380px; /* Adjust min height again */
+        padding: 15px;
+        min-height: 380px;
     }
 
     h1 {
-        font-size: 1.8em; /* Even smaller heading */
+        font-size: 1.8em;
     }
 
     .settings-panel {
@@ -561,9 +566,9 @@ h1 {
     }
     .settings-group {
         justify-content: center;
-        flex-wrap: wrap; /* Ensure checkboxes/mode/options wrap */
-        width: 100%; /* Take full width of panel */
-        gap: 8px; /* Slightly reduce gap within groups */
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 8px;
     }
     .mode-selector, .options-group {
         width: 100%;
@@ -571,12 +576,12 @@ h1 {
     }
     .mode-btn, .option-btn {
         flex-grow: 1;
-        padding: 10px 8px; /* Slightly more vertical padding, less horizontal */
-        font-size: 0.95em; /* Slightly smaller text in buttons */
+        padding: 10px 8px;
+        font-size: 0.95em;
     }
 
     .checkbox-container {
-        font-size: 0.9em; /* Smaller checkbox label */
+        font-size: 0.9em;
         padding-left: 25px;
     }
     .checkmark {
@@ -592,29 +597,29 @@ h1 {
     }
 
     .words-display {
-        font-size: 1.3em; /* Smaller font for words */
+        font-size: 1.3em;
         line-height: 1.4em;
-        height: 80px; /* Adjust height for fewer lines/smaller font */
+        height: 80px;
         padding: 10px;
         margin-bottom: 15px;
     }
     .caret {
-        height: 1.4em; /* Match new line height */
+        height: 1.4em;
     }
     .word {
-        margin-right: 6px; /* Slightly less space between words */
+        margin-right: 6px;
     }
 
     .results {
-        flex-direction: column; /* Stack live metrics vertically */
+        flex-direction: column;
         align-items: center;
         gap: 10px;
         margin-bottom: 20px;
     }
     .metric {
-        width: 80%; /* Metrics take more width when stacked */
-        max-width: 250px; /* Prevent them from becoming too wide */
-        font-size: 1.2em; /* Slightly larger for emphasis */
+        width: 80%;
+        max-width: 250px;
+        font-size: 1.2em;
         padding: 12px 20px;
     }
 
@@ -623,26 +628,28 @@ h1 {
         font-size: 1.1em;
     }
 
-    /* Results screen responsive adjustments */
+    /* Results screen responsive adjustments (even more aggressive for tiny phones) */
     #results-screen h2 {
-        font-size: 1.8em; /* Even smaller heading on results */
+        font-size: 1.8em;
         margin-bottom: 10px;
     }
     .main-results-summary {
-        flex-direction: column; /* Stack main results vertically */
+        /* Already handled by 768px, but ensure overrides are robust */
+        flex-direction: column;
         width: 95%;
         gap: 10px;
     }
     .main-results-summary .metric-item {
         width: 100%;
         padding: 12px 15px;
-        font-size: 0.9em; /* Reduce overall font size for item */
+        font-size: 0.9em;
     }
     .main-results-summary .metric-item span:first-child {
-        font-size: 2.5em; /* Smaller WPM/Accuracy on results screen */
+        font-size: 2.5em;
     }
     .detailed-results {
-        flex-direction: column; /* Stack detailed results vertically */
+        /* Already handled by 768px, but ensure overrides are robust */
+        flex-direction: column;
         width: 95%;
         gap: 8px;
     }
