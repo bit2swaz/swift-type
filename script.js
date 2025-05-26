@@ -5,6 +5,13 @@ const timerDisplay = document.getElementById('timer');
 const wpmDisplay = document.getElementById('wpm');
 const accuracyDisplay = document.getElementById('accuracy');
 const restartBtn = document.getElementById('restart-btn');
+const includeNumbersCheckbox = document.getElementById('include-numbers');
+const includePunctuationCheckbox = document.getElementById('include-punctuation');
+const modeTimeBtn = document.getElementById('mode-time');
+const modeWordsBtn = document.getElementById('mode-words');
+const timeOptionsDiv = document.getElementById('time-options');
+const wordsOptionsDiv = document.getElementById('words-options');
+
 
 // --- Game State Variables ---
 let words = [];
