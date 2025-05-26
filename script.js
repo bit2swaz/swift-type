@@ -264,110 +264,139 @@ function resetGame() {
 
 // --- Event Listeners ---
 
+// textInput Listeners (Modifications for error handling and end of test)
 textInput.addEventListener('keydown', (e) => {
-    // Prevent spacebar from triggering default browser scroll
-    if (e.key === ' ' && textInput.value.length === 0 && !testStarted) {
-        e.preventDefault();
-        return; // Don't start if first character is space
+    if (testFinished) {
+        e.preventDefault(); // Prevent typing if test is finished
+        return;
     }
 
-    if (!testStarted && e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Meta' && e.key !== 'CapsLock' && e.key !== 'Tab' && e.key !== 'Escape') {
+    // Prevent spacebar from triggering default browser scroll if input is empty
+    if (e.key === ' ' && textInput.value.length === 0 && !testStarted) {
+        e.preventDefault();
+        return;
+    }
+
+    if (!testStarted && e.key.length === 1) { // Any single character key press starts the test
         testStarted = true;
         startTimer();
     }
 });
 
 textInput.addEventListener('input', (e) => {
-    if (!testStarted) return; // Don't process input if test hasn't started
+    if (!testStarted || testFinished) return;
 
     const typedText = textInput.value;
     const currentWordElement = wordsDisplay.querySelectorAll('.word')[currentWordIndex];
-    if (!currentWordElement) return; // Should not happen if words are rendered
+    if (!currentWordElement) {
+        // This case indicates an issue or end of test
+        endTest();
+        return;
+    }
 
     const targetWord = words[currentWordIndex];
-    let isCorrectWordSoFar = true;
+    const targetWordLength = targetWord.length;
 
-    // Reset character styling for the current word
-    Array.from(currentWordElement.children).forEach(charSpan => {
-        charSpan.classList.remove('correct', 'incorrect');
+    // Reset character styling for the current word and any 'extra' characters
+    const allCharsInWord = Array.from(currentWordElement.children);
+    allCharsInWord.forEach(charSpan => {
+        charSpan.classList.remove('correct', 'incorrect', 'extra');
     });
 
-    for (let i = 0; i < targetWord.length; i++) {
+    let correctCharsInCurrentWord = 0;
+    let charsMatchedSoFar = 0; // Number of characters compared for correctness
+
+    // Compare typed characters with target word characters
+    for (let i = 0; i < targetWordLength; i++) {
         const targetChar = targetWord[i];
         const typedChar = typedText[i];
         const charSpan = currentWordElement.children[i];
 
         if (typedChar === undefined) {
-            // User hasn't typed this character yet
-            isCorrectWordSoFar = false;
+            // User hasn't typed this character yet, so no class for correct/incorrect
+            // We ensure no incorrect/correct classes are left over from previous state
+            charSpan.classList.remove('correct', 'incorrect');
         } else if (typedChar === targetChar) {
             charSpan.classList.add('correct');
+            charSpan.classList.remove('incorrect');
+            correctCharsInCurrentWord++;
+            charsMatchedSoFar++;
         } else {
             charSpan.classList.add('incorrect');
-            isCorrectWordSoFar = false;
+            charSpan.classList.remove('correct');
+            charsMatchedSoFar++;
         }
     }
 
-    // Handle spacebar or end of word
+    // --- Handle "extra" characters typed beyond the word length ---
+    // Remove any existing 'extra' spans first
+    currentWordElement.querySelectorAll('.extra').forEach(el => el.remove());
+
+    if (typedText.length > targetWordLength) {
+        for (let i = targetWordLength; i < typedText.length; i++) {
+            const extraCharSpan = document.createElement('span');
+            extraCharSpan.classList.add('character', 'extra');
+            extraCharSpan.textContent = typedText[i];
+            currentWordElement.appendChild(extraCharSpan);
+            // Mark extra characters as incorrect for calculation
+            extraCharSpan.classList.add('incorrect');
+            charsMatchedSoFar++;
+        }
+    }
+
+
+    // --- Logic for moving to next word or ending test ---
     if (e.inputType === 'insertText' && typedText.endsWith(' ')) {
-        // Space pressed
-        totalCharactersTyped++; // Count the space
-        const targetSpaceChar = words[currentWordIndex][targetWord.length] === undefined ? ' ' : words[currentWordIndex][targetWord.length]; // Check if it's the actual space character
-        if (targetSpaceChar === ' ') {
-            // We assume the space after the word is always correct if typed
-            correctCharactersTyped++;
+        // User typed a space (finished current word)
+        e.preventDefault(); // Prevent actual space from appearing in input field before clearing
+
+        // Calculate total and correct for the *current word* before moving on
+        // This accounts for extra characters and partial correctness
+        totalCharactersTyped += typedText.length;
+        correctCharactersTyped += correctCharsInCurrentWord;
+
+        // If the *target* word itself had a space (e.g., if we included spaces as distinct characters from word lists),
+        // we'd handle that. But for now, we assume words are space-separated, and the space typed by the user is the delimiter.
+        // We can consider the typed space as correct if the previous word was fully correct up to its length
+        if (typedText.substring(0, targetWordLength) === targetWord) {
+             correctCharactersTyped++; // Count the space as correct if the word before it was correct
+        } else {
+            // If the word typed was incorrect, the space is also an "error" in a sense
+            // Total characters still increases for the space
+            totalCharactersTyped++; // Count the space, even if word was incorrect
         }
 
-        // Move to the next word
+
         currentWordIndex++;
         currentCharIndex = 0;
         textInput.value = ''; // Clear input for the next word
 
-        if (currentWordIndex < words.length) {
+        if (currentTestMode === 'words' && currentWordIndex >= words.length) {
+            endTest(); // End test if word count reached
+        } else if (currentWordIndex < words.length) {
             highlightCurrentCharacter();
         } else {
-            // End of test
-            stopTimer();
-            textInput.disabled = true;
-            calculateMetrics();
-            alert('Test finished! Check your results.');
+            // This case might be reached if in time mode and run out of generated words
+            // before time runs out. We should handle this by ending the test.
+            endTest();
         }
     } else if (e.inputType === 'deleteContentBackward') {
-        // Handle backspace
-        // We only decrement correct/total characters if we're deleting a character that was previously counted
-        if (currentCharIndex > 0) {
-            totalCharactersTyped--;
-            // If the character being deleted was correct, decrement correct count
-            const currentWordChars = words[currentWordIndex].split('');
-            if (currentWordChars[currentCharIndex - 1] === typedText[currentCharIndex - 1]) { // Compare original char with the one that was correct
-                 correctCharactersTyped--;
-            }
-            currentCharIndex--;
-        } else if (currentWordIndex > 0 && textInput.value === '') {
-            // If at the beginning of a word and backspacing empty input, go to previous word
-            currentWordIndex--;
-            const prevWord = words[currentWordIndex];
-            currentCharIndex = prevWord.length; // Set cursor to end of previous word
-            textInput.value = prevWord; // Pre-fill input with previous word
-            // Re-evaluate previous word's correct/incorrect characters for styling
-            // This is a bit more complex, for now, we'll just move the cursor
-        }
-        highlightCurrentCharacter();
-        calculateMetrics(); // Recalculate metrics on backspace
-    } else {
-        // Regular typing: Check character by character
-        if (typedText.length > currentCharIndex) {
-            totalCharactersTyped++;
-            const targetChar = targetWord[currentCharIndex];
-            const typedChar = typedText[currentCharIndex];
-
-            if (typedChar === targetChar) {
-                correctCharactersTyped++;
-            }
-        }
+        // Handle backspace: Recalculate metrics on the fly
+        // The total/correct counts are accumulated *when a word is completed*.
+        // When backspacing, we are only affecting the *current* word's visual correctness
+        // and its potential contribution to total/correct characters if it were to be completed.
+        // So, we don't adjust totalCharactersTyped or correctCharactersTyped here.
+        // Those metrics are derived from completed words.
+        // The `calculateMetrics` will be called, which uses the accumulated
+        // correctCharactersTyped / totalCharactersTyped. This is okay.
         currentCharIndex = typedText.length;
         highlightCurrentCharacter();
         calculateMetrics();
+    } else {
+        // Regular typing: Update char index and calculate metrics
+        currentCharIndex = typedText.length;
+        highlightCurrentCharacter();
+        calculateMetrics(); // Update metrics as user types within a word
     }
 });
 
