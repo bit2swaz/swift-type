@@ -30,3 +30,19 @@ h1 {
     margin-bottom: 30px;
 }
 
+.words-display {
+    background-color: #21252b;
+    border: 1px solid #4b5263;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    line-height: 1.6em;
+    min-height: 120px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; /* Space between words */
+    justify-content: center;
+    align-items: flex-start;
+    overflow: hidden;
+}
