@@ -227,8 +227,6 @@ function endTest() {
     alert(`Test finished! Your WPM: ${wpmDisplay.textContent.split(': ')[1]}, Accuracy: ${accuracyDisplay.textContent.split(': ')[1]}`);
 }
 
-
-
 function calculateMetrics() {
     const currentTime = new Date().getTime();
     const elapsedTimeInMinutes = (currentTime - startTime) / 1000 / 60; // in minutes
@@ -250,18 +248,19 @@ function resetGame() {
     totalCharactersTyped = 0;
     correctCharactersTyped = 0;
     testStarted = false;
+    testFinished = false;
 
     timerDisplay.textContent = 'Time: 0s';
     wpmDisplay.textContent = 'WPM: 0';
     accuracyDisplay.textContent = 'Accuracy: 0%';
     textInput.value = '';
-    textInput.disabled = false; // Enable input
-    textInput.focus(); // Focus the input again
+    textInput.disabled = false;
+    textInput.focus();
+    wordsDisplay.scrollTop = 0; // Reset scroll position
 
-    generateWords();
+    generateWords(); // Regenerate words based on current settings
     renderWords();
 }
-
 // --- Event Listeners ---
 
 textInput.addEventListener('keydown', (e) => {
