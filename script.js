@@ -43,3 +43,28 @@ function generateWords() {
     const numWords = Math.floor(Math.random() * (70 - 50 + 1)) + 50;
     words = shuffledWords.slice(0, numWords);
 }
+
+function renderWords() {
+    wordsDisplay.innerHTML = ''; // Clear previous words
+    words.forEach((word, wordIndex) => {
+        const wordSpan = document.createElement('span');
+        wordSpan.classList.add('word');
+        word.split('').forEach(char => {
+            const charSpan = document.createElement('span');
+            charSpan.classList.add('character');
+            charSpan.textContent= char;
+            wordSpan.appendChild(charSpan);
+        });
+        wordsDisplay.appendChild(wordSpan);
+
+        if (wordIndex < words.length - 1) {
+            const spaceSpan = document.createElement('span');
+            spaceSpan.classList.add('character'); // Space is also a character for tracking
+            spaceSpan.textContent = '';
+            wordSpan.appendChild(spaceSpan); // Append space inside the wordSpan for proper highlighting
+        }
+    });
+
+    // Highlight the first character of the first word
+    highlightCurrentCharacter();
+}
