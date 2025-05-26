@@ -56,3 +56,17 @@ h1 {
     padding: 1px 0;
     transition: background-color 0.1s ease;
 }
+
+.character.current {
+    background-color: #56b6c2; /* Highlight current character */
+    border-radius: 2px;
+}
+
+.character.correct {
+    color: #98c379; /* Green for correct */
+}
+
+.character.incorrect {
+    color: #e06c75; /* Red for incorrect */
+    text-decoration: underline wavy #e06c75; /* Wavy underline for incorrect */
+}
