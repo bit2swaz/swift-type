@@ -277,7 +277,7 @@ function resetGame() {
     textInput.focus(); // Ensure input is focused
     wordsDisplay.scrollTop = 0; // Reset scroll position
 
-    generateWords();
+    generateWords(); // **Crucially, generate the words *before* rendering them**
     renderWords(); // This will also call updateCaretPosition
 }
 
