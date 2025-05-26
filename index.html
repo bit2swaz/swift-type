@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SwiftType</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>SwiftType</h1>
+    <h1>SwiftType</h1>
 
+    <div class="container">
         <div class="settings-panel">
             <div class="settings-group">
                 <label class="checkbox-container">
@@ -48,7 +49,7 @@
         <div class="test-area">
             <div id="words-display" class="words-display">
                 <div id="caret" class="caret"></div>
-                </div>
+            </div>
             <input type="text" id="text-input" class="text-input" autofocus>
         </div>
 
@@ -58,7 +59,8 @@
             <div id="accuracy" class="metric">Accuracy: 0%</div>
         </div>
 
-        <button id="restart-btn" class="restart-btn">Restart Test</button>
+        <button id="restart-btn" class="restart-btn hidden">
+            <span class="material-icons">refresh</span> </button>
     </div>
 
     <script src="script.js"></script>
