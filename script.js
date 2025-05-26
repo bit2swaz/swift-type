@@ -104,7 +104,6 @@ const punctuations = [",", ".", ";", ":", "'", '"', "(", ")", "[", "]", "{", "}"
 function generateWords() {
     console.log("generateWords() called.");
     let baseWords = [...commonWords]; // Start with common words
-    // baseWords = baseWords.map(word => word.replace(/[a-zA-Z0-9]/g, '').toLowerCase()).filter(word => word.length > 0)
 
     if (includeNumbers) {
         baseWords = baseWords.concat(numbers);
