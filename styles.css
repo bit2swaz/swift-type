@@ -93,3 +93,13 @@ h1 {
     margin-bottom: 30px;
     flex-wrap: wrap;
 }
+
+.metric {
+    background-color: #4b5263;
+    padding: 15px 25px;
+    border-radius: 5px;
+    font-size: 1.3em;
+    font-weight: bold;
+    margin: 10px;
+}
+
