@@ -178,3 +178,97 @@ textInput.addEventListener('keydown', (e) => {
         startTimer();
     }
 });
+
+textInput.addEventListener('input', (e) => {
+    if (!testStarted) return; // Don't process input if test hasn't started
+
+    const typedText = textInput.value;
+    const currentWordElement = wordsDisplay.querySelectorAll('.word')[currentWordIndex];
+    if (!currentWordElement) return; // Should not happen if words are rendered
+
+    const targetWord = words[currentWordIndex];
+    let isCorrectWordSoFar = true;
+
+    // Reset character styling for the current word
+    Array.from(currentWordElement.children).forEach(charSpan => {
+        charSpan.classList.remove('correct', 'incorrect');
+    });
+
+    for (let i = 0; i < targetWord.length; i++) {
+        const targetChar = targetWord[i];
+        const typedChar = typedText[i];
+        const charSpan = currentWordElement.children[i];
+
+        if (typedChar === undefined) {
+            // User hasn't typed this character yet
+            isCorrectWordSoFar = false;
+        } else if (typedChar === targetChar) {
+            charSpan.classList.add('correct');
+        } else {
+            charSpan.classList.add('incorrect');
+            isCorrectWordSoFar = false;
+        }
+    }
+
+    // Handle spacebar or end of word
+    if (e.inputType === 'insertText' && typedText.endsWith(' ')) {
+        // Space pressed
+        totalCharactersTyped++; // Count the space
+        const targetSpaceChar = words[currentWordIndex][targetWord.length] === undefined ? ' ' : words[currentWordIndex][targetWord.length]; // Check if it's the actual space character
+        if (targetSpaceChar === ' ') {
+            // We assume the space after the word is always correct if typed
+            correctCharactersTyped++;
+        }
+
+        // Move to the next word
+        currentWordIndex++;
+        currentCharIndex = 0;
+        textInput.value = ''; // Clear input for the next word
+
+        if (currentWordIndex < words.length) {
+            highlightCurrentCharacter();
+        } else {
+            // End of test
+            stopTimer();
+            textInput.disabled = true;
+            calculateMetrics();
+            alert('Test finished! Check your results.');
+        }
+    } else if (e.inputType === 'deleteContentBackward') {
+        // Handle backspace
+        // We only decrement correct/total characters if we're deleting a character that was previously counted
+        if (currentCharIndex > 0) {
+            totalCharactersTyped--;
+            // If the character being deleted was correct, decrement correct count
+            const currentWordChars = words[currentWordIndex].split('');
+            if (currentWordChars[currentCharIndex - 1] === typedText[currentCharIndex - 1]) { // Compare original char with the one that was correct
+                 correctCharactersTyped--;
+            }
+            currentCharIndex--;
+        } else if (currentWordIndex > 0 && textInput.value === '') {
+            // If at the beginning of a word and backspacing empty input, go to previous word
+            currentWordIndex--;
+            const prevWord = words[currentWordIndex];
+            currentCharIndex = prevWord.length; // Set cursor to end of previous word
+            textInput.value = prevWord; // Pre-fill input with previous word
+            // Re-evaluate previous word's correct/incorrect characters for styling
+            // This is a bit more complex, for now, we'll just move the cursor
+        }
+        highlightCurrentCharacter();
+        calculateMetrics(); // Recalculate metrics on backspace
+    } else {
+        // Regular typing: Check character by character
+        if (typedText.length > currentCharIndex) {
+            totalCharactersTyped++;
+            const targetChar = targetWord[currentCharIndex];
+            const typedChar = typedText[currentCharIndex];
+
+            if (typedChar === targetChar) {
+                correctCharactersTyped++;
+            }
+        }
+        currentCharIndex = typedText.length;
+        highlightCurrentCharacter();
+        calculateMetrics();
+    }
+});
