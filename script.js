@@ -114,3 +114,19 @@ function scrollWordsDisplay() {
         }
     }
 }
+
+function startTimer() {
+    startTime = new Date().getTime();
+    timerInterval = setInterval(updateTimer, 1000);
+}
+
+function updateTimer() {
+    const currentTime = new Date().getTime();
+    const elapsedTime = Math.floor((currentTime - startTime) / 1000);
+    timerDisplay.textContent = `Time: ${elapsedTime}s`;
+    calculateMetrics(); // Update WPM and accuracy continuously
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+}
