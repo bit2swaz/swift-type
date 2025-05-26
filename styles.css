@@ -1,43 +1,62 @@
+:root {
+    --bg-color: #282c34;
+    --text-color: #abb2bf;
+    --accent-color: #61afef; /* Used for main accents like SwiftType header */
+    --option-active-color: #c678dd; /* Different active color for options */
+    --correct-color: #98c379; /* Green for correct text */
+    --incorrect-color: #e06c75; /* Red for incorrect text/extra */
+    --caret-color: #61afef; /* Caret matches main accent */
+    --border-color: #4b5263; /* General border color */
+    --panel-bg: #21252b; /* Background for panels like settings */
+    --input-bg: #3e4451; /* Background for main container and buttons */
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #282c34; /* Dark background */
-    color: #abb2bf; /* Light text */
+    background-color: var(--bg-color);
+    color: var(--text-color);
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column; /* Stacks h1 and .container vertically */
+    justify-content: flex-start; /* Aligns content to the top */
+    align-items: center; /* Centers content horizontally */
     min-height: 100vh;
     margin: 0;
-    padding: 20px;
+    padding-top: 20px; /* WGives space for the h1 at the top */
     box-sizing: border-box;
-    overflow: hidden; /* Prevent body scroll if test area scrolls */
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Header Styling */
+h1 {
+    color: var(--accent-color);
+    font-size: 2.5em;
+    margin-top: 0; /* Removes default top margin to align with body top */
+    margin-bottom: 25px; /* Adjust spacing below header */
+    z-index: 1; /* Ensures it stays above other elements if needed */
 }
 
 .container {
-    background-color: #3e4451;
+    background-color: var(--input-bg);
     border-radius: 8px;
     padding: 30px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     text-align: center;
     width: 100%;
     max-width: 800px;
-}
-
-h1 {
-    color: #61afef;
-    margin-bottom: 30px;
+    position: relative; /* Essential for positioning absolute children like restart-btn if it were inside */
 }
 
 .settings-panel {
     display: flex;
-    justify-content: space-between; /* Distribute sections horizontally */
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
-    background-color: #21252b;
+    background-color: var(--panel-bg);
     border-radius: 8px;
     padding: 15px 20px;
     box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    gap: 15px; /* Space between groups */
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .settings-group {
@@ -55,7 +74,7 @@ h1 {
     cursor: pointer;
     font-size: 1.1em;
     user-select: none;
-    color: #abb2bf;
+    color: var(--text-color);
 }
 
 .checkbox-container input {
@@ -72,17 +91,17 @@ h1 {
     left: 0;
     height: 20px;
     width: 20px;
-    background-color: #4b5263;
+    background-color: var(--border-color);
     border-radius: 4px;
     transition: background-color 0.2s;
 }
 
 .checkbox-container:hover input ~ .checkmark {
-    background-color: #5c6370;
+    background-color: #5c6370; /* Slightly lighter on hover */
 }
 
 .checkbox-container input:checked ~ .checkmark {
-    background-color: #61afef;
+    background-color: var(--accent-color);
 }
 
 .checkmark:after {
@@ -109,13 +128,13 @@ h1 {
 .mode-selector {
     display: flex;
     border-radius: 5px;
-    overflow: hidden; /* For rounded edges of active button */
-    border: 1px solid #4b5263;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
 }
 
 .mode-btn {
-    background-color: #3e4451;
-    color: #abb2bf;
+    background-color: var(--input-bg); 
+    color: var(--text-color);
     border: none;
     padding: 10px 15px;
     font-size: 1.1em;
@@ -124,11 +143,11 @@ h1 {
 }
 
 .mode-btn:hover {
-    background-color: #4b5263;
+    background-color: var(--border-color); 
 }
 
 .mode-btn.active {
-    background-color: #61afef;
+    background-color: var(--accent-color); 
     color: white;
     font-weight: bold;
 }
@@ -138,12 +157,12 @@ h1 {
     display: flex;
     border-radius: 5px;
     overflow: hidden;
-    border: 1px solid #4b5263;
+    border: 1px solid var(--border-color);
 }
 
 .option-btn {
-    background-color: #3e4451;
-    color: #abb2bf;
+    background-color: var(--input-bg); 
+    color: var(--text-color);
     border: none;
     padding: 10px 15px;
     font-size: 1.1em;
@@ -152,90 +171,88 @@ h1 {
 }
 
 .option-btn:hover {
-    background-color: #4b5263;
+    background-color: var(--border-color);
 }
 
 .option-btn.active {
-    background-color: #c678dd; /* Different active color for options */
+    background-color: var(--option-active-color); 
     color: white;
     font-weight: bold;
 }
 
 /* Utility Class */
 .hidden {
-    display: none !important;
+    display: none !important; /* Crucial for hiding elements completely and overriding other display properties */
 }
 
 .test-area {
     margin-bottom: 30px;
+    width: 100%; /* Ensure it takes full width of container */
 }
 
 .words-display {
-    background-color: #21252b;
-    border: 1px solid #4b5263;
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
     border-radius: 5px;
     padding: 20px;
     margin-bottom: 20px;
     font-size: 1.8em;
-    line-height: 1.6em; /* Adjust this to control line height */
-    height: 120px; /* Fixed height for ~3 lines (adjust based on font-size/line-height) */
-    overflow: hidden; /* Hide overflow, JavaScript will manage scroll */
-    position: relative; /* Crucial for positioning the caret */
-    text-align: left; /* Align words to the left */
-    user-select: none; /* Prevent text selection in the words display */
+    line-height: 1.6em;
+    height: 120px;
+    overflow: hidden;
+    position: relative;
+    text-align: left;
+    user-select: none;
 }
 
 .word {
-    display: inline-block; /* Treat words as blocks for better wrapping and positioning */
-    margin-right: 8px; /* Space between words */
-    white-space: nowrap; /* Prevent words from breaking lines */
+    display: inline-block;
+    margin-right: 8px;
+    white-space: nowrap;
 }
 
 .character {
-    display: inline-block; /* Allows individual character styling */
-    padding: 1px 0; /* Minimal padding */
+    display: inline-block;
+    padding: 1px 0;
     transition: background-color 0.1s ease, color 0.1s ease;
-    /* Current character will be highlighted by the caret, not background color */
 }
 
 .character.correct {
-    color: #98c379; /* Green for correct */
+    color: var(--correct-color);
 }
 
 .character.incorrect {
-    color: #e06c75; /* Red for incorrect */
+    color: var(--incorrect-color);
 }
 
 .character.extra {
-    color: #e06c75; /* Red for extra characters */
-    text-decoration: underline wavy #e06c75 1px; /* Wavy underline for incorrect */
+    color: var(--incorrect-color);
+    text-decoration: underline wavy var(--incorrect-color) 1px;
 }
 
-/* Hide the actual text input field visually */
 .text-input {
-    position: absolute; /* Take it out of flow */
-    left: -9999px; /* Move it far off-screen */
-    opacity: 0; /* Make it completely transparent */
-    pointer-events: none; /* Make it non-interactive for mouse events */
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    pointer-events: none;
     width: 1px;
     height: 1px;
     overflow: hidden;
     white-space: nowrap;
-    z-index: -1; /* Ensure it's behind everything */
+    z-index: -1;
 }
 
-/* Custom Caret Styling */
 .caret {
     position: absolute;
-    height: 1.6em; /* Match line height of words-display font, line-height 1.6em */
-    width: 2px; /* Thickness of the caret */
-    background-color: #61afef; /* Caret color */
+    height: 1.6em;
+    width: 2px;
+    background-color: var(--caret-color);
     animation: blink 1s infinite;
-    top: 0; /* Will be set by JS */
-    left: 0; /* Will be set by JS */
-    transition: transform 0.05s ease-out; /* Smooth movement */
-    pointer-events: none; /* Ensure it doesn't block clicks */
-    z-index: 10; /* Ensure it's above words */
+    top: 0;
+    left: 0;
+    transition: transform 0.05s ease-out;
+    pointer-events: none;
+    z-index: 10;
 }
 
 @keyframes blink {
@@ -243,22 +260,16 @@ h1 {
     50% { opacity: 0; }
 }
 
-/* Remove current class from character */
-.character.current {
-    /* No longer needed, caret handles this */
-    background-color: transparent; /* Ensure it's transparent */
-}
-
-
 .results {
     display: flex;
     justify-content: space-around;
     margin-bottom: 30px;
     flex-wrap: wrap;
+    width: 100%; /* Ensure it takes full width of container */
 }
 
 .metric {
-    background-color: #4b5263;
+    background-color: var(--border-color);
     padding: 15px 25px;
     border-radius: 5px;
     font-size: 1.3em;
@@ -266,24 +277,33 @@ h1 {
     margin: 10px;
 }
 
-.restart-btn {
-    background-color: #c678dd;
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    border-radius: 5px;
-    font-size: 1.2em;
+/* Restart Button Styling */
+#restart-btn {
+    /* Positioned absolutely to stay in place when other UI elements are hidden/shown */
+    position: absolute;
+    top: 20px; /* Distance from the top of the viewport/parent */
+    right: 20px; /* Distance from the right of the viewport/parent */
+    background: none; /* Remove background as it's an icon-only button */
+    border: none; /* Remove border */
+    padding: 0; /* Remove padding to make it compact like an icon */
+    font-size: 2.5em; /* Make the icon large and visible */
+    color: var(--text-color); /* Set icon color to match text, or choose an accent color */
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
+    z-index: 1000; /* Ensure it's on top of all other content */
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.restart-btn:hover {
-    background-color: #9f60b6;
+#restart-btn:hover {
+    color: var(--accent-color); /* Change color on hover for feedback */
 }
 
-.restart-btn:active {
-    transform: translateY(1px);
+#restart-btn .material-icons {
+    font-size: inherit; /* Inherits the 2.5em from its parent #restart-btn */
 }
+
 
 /* Responsive adjustments for settings panel */
 @media (max-width: 600px) {
@@ -301,6 +321,13 @@ h1 {
         justify-content: center;
     }
     .mode-btn, .option-btn {
-        flex-grow: 1; /* Make buttons expand to fill width */
+        flex-grow: 1;
+    }
+    .results {
+        flex-direction: column;
+        align-items: center;
+    }
+    .metric {
+        width: calc(100% - 20px); /* Full width minus margin */
     }
 }
