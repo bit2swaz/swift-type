@@ -11,36 +11,35 @@
 
         <div class="settings-panel">
             <div class="settings-group">
-                <label class="checkbox-container">
-                    <input type="checkbox" id="include-numbers">
-                    <span class="checkmark"></span>
-                    Numbers
+                <label class="checkbox-container">Numbers
+                <input type="checkbox" id="numbersToggle">
+                <span class="checkmark"></span>
                 </label>
-                <label class="checkbox-container">
-                    <input type="checkbox" id="include-punctuation">
-                    <span class="checkmark"></span>
-                    Punctuation
+                <label class="checkbox-container">Punctuation
+                <input type="checkbox" id="punctuationToggle">
+                <span class="checkmark"></span>
                 </label>
             </div>
 
-            <div class="settings-group">
+            <div class="mode-and-options">
                 <div class="mode-selector">
-                    <button class="mode-btn active" id="mode-time" data-mode="time">Time</button>
-                    <button class="mode-btn" id="mode-words" data-mode="words">Words</button>
+                    <button class="mode-btn active" id="timeModeBtn">Time</button>
+                    <button class="mode-btn" id="wordsModeBtn">Words</button>
                 </div>
-            </div>
 
-            <div class="settings-group options-group" id="time-options">
-                <button class="option-btn" data-value="15">15s</button>
-                <button class="option-btn" data-value="30">30s</button>
-                <button class="option-btn" data-value="60">60s</button>
-                <button class="option-btn" data-value="120">120s</button>
-            </div>
-            <div class="settings-group options-group hidden" id="words-options">
-                <button class="option-btn" data-value="10">10</button>
-                <button class="option-btn" data-value="25">25</button>
-                <button class="option-btn" data-value="50">50</button>
-                <button class="option-btn" data-value="100">100</button>
+                <div class="options-group" id="timeOptions">
+                    <button class="option-btn active" data-value="15">15s</button>
+                    <button class="option-btn" data-value="30">30s</button>
+                    <button class="option-btn" data-value="60">60s</button>
+                    <button class="option-btn" data-value="120">120s</button>
+                </div>
+
+                <div class="options-group hidden" id="wordsOptions">
+                    <button class="option-btn active" data-value="10">10</button>
+                    <button class="option-btn" data-value="25">25</button>
+                    <button class="option-btn" data-value="50">50</button>
+                    <button class="option-btn" data-value="100">100</button>
+                </div>
             </div>
         </div>
 
