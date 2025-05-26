@@ -28,7 +28,7 @@ let testFinished = false;
 
 // Test settings
 let currentTestMode = 'time'; // 'time' or 'words'
-let currentTestDuration = 60; // default to 60 seconds
+let currentTestDuration = 30; // default to 30 seconds
 let currentWordCount = 50; // default to 50 words
 let includeNumbers = false;
 let includePunctuation = false;
@@ -266,9 +266,12 @@ function stopTimer() {
 function updateTimer() {
     const currentTime = new Date().getTime();
     const elapsedTime = Math.floor((currentTime - startTime) / 1000);
+    const remainingTime = currentTestDuration - elapsedTime; // Calculate remaining time
+
+    // Display remaining time
     timerDisplay.textContent = `Time: ${elapsedTime}s`;
 
-    if (currentTestMode === 'time' && elapsedTime >= currentTestDuration) {
+    if (currentTestMode === 'time' && remainingTime <= 0) {
         endTest();
     } else {
         calculateMetrics();
@@ -296,7 +299,8 @@ function resetGame() {
     testStarted = false;
     testFinished = false;
 
-    timerDisplay.textContent = 'Time: 0s';
+    // Set initial timer display to the current test duration
+    timerDisplay.textContent = `Time: ${currentTestDuration}s`;
     wpmDisplay.textContent = 'WPM: 0';
     accuracyDisplay.textContent = 'Accuracy: 0%';
     textInput.value = '';
@@ -503,7 +507,7 @@ restartBtn.addEventListener('click', resetGame);
 
 // --- Initialize the game on load ---
 // Set initial active states for buttons
-document.querySelector('#time-options .option-btn[data-value="60"]').classList.add('active');
+document.querySelector('#time-options .option-btn[data-value="30"]').classList.add('active');
 document.querySelector('#mode-time').classList.add('active');
 resetGame();
 
