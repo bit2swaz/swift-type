@@ -502,6 +502,7 @@ textInput.addEventListener('input', (e) => {
 restartBtn.addEventListener('click', resetGame);
 
 // --- Initialize the game on load ---
+// Set initial active states for buttons
 document.querySelector('#time-options .option-btn[data-value="60"]').classList.add('active');
 document.querySelector('#mode-time').classList.add('active');
 resetGame();
