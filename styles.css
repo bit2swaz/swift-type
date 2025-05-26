@@ -46,3 +46,7 @@ h1 {
     align-items: flex-start;
     overflow: hidden;
 }
+
+.word {
+    white-space: nowrap; /* Prevent words from breaking */
+}
