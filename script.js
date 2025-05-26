@@ -103,24 +103,87 @@ const punctuations = [",", ".", ";", ":", "'", '"', "(", ")", "[", "]", "{", "}"
 
 function generateWords() {
     console.log("generateWords() called.");
-    let baseWords = [...commonWords]; // Start with common words
 
-    if (includeNumbers) {
-        baseWords = baseWords.concat(numbers);
-    }
-    if (includePunctuation) {
-        baseWords = baseWords.concat(punctuations);
+    // Determine how many words to generate in total for the current test mode
+    // (e.g., 50 for words mode, 200 for time mode to ensure enough words are available)
+    const totalWordsToGenerate = currentTestMode === 'words' ? currentWordCount : 200;
+
+    // Sanitize commonWords once to remove any internal punctuation
+    const sanitizedCommonWords = commonWords
+        .map(word => word.replace(/[^a-zA-Z0-9]/g, '').toLowerCase())
+        .filter(word => word.length > 0);
+
+    let wordsToUse = []; // This will be the final pool of words before the final shuffle
+
+    // Define the desired proportion for numbers/punctuation when enabled.
+    // Let's aim for up to 35% of the total words to be numbers/punctuation combined,
+    // as per your request for a "good number" like "at least 30 out of 70".
+    const nonWordProportion = 0.35; // You can adjust this percentage (e.g., 0.3 for 30%)
+
+    let numNumbersNeeded = 0;
+    let numPunctuationsNeeded = 0;
+    let numCommonWordsNeeded = totalWordsToGenerate; // Start by assuming all are common words
+
+    if (includeNumbers && includePunctuation) {
+        // If both are enabled, split the non-word proportion evenly between them
+        numNumbersNeeded = Math.floor(totalWordsToGenerate * (nonWordProportion / 2));
+        numPunctuationsNeeded = Math.floor(totalWordsToGenerate * (nonWordProportion / 2));
+        numCommonWordsNeeded = totalWordsToGenerate - numNumbersNeeded - numPunctuationsNeeded;
+    } else if (includeNumbers) {
+        // If only numbers are enabled, use the full non-word proportion for them
+        numNumbersNeeded = Math.floor(totalWordsToGenerate * nonWordProportion);
+        numCommonWordsNeeded = totalWordsToGenerate - numNumbersNeeded;
+    } else if (includePunctuation) {
+        // If only punctuation is enabled, use the full non-word proportion for them
+        numPunctuationsNeeded = Math.floor(totalWordsToGenerate * nonWordProportion);
+        numCommonWordsNeeded = totalWordsToGenerate - numPunctuationsNeeded;
     }
 
-    // Shuffle the combined baseWords array
-    const shuffledWords = baseWords.sort(() => 0.5 - Math.random());
+    // Ensure we don't try to pick more numbers/punctuation than are actually available in their arrays.
+    numNumbersNeeded = Math.min(numNumbersNeeded, numbers.length);
+    numPunctuationsNeeded = Math.min(numPunctuationsNeeded, punctuations.length);
+    // Recalculate common words needed to fill any space if numbers/punctuation arrays were too small
+    numCommonWordsNeeded = totalWordsToGenerate - numNumbersNeeded - numPunctuationsNeeded;
+    // Also ensure we don't pick more common words than available
+    numCommonWordsNeeded = Math.min(numCommonWordsNeeded, sanitizedCommonWords.length);
 
-    if (currentTestMode === 'words') {
-        words = shuffledWords.slice(0, currentWordCount);
-    } else {
-        words = shuffledWords.slice(0, 200); // Generate enough words for time mode
+
+    // Helper function to get a shuffled slice of an array.
+    // If 'count' is more than 'arr.length', it will repeat elements from 'arr' to meet the count.
+    function getShuffledSlice(arr, count) {
+        if (arr.length === 0 || count <= 0) return [];
+        let result = [];
+        // If we need more elements than available in the array, repeat the array elements
+        if (count > arr.length) {
+            while(result.length < count) {
+                result.push(...arr.sort(() => 0.5 - Math.random())); // Shuffle and add all
+            }
+            return result.slice(0, count); // Slice to exact count
+        }
+        // Otherwise, just get a random slice
+        return [...arr].sort(() => 0.5 - Math.random()).slice(0, count);
     }
-    console.log("Words generated. Total words:", words.length, "First 5 words:", words.slice(0, 5));
+
+    // Add the calculated number of common words, numbers, and punctuation to our pool
+    wordsToUse = wordsToUse.concat(getShuffledSlice(sanitizedCommonWords, numCommonWordsNeeded));
+    wordsToUse = wordsToUse.concat(getShuffledSlice(numbers, numNumbersNeeded));
+    wordsToUse = wordsToUse.concat(getShuffledSlice(punctuations, numPunctuationsNeeded));
+
+    // Final check: If somehow we still have too few words (e.g., all source arrays are tiny)
+    // Fill the remaining spots with random common words (will repeat if needed)
+    while(wordsToUse.length < totalWordsToGenerate && sanitizedCommonWords.length > 0) {
+        wordsToUse.push(sanitizedCommonWords[Math.floor(Math.random() * sanitizedCommonWords.length)]);
+    }
+
+    // Finally, shuffle the entire combined pool to mix them up randomly
+    words = wordsToUse.sort(() => 0.5 - Math.random());
+
+    // Slice to the exact required number, just in case we over-generated slightly in the while loop
+    words = words.slice(0, totalWordsToGenerate);
+
+    console.log("Words generated. Total words:", words.length);
+    console.log(`Breakdown: Common Words: ${numCommonWordsNeeded}, Numbers: ${numNumbersNeeded}, Punctuation: ${numPunctuationsNeeded}`);
+    console.log("First 10 generated words:", words.slice(0, 10));
 }
 
 function renderWords() {
@@ -422,14 +485,20 @@ textInput.addEventListener('input', (e) => {
 
     const typedText = textInput.value;
     const currentWordElement = wordsDisplay.querySelectorAll('.word')[currentWordIndex];
-    if (!currentWordElement) {
-        endTest();
-        return;
+
+    // Safety check: If currentWordElement is null or we're past the words array (e.g., test ended by timer)
+    if (!currentWordElement || !words[currentWordIndex]) {
+        // If in words mode and somehow past the words, and test hasn't finished, end it.
+        if (currentTestMode === 'words' && currentWordIndex >= words.length && !testFinished) {
+             endTest();
+        }
+        return; // Exit if no valid word to process
     }
 
     const targetWord = words[currentWordIndex];
     const targetWordLength = targetWord.length;
 
+    // --- Character styling logic (marking correct/incorrect characters) ---
     Array.from(currentWordElement.children).forEach(charSpan => {
         charSpan.classList.remove('correct', 'incorrect');
         if (charSpan.classList.contains('extra')) {
@@ -462,36 +531,47 @@ textInput.addEventListener('input', (e) => {
             currentWordElement.appendChild(extraCharSpan);
         }
     }
+    // --- End character styling logic ---
 
-    if (e.inputType === 'insertText' && typedText.endsWith(' ')) {
-        e.preventDefault();
 
+    // *** NEW LOGIC: End test immediately when the last word's last character is typed ***
+    if (currentTestMode === 'words' &&               // Only apply in words mode
+        currentWordIndex === words.length - 1 &&    // Check if it's the very last word
+        typedText.length === targetWordLength        // Check if the user has typed its full length
+    ) {
+        // User has successfully finished typing the last character of the last word.
+        // Update totals for this word before ending the test.
         totalCharactersTyped += typedText.length;
         correctCharactersTyped += correctCharsInCurrentVisualWord;
+        endTest(); // End the test
+        return; // Important: Exit the function to prevent further processing for this input event
+    }
 
-        if (typedText.substring(0, targetWordLength) === targetWord) {
-             correctCharactersTyped++;
-        }
+    // *** Original logic for handling spacebar or regular character input ***
+    // This block now only runs if the test was NOT ended by the new logic above.
+    if (e.inputType === 'insertText' && typedText.endsWith(' ')) {
+        e.preventDefault(); // Prevent the space from showing in the input field
 
+        totalCharactersTyped += typedText.length; // Include the typed word and space
+        correctCharactersTyped += correctCharsInCurrentVisualWord; // Add correct chars for the word
+
+        // Move to the next word
         currentWordIndex++;
         currentCharIndex = 0;
-        textInput.value = '';
+        textInput.value = ''; // Clear input field
 
+        // Check if the test should end because we've run out of words (in words mode)
+        // This path will now primarily handle moving between words,
+        // or ending if the very last word was completed with a space (less likely now)
         if (currentTestMode === 'words' && currentWordIndex >= words.length) {
             endTest();
         } else if (currentWordIndex < words.length) {
-            updateCaretPosition();
-        } else {
-            endTest();
+            updateCaretPosition(); // Move caret to the start of the next word
         }
-    } else if (e.inputType === 'deleteContentBackward') {
-        currentCharIndex = typedText.length;
+    } else { // This 'else' block runs for any non-space character input (e.g., letters, numbers, punctuation)
+        currentCharIndex = typedText.length; // Update caret position to the end of typed text
         updateCaretPosition();
-        calculateMetrics();
-    } else {
-        currentCharIndex = typedText.length;
-        updateCaretPosition();
-        calculateMetrics();
+        calculateMetrics(); // Recalculate WPM/Accuracy on each character typed
     }
 });
 
