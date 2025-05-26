@@ -45,7 +45,10 @@ h1 {
     gap: 8px; /* Space between words */
     justify-content: center;
     align-items: flex-start;
-    overflow: hidden;
+    height: 120px; /* Fixed height for ~3 lines (adjust based on font-size/line-height) */
+    overflow: hidden; /* Hide overflow, JavaScript will manage scroll */
+    position: relative; /* Crucial for positioning the caret */
+    text-align: left; /* Align words to the left */
 }
 
 .word {
