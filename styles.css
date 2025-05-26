@@ -440,6 +440,12 @@ h1 {
     letter-spacing: 0.5px;
 }
 
+.mode-and-options {
+    display: flex;
+    flex-direction: column; /* Stack children (mode-selector and options-group) vertically */
+    gap: 15px; /* Default vertical gap between mode selector and options */
+    width: 100%; /* Ensure it takes full available width */
+}
 
 /* --- Responsive Adjustments --- */
 
@@ -542,6 +548,15 @@ h1 {
     #results-restart-btn.new-test-btn {
         padding: 15px 30px;
         font-size: 1.2em;
+    }
+
+    .mode-and-options {
+        gap: 10px; /* Adjust gap for tablets */
+    }
+
+    .mode-selector {
+        width: 100%;
+        justify-content: center;
     }
 }
 
@@ -674,5 +689,14 @@ h1 {
     #results-restart-btn.new-test-btn {
         padding: 10px 20px;
         font-size: 1em;
+    }
+
+    .mode-and-options {
+        gap: 8px; /* Adjust gap for smaller phones */
+    }
+
+     .mode-selector {
+        width: 100%;
+        justify-content: center;
     }
 }
