@@ -38,23 +38,22 @@ let currentCharIndex = 0;
 let startTime;
 let timerInterval;
 let totalCharactersTyped = 0;
-let correctCharactersTyped = 0;
+let correctCharactersTyped = 0; // This variable tracks characters that form correctly typed words (for Net WPM)
 let testStarted = false;
 let testFinished = false;
 
 // Test settings
 let currentTestMode = 'time'; // 'time' or 'words'
-let currentTestDuration = 30; // default to 30 seconds
+let currentTestDuration = 30; // default to 30 seconds (in seconds)
 let currentWordCount = 50; // default to 50 words
 let includeNumbers = false;
 let includePunctuation = false;
 
-// NEW: Metrics for Results Screen
-let grossWPM = 0;
+// NEW: Metrics for Results Screen (raw counts for detailed breakdown)
 let rawCorrectCharacters = 0;
 let rawIncorrectCharacters = 0;
 let rawExtraCharacters = 0;
-
+let finalGrossWPM = 0; // Renamed to avoid confusion with live gross WPM
 
 // --- Word Lists (significantly expanded) ---
 const commonWords = [
@@ -95,11 +94,18 @@ const commonWords = [
   "bring", "carry", "send", "show", "offer", "ask", "answer", "tell", "call", "name",
   "use", "make", "do", "have", "get", "go", "come", "leave", "arrive", "return",
   "put", "set", "place", "move", "stay", "wait", "watch", "look", "see", "hear",
-  "listen", "speak", "say", "tell", "ask", "answer", "write", "draw", "paint",
+  "listen", "speak", "say", "tell", "ask", "answer", "read", "write", "draw", "paint",
   "cook", "eat", "drink", "buy", "sell", "pay", "cost", "spend", "save", "earn",
   "build", "break", "repair", "fix", "clean", "wash", "dry", "open", "close", "lock",
   "push", "pull", "throw", "catch", "climb", "jump", "run", "walk", "drive", "ride",
-  "fly", "swim", "sit", "stand", "sleep", "wake", "dream", "rest", "work", "play", "study", "learn",
+  "fly", "swim", "sit", "stand", "sleep", "wake", "dream", "think", "believe", "know",
+  "understand", "learn", "teach", "remember", "forget", "plan", "decide", "choose", "hope",
+  "wish", "need", "want", "like", "love", "hate", "enjoy", "prefer", "feel", "touch", "hold",
+  "see", "hear", "listen", "smell", "taste", "look", "watch", "speak", "talk", "say",
+  "tell", "ask", "answer", "shout", "whisper", "laugh", "cry", "smile", "frown", "yell",
+  "run", "walk", "jog", "sprint", "jump", "hop", "skip", "climb", "crawl", "swim",
+  "dive", "fly", "ride", "drive", "travel", "move", "stay", "wait", "sit", "stand",
+  "fall", "rise", "wake", "sleep", "dream", "rest", "work", "play", "study", "learn",
   "teach", "train", "practice", "try", "test", "pass", "fail", "win", "lose", "fight",
   "argue", "agree", "disagree", "help", "support", "save", "rescue", "protect", "defend", "attack",
   "hit", "kick", "throw", "catch", "push", "pull", "lift", "drop", "carry", "bring",
@@ -181,10 +187,6 @@ function generateWords() {
 function renderWords() {
     console.log("renderWords() called. Words array length:", words.length);
 
-    // Remove all existing word spans, but keep the caret
-    // It's safer to clear the entire wordsDisplay content except for the caret itself
-    // Or, even better, recreate it and prepend the caret.
-    // For now, let's stick to your current approach of removing children.
     const existingWordSpans = wordsDisplay.querySelectorAll('.word');
     console.log("Found existing word spans:", existingWordSpans.length);
     for (let i = existingWordSpans.length - 1; i >= 0; i--) {
@@ -192,7 +194,6 @@ function renderWords() {
     }
     console.log("Existing word spans removed.");
 
-    // Ensure caret is the first child (if it somehow got moved)
     if (wordsDisplay.firstChild !== caret) {
         wordsDisplay.prepend(caret);
         console.log("Caret prepended to wordsDisplay.");
@@ -200,10 +201,9 @@ function renderWords() {
         console.log("Caret is already first child.");
     }
 
-    // Append new words
     if (words.length === 0) {
         console.error("Error: words array is empty in renderWords(). Cannot render.");
-        return; // Exit if no words to render
+        return;
     }
 
     words.forEach((word, wordIndex) => {
@@ -217,7 +217,6 @@ function renderWords() {
         });
         wordsDisplay.appendChild(wordSpan);
 
-        // Add a space span after each word, except the last one
         if (wordIndex < words.length - 1) {
             const spaceSpan = document.createElement('span');
             spaceSpan.classList.add('character', 'space');
@@ -227,7 +226,7 @@ function renderWords() {
     });
     console.log("All words appended to wordsDisplay.");
 
-    updateCaretPosition(); // Position the caret after words are rendered
+    updateCaretPosition();
     console.log("updateCaretPosition called.");
 }
 
@@ -236,12 +235,11 @@ function updateCaretPosition() {
     const currentWordElement = allWordElements[currentWordIndex];
 
     if (!currentWordElement) {
-        // If no more words, hide caret
         caret.style.display = 'none';
         return;
     }
 
-    caret.style.display = 'block'; // Ensure caret is visible
+    caret.style.display = 'block';
 
     let targetCharacterSpan = null;
     let charactersInCurrentWord = Array.from(currentWordElement.children);
@@ -249,8 +247,6 @@ function updateCaretPosition() {
     if (currentCharIndex < charactersInCurrentWord.length) {
         targetCharacterSpan = charactersInCurrentWord[currentCharIndex];
     } else {
-        // If currentCharIndex is at the end of the word (meaning we're effectively on the space)
-        // Position caret after the last character of the word
         const lastCharOfWord = charactersInCurrentWord[charactersInCurrentWord.length - 1];
         if (lastCharOfWord) {
             targetCharacterSpan = lastCharOfWord;
@@ -261,26 +257,23 @@ function updateCaretPosition() {
         const rect = targetCharacterSpan.getBoundingClientRect();
         const displayRect = wordsDisplay.getBoundingClientRect();
 
-        const caretLeft = rect.left - displayRect.left + wordsDisplay.scrollLeft;
+        let caretLeft = rect.left - displayRect.left + wordsDisplay.scrollLeft;
         const caretTop = rect.top - displayRect.top + wordsDisplay.scrollTop;
 
         // Adjust caret position for when it's at the end of a word (on the space)
         const currentWordText = words[currentWordIndex];
-        let offsetX = 0;
         if (currentCharIndex === currentWordText.length) { // We are on the "virtual" space after the word
-             // If there's a next word, get its first char's width, otherwise just the last char of current word
-            const nextWordElement = allWordElements[currentWordIndex + 1];
-            if (nextWordElement && nextWordElement.children[0]) {
-                offsetX = nextWordElement.children[0].getBoundingClientRect().left - rect.right;
-                 // If the next word exists, the space width is the difference between current word's end and next word's start
-            } else if (rect.width > 0) { // If it's the last word, just use a typical character width
-                offsetX = rect.width * 0.5; // Estimate space width
+            // Calculate space width based on the visual space span if it exists
+            const spaceSpan = currentWordElement.querySelector('.space');
+            if (spaceSpan) {
+                caretLeft += spaceSpan.getBoundingClientRect().width;
+            } else {
+                // Fallback: Estimate space width (e.g., half a typical character width)
+                caretLeft += (rect.width * 0.5);
             }
         }
         
-        caret.style.transform = `translate(${caretLeft + offsetX}px, ${caretTop}px)`;
-        // console.log(`Caret moved to: left=${caretLeft + offsetX}px, top=${caretTop}px`);
-
+        caret.style.transform = `translate(${caretLeft}px, ${caretTop}px)`;
         scrollWordsDisplay(rect.top, rect.height);
     } else {
         console.warn("No target character span found for caret positioning.");
@@ -316,18 +309,25 @@ function stopTimer() {
     console.log("Timer stopped.");
 }
 
+// FIX 2: Timer Countdown
 function updateTimer() {
     const currentTime = new Date().getTime();
-    const elapsedTime = Math.floor((currentTime - startTime) / 1000);
-    const remainingTime = currentTestDuration - elapsedTime;
+    const elapsedTimeInSeconds = Math.floor((currentTime - startTime) / 1000);
 
-    timerDisplay.textContent = `Time: ${elapsedTime}s`;
-
-    if (currentTestMode === 'time' && remainingTime <= 0) {
-        endTest();
-    } else {
-        calculateMetrics();
+    let displayTime;
+    if (currentTestMode === 'time') {
+        const remainingTime = currentTestDuration - elapsedTimeInSeconds;
+        displayTime = Math.max(0, remainingTime); // Ensure it doesn't go below 0
+        if (remainingTime <= 0) {
+            endTest();
+            return; // Exit to prevent further updates after ending
+        }
+    } else { // In words mode, count up
+        displayTime = elapsedTimeInSeconds;
     }
+
+    timerDisplay.textContent = `Time: ${displayTime}s`;
+    calculateMetrics();
 }
 
 function endTest() {
@@ -338,7 +338,6 @@ function endTest() {
     textInput.blur();
     caret.style.display = 'none';
 
-    // Calculate final metrics for the results screen
     calculateFinalMetrics();
     showResultsScreen();
 }
@@ -350,29 +349,29 @@ function resetGame() {
     currentCharIndex = 0;
     totalCharactersTyped = 0;
     correctCharactersTyped = 0;
-    rawCorrectCharacters = 0; // Reset for new test
-    rawIncorrectCharacters = 0; // Reset for new test
-    rawExtraCharacters = 0; // Reset for new test
+    rawCorrectCharacters = 0;
+    rawIncorrectCharacters = 0;
+    rawExtraCharacters = 0;
     testStarted = false;
     testFinished = false;
 
-    timerDisplay.textContent = `Time: 0s`; // Should show 0s at start
+    // Reset timer display based on mode
+    timerDisplay.textContent = `Time: ${currentTestMode === 'time' ? currentTestDuration : 0}s`;
     wpmDisplay.textContent = 'WPM: 0';
     accuracyDisplay.textContent = 'Accuracy: 0%';
     textInput.value = '';
     textInput.disabled = false;
-    textInput.focus();
     wordsDisplay.scrollTop = 0;
 
-    // Show typing interface, hide results screen
     hideResultsScreen();
-    showTypingInterface();
+    showTypingInterface(); // This now handles setting focus after fade
 
     generateWords();
     renderWords();
     console.log("resetGame() finished.");
 }
 
+// FIX 4: Improved Live WPM and Accuracy Calculation
 function calculateMetrics() {
     if (!testStarted || testFinished) return;
 
@@ -380,44 +379,55 @@ function calculateMetrics() {
     const elapsedTimeInSeconds = Math.floor((currentTime - startTime) / 1000);
     const elapsedTimeInMinutes = elapsedTimeInSeconds / 60;
 
-    let currentTypedWord = textInput.value;
+    const currentTypedText = textInput.value;
     const targetWord = words[currentWordIndex] || '';
 
-    // Calculate live WPM (based on correct words, or corrected characters)
-    // Let's keep it based on totalCorrectCharactersTyped for consistency with accuracy
-    // A "word" is 5 characters including space.
-    const calculatedWPM = elapsedTimeInMinutes > 0 ? Math.round((correctCharactersTyped + getCorrectCharsInCurrentWord()) / 5 / elapsedTimeInMinutes) : 0;
-    wpmDisplay.textContent = `WPM: ${calculatedWPM}`;
+    // Calculate characters typed in the *current word*
+    let currentWordCorrectChars = 0;
+    let currentWordIncorrectChars = 0;
+    let currentWordExtraChars = 0;
 
-    // Calculate live Accuracy
-    const totalCharsCurrent = totalCharactersTyped + currentTypedWord.length;
-    const correctCharsCurrent = correctCharactersTyped + getCorrectCharsInCurrentWord();
-    const calculatedAccuracy = totalCharsCurrent > 0 ? Math.round((correctCharsCurrent / totalCharsCurrent) * 100) : 0;
-    accuracyDisplay.textContent = `Accuracy: ${calculatedAccuracy}%`;
-}
+    for (let i = 0; i < Math.max(currentTypedText.length, targetWord.length); i++) {
+        const typedChar = currentTypedText[i];
+        const targetChar = targetWord[i];
 
-// Helper to get correct characters in the currently typed word
-function getCorrectCharsInCurrentWord() {
-    const typedText = textInput.value;
-    const targetWord = words[currentWordIndex] || '';
-    let correctCount = 0;
-    for (let i = 0; i < typedText.length && i < targetWord.length; i++) {
-        if (typedText[i] === targetWord[i]) {
-            correctCount++;
+        if (typedChar === undefined) {
+            // User hasn't typed this far in the current word yet
+        } else if (targetChar === undefined) {
+            currentWordExtraChars++;
+        } else if (typedChar === targetChar) {
+            currentWordCorrectChars++;
+        } else {
+            currentWordIncorrectChars++;
         }
     }
-    return correctCount;
+
+    // Live Total Characters Typed (including current word)
+    const liveTotalCharsTyped = rawCorrectCharacters + rawIncorrectCharacters + rawExtraCharacters + // Already processed words
+                                currentWordCorrectChars + currentWordIncorrectChars + currentWordExtraChars; // Current word
+
+    // Live Correct Characters (including current word)
+    const liveCorrectChars = rawCorrectCharacters + currentWordCorrectChars;
+
+    // Live Gross WPM (total characters typed including errors, / 5)
+    // This is generally more responsive and indicates typing speed, regardless of accuracy.
+    const liveGrossWPM = elapsedTimeInMinutes > 0 ? Math.round((liveTotalCharsTyped / 5) / elapsedTimeInMinutes) : 0;
+    wpmDisplay.textContent = `WPM: ${liveGrossWPM}`; // Display Gross WPM live
+
+    // Live Accuracy
+    const liveAccuracy = liveTotalCharsTyped > 0 ? Math.round((liveCorrectChars / liveTotalCharsTyped) * 100) : 0;
+    accuracyDisplay.textContent = `Accuracy: ${liveAccuracy}%`;
 }
 
-// NEW: Function to calculate and display final metrics
+
 function calculateFinalMetrics() {
     const finalElapsedTimeInSeconds = Math.floor((new Date().getTime() - startTime) / 1000);
     const finalElapsedTimeInMinutes = finalElapsedTimeInSeconds / 60;
 
-    // Raw WPM (Gross WPM): (All typed characters / 5) / time
-    grossWPM = finalElapsedTimeInMinutes > 0 ? Math.round((rawCorrectCharacters + rawIncorrectCharacters + rawExtraCharacters) / 5 / finalElapsedTimeInMinutes) : 0;
+    // Gross WPM (All typed characters including errors / 5) / time
+    finalGrossWPM = finalElapsedTimeInMinutes > 0 ? Math.round((rawCorrectCharacters + rawIncorrectCharacters + rawExtraCharacters) / 5 / finalElapsedTimeInMinutes) : 0;
     
-    // Net WPM (Adjusted WPM): (Correct characters / 5) / time
+    // Net WPM (Correct characters / 5) / time - this is the main WPM for results
     const netWPM = finalElapsedTimeInMinutes > 0 ? Math.round((rawCorrectCharacters / 5) / finalElapsedTimeInMinutes) : 0;
 
     // Final Accuracy: (Correct characters / Total typed characters) * 100
@@ -426,23 +436,22 @@ function calculateFinalMetrics() {
 
     finalWpmDisplay.textContent = netWPM;
     finalAccuracyDisplay.textContent = `${finalAccuracy}%`;
-    finalRawWpmDisplay.textContent = grossWPM;
+    finalRawWpmDisplay.textContent = finalGrossWPM; // Display gross WPM separately on results
     correctLettersDisplay.textContent = rawCorrectCharacters;
     incorrectLettersDisplay.textContent = rawIncorrectCharacters;
     extraLettersDisplay.textContent = rawExtraCharacters;
 }
 
-// NEW: Functions to show/hide the results screen and typing interface
+// FIX 1: Ensure focus after showing typing interface
 function showResultsScreen() {
     settingsPanel.classList.add('hidden');
     testArea.classList.add('hidden');
     liveResults.classList.add('hidden');
-    restartBtn.classList.add('hidden'); // Hide the main restart button
+    restartBtn.classList.add('hidden');
 
-    // Give a small delay for the fade-out transition to start before showing results
     setTimeout(() => {
         resultsScreen.classList.add('show');
-    }, 500); // This delay should match or be slightly longer than the CSS transition duration
+    }, 500);
 }
 
 function hideResultsScreen() {
@@ -450,13 +459,16 @@ function hideResultsScreen() {
 }
 
 function showTypingInterface() {
-    // Give a small delay for the results screen fade-out to complete before showing typing interface
+    // Add a delay to ensure the results screen fades out completely before showing the typing interface
     setTimeout(() => {
         settingsPanel.classList.remove('hidden');
         testArea.classList.remove('hidden');
         liveResults.classList.remove('hidden');
-        restartBtn.classList.remove('hidden'); // Show the main restart button
-    }, 500); // This delay should match or be slightly longer than the CSS transition duration
+        restartBtn.classList.remove('hidden');
+        
+        // FIX 1: Re-focus text input after the transition
+        textInput.focus(); 
+    }, 500);
 }
 
 
@@ -481,8 +493,8 @@ modeTimeBtn.addEventListener('click', () => {
         timeOptionsDiv.classList.remove('hidden');
         wordsOptionsDiv.classList.add('hidden');
         if (!timeOptionsDiv.querySelector('.option-btn.active')) {
-            timeOptionsDiv.querySelector('.option-btn[data-value="30"]').classList.add('active'); // Default to 30s
-            currentTestDuration = 30; // Set duration
+            timeOptionsDiv.querySelector('.option-btn[data-value="30"]').classList.add('active');
+            currentTestDuration = 30;
         } else {
             currentTestDuration = parseInt(timeOptionsDiv.querySelector('.option-btn.active').dataset.value);
         }
@@ -498,8 +510,8 @@ modeWordsBtn.addEventListener('click', () => {
         wordsOptionsDiv.classList.remove('hidden');
         timeOptionsDiv.classList.add('hidden');
         if (!wordsOptionsDiv.querySelector('.option-btn.active')) {
-            wordsOptionsDiv.querySelector('.option-btn[data-value="50"]').classList.add('active'); // Default to 50 words
-            currentWordCount = 50; // Set word count
+            wordsOptionsDiv.querySelector('.option-btn[data-value="50"]').classList.add('active');
+            currentWordCount = 50;
         } else {
             currentWordCount = parseInt(wordsOptionsDiv.querySelector('.option-btn.active').dataset.value);
         }
@@ -532,20 +544,8 @@ textInput.addEventListener('keydown', (e) => {
         return;
     }
 
-    if (e.key === ' ' && textInput.value.length === 0 && !testStarted) {
-        e.preventDefault(); // Prevent starting with a space
-        return;
-    }
-
-    // Allow backspace for corrections
-    if (e.key === 'Backspace') {
-        // We handle backspace for visual feedback in the 'input' event,
-        // but here we ensure it doesn't interfere with starting the test.
-        return;
-    }
-    
-    // Prevent space at the beginning of the line
-    if (textInput.value.length === 0 && e.key === ' ') {
+    // Prevent space at the very beginning of the test or input field
+    if (e.key === ' ' && textInput.value.length === 0) {
         e.preventDefault();
         return;
     }
@@ -565,8 +565,6 @@ textInput.addEventListener('input', (e) => {
     const targetWord = words[currentWordIndex];
 
     if (!currentWordElement || !targetWord) {
-        // This can happen if test ends and an input event is still queued, or words array is empty.
-        // If in words mode and somehow past the words, and test hasn't finished, end it.
         if (currentTestMode === 'words' && currentWordIndex >= words.length && !testFinished) {
             endTest();
         }
@@ -575,23 +573,19 @@ textInput.addEventListener('input', (e) => {
 
     const targetWordLength = targetWord.length;
 
-    // Remove existing 'extra' characters first
+    // Reset extra character spans for the current word
     Array.from(currentWordElement.querySelectorAll('.character.extra')).forEach(span => span.remove());
 
-    let newRawCorrectCharactersInWord = 0;
-    let newRawIncorrectCharactersInWord = 0;
-    let newRawExtraCharactersInWord = 0;
-
-    // Loop through characters in the current word
+    // Character styling logic (marking correct/incorrect characters)
     for (let i = 0; i < targetWordLength; i++) {
         const targetChar = targetWord[i];
         const typedChar = typedText[i];
-        const charSpan = currentWordElement.children[i]; // Get the original character span
+        const charSpan = currentWordElement.children[i];
 
-        charSpan.classList.remove('correct', 'incorrect'); // Reset classes
+        charSpan.classList.remove('correct', 'incorrect');
 
         if (typedChar === undefined) {
-            // Nothing typed yet for this character, no class needed
+            // no class
         } else if (typedChar === targetChar) {
             charSpan.classList.add('correct');
         } else {
@@ -603,70 +597,65 @@ textInput.addEventListener('input', (e) => {
     if (typedText.length > targetWordLength) {
         for (let i = targetWordLength; i < typedText.length; i++) {
             const extraCharSpan = document.createElement('span');
-            extraCharSpan.classList.add('character', 'extra', 'incorrect'); // Mark as incorrect
+            extraCharSpan.classList.add('character', 'extra', 'incorrect');
             extraCharSpan.textContent = typedText[i];
             currentWordElement.appendChild(extraCharSpan);
         }
     }
 
-    // Calculate raw metrics for the current word for the results screen
-    // This is done on each input to be precise for final calculation
-    for (let i = 0; i < Math.max(typedText.length, targetWordLength); i++) {
-        const targetChar = targetWord[i];
-        const typedChar = typedText[i];
-
-        if (typedChar === undefined) {
-            // User hasn't typed this far yet, or backspaced over it. Do nothing for raw counts.
-        } else if (targetChar === undefined) {
-            // Typed character exists but no corresponding target character (it's an extra character)
-            newRawExtraCharactersInWord++;
-        } else if (typedChar === targetChar) {
-            // Typed character matches target character
-            newRawCorrectCharactersInWord++;
-        } else {
-            // Typed character does not match target character
-            newRawIncorrectCharactersInWord++;
+    // FIX 3: End test immediately when the last word's last character is typed (in Words mode)
+    if (currentTestMode === 'words' && 
+        currentWordIndex === words.length - 1 &&
+        typedText.length === targetWordLength &&
+        e.inputType !== 'deleteContentBackward' // Don't end if backspacing on last char
+    ) {
+        // Correctly capture final stats for this word before ending
+        for (let i = 0; i < targetWordLength; i++) {
+            const targetChar = targetWord[i];
+            const typedChar = typedText[i];
+            if (typedChar === targetChar) {
+                rawCorrectCharacters++;
+            } else {
+                rawIncorrectCharacters++;
+            }
         }
+        // No extra characters to consider for the last word if it's perfectly typed and ends the test
+        // Any extra characters would have been caught earlier in rawExtraCharacters accumulation
+        endTest();
+        return; // Exit to prevent further processing
     }
 
-    // This is important: Only process word completion on space or enter
-    // The previous logic for `typedText.endsWith(' ')` was causing issues with `currentCharIndex` and `totalCharactersTyped`
-    // We will now handle space as the official word separator.
-    if (e.inputType === 'insertText' && typedText.endsWith(' ') || e.inputType === 'insertLineBreak') { // Handle space or Enter key
-        e.preventDefault(); // Prevent space from being added to input field
+
+    // Logic for word completion (spacebar press)
+    if (e.inputType === 'insertText' && typedText.endsWith(' ')) {
+        e.preventDefault(); // Prevent the space from showing in the input field
 
         const finalTypedWordForCurrentWord = typedText.trim(); // Get the word without trailing space
         const currentTargetWord = words[currentWordIndex];
 
-        // Process characters for the word that was just completed
+        // Accumulate raw character counts for the word just completed
         for (let i = 0; i < Math.max(finalTypedWordForCurrentWord.length, currentTargetWord.length); i++) {
-            const targetChar = currentTargetWord[i];
             const typedChar = finalTypedWordForCurrentWord[i];
+            const targetChar = currentTargetWord[i];
 
             if (typedChar === undefined) {
-                // User typed less than the target word
-                // No action needed for raw counts, it's considered missed, not incorrect/extra in this context.
+                // User typed less than the target word, these are 'missed' characters, not incorrect/extra.
+                // We track correct/incorrect/extra *typed* characters.
             } else if (targetChar === undefined) {
-                rawExtraCharacters++; // Extra character beyond the target word length
+                rawExtraCharacters++;
             } else if (typedChar === targetChar) {
-                rawCorrectCharacters++; // Correct character
+                rawCorrectCharacters++;
             } else {
-                rawIncorrectCharacters++; // Incorrect character
+                rawIncorrectCharacters++;
             }
         }
         
-        // Add the space character to total characters typed and track correctness
-        if (typedText.endsWith(' ')) {
-            totalCharactersTyped++; // Count the space as a character typed
-            if (finalTypedWordForCurrentWord.length === currentTargetWord.length && typedText[typedText.length - 1] === ' ') {
-                // If the word was perfectly typed and followed by a space, consider the space correct
-                correctCharactersTyped++;
-            } else {
-                // If the word was typed incorrectly, or extra chars were added, the space might be "incorrect"
-                // For simplicity in WPM/Accuracy, we primarily count correct WORD characters.
-                // The main count `correctCharactersTyped` for WPM is based on characters that match the target word.
-                // We're already updating `rawCorrectCharacters` etc for detailed metrics.
-            }
+        // Update correctCharactersTyped for Net WPM if the word was perfectly typed
+        if (finalTypedWordForCurrentWord === currentTargetWord) {
+            correctCharactersTyped += currentTargetWord.length + 1; // +1 for the space itself for WPM calculation
+        } else {
+            // Even if the word was incorrect, count its actual typed length for overall total characters typed
+            totalCharactersTyped += finalTypedWordForCurrentWord.length + 1; // +1 for the space
         }
 
         // Move to the next word
@@ -674,16 +663,18 @@ textInput.addEventListener('input', (e) => {
         currentCharIndex = 0;
         textInput.value = ''; // Clear input field
 
+        // Check if the test should end because we've run out of words (in words mode)
+        // This path will now mainly handle moving between words
         if (currentTestMode === 'words' && currentWordIndex >= words.length) {
             endTest();
-        } else {
+        } else if (currentWordIndex < words.length) {
             updateCaretPosition(); // Move caret to the start of the next word
         }
     } else {
-        // For regular character input (not space/enter)
+        // For any non-space character input
         currentCharIndex = typedText.length;
         updateCaretPosition();
-        calculateMetrics(); // Update live WPM/Accuracy on every character
+        calculateMetrics(); // Recalculate WPM/Accuracy on each character typed
     }
 });
 
@@ -699,18 +690,18 @@ document.querySelector('#mode-time').classList.add('active');
 resetGame(); // Initial setup
 
 window.addEventListener('load', () => {
-    textInput.focus();
+    // Initial focus, handled by resetGame now
 });
 
 document.addEventListener('click', (e) => {
     // If click is outside of input, restart, words display, or settings panel, re-focus input
     if (!textInput.contains(e.target) &&
         !restartBtn.contains(e.target) &&
-        !resultsRestartBtn.contains(e.target) && // Include new restart button
+        !resultsRestartBtn.contains(e.target) &&
         !wordsDisplay.contains(e.target) &&
-        !settingsPanel.contains(e.target) && // Ensure clicks on settings don't lose focus
-        !liveResults.contains(e.target) && // Clicks on live metrics shouldn't lose focus
-        !resultsScreen.contains(e.target) // Clicks on results screen shouldn't lose focus during transition
+        !settingsPanel.contains(e.target) &&
+        !liveResults.contains(e.target) &&
+        !resultsScreen.contains(e.target)
         ) {
         textInput.focus();
     }
