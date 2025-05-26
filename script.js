@@ -218,6 +218,17 @@ function stopTimer() {
     clearInterval(timerInterval);
 }
 
+function endTest() {
+    stopTimer();
+    testFinished = true;
+    textInput.disabled = true;
+    calculateMetrics();
+    // Potentially show a modal or final results screen here
+    alert(`Test finished! Your WPM: ${wpmDisplay.textContent.split(': ')[1]}, Accuracy: ${accuracyDisplay.textContent.split(': ')[1]}`);
+}
+
+
+
 function calculateMetrics() {
     const currentTime = new Date().getTime();
     const elapsedTimeInMinutes = (currentTime - startTime) / 1000 / 60; // in minutes
