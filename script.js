@@ -26,7 +26,7 @@ let testFinished = false; // New flag to prevent input after test ends
 
 // Test settings
 let currentTestMode = 'time'; // 'time' or 'words'
-let currentTestDuration = 60; // default to 60 seconds
+let currentTestDuration = 30; // default to 30 seconds
 let currentWordCount = 50; // default to 50 words
 let includeNumbers = false;
 let includePunctuation = false;
