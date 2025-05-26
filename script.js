@@ -106,12 +106,25 @@ const punctuations = [",", ".", ";", ":", "'", '"', "(", ")", "[", "]", "{", "}"
 // --- Functions ---
 
 function generateWords() {
-    words = [];
-    // Shuffle the commonWords array and pick a subset
-    const shuffledWords = commonWords.sort(() => 0.5 - Math.random());
-    // Pick around 50-70 words for a standard test
-    const numWords = Math.floor(Math.random() * (70 - 50 + 1)) + 50;
-    words = shuffledWords.slice(0, numWords);
+    let baseWords = [...commonWords]; // Start with common words
+
+    if (includeNumbers) {
+        baseWords = baseWords.concat(numbers);
+    }
+    if (includePunctuation) {
+        baseWords = baseWords.concat(punctuations);
+    }
+
+    // Shuffle the combined baseWords array
+    const shuffledWords = baseWords.sort(() => 0.5 - Math.random());
+
+    if (currentTestMode === 'words') {
+        words = shuffledWords.slice(0, currentWordCount);
+    } else {
+        // For time mode, generate a sufficiently large number of words
+        // We'll cap the test by time, not word count, so more words are better.
+        words = shuffledWords.slice(0, 200); // Generate enough words to last 120s+ for most typists
+    }
 }
 
 function renderWords() {
