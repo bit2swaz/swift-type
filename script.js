@@ -6,7 +6,7 @@ const wpmDisplay = document.getElementById('wpm');
 const accuracyDisplay = document.getElementById('accuracy');
 const restartBtn = document.getElementById('restart-btn');
 
-// Game State Variables
+// --- Game State Variables ---
 let words = [];
 let currentWordIndex = 0;
 let currentCharIndex = 0;
@@ -16,9 +16,9 @@ let totalCharactersTyped = 0;
 let correctCharactersTyped = 0;
 let testStarted = false;
 
-// Word List
+// --- Word List (you can expand this significantly or fetch from an API) ---
 const commonWords = [
-     "the", "be", "is", "of", "and", "a", "to", "in", "he", "have",
+    "the", "be", "is", "of", "and", "a", "to", "in", "he", "have",
     "it", "that", "for", "they", "i", "with", "as", "not", "on", "she",
     "at", "by", "this", "we", "you", "do", "but", "his", "from", "her",
     "or", "which", "one", "all", "would", "there", "their", "what", "so", "up",
@@ -34,12 +34,13 @@ const commonWords = [
     "challenge", "program", "code", "developer", "javascript", "html", "css", "website", "application", "data"
 ];
 
-// Functions
+// --- Functions ---
+
 function generateWords() {
     words = [];
     // Shuffle the commonWords array and pick a subset
     const shuffledWords = commonWords.sort(() => 0.5 - Math.random());
-    // Pick around 50 to 70 words for a standard test
+    // Pick around 50-70 words for a standard test
     const numWords = Math.floor(Math.random() * (70 - 50 + 1)) + 50;
     words = shuffledWords.slice(0, numWords);
 }
@@ -52,7 +53,7 @@ function renderWords() {
         word.split('').forEach(char => {
             const charSpan = document.createElement('span');
             charSpan.classList.add('character');
-            charSpan.textContent= char;
+            charSpan.textContent = char;
             wordSpan.appendChild(charSpan);
         });
         wordsDisplay.appendChild(wordSpan);
@@ -60,7 +61,7 @@ function renderWords() {
         if (wordIndex < words.length - 1) {
             const spaceSpan = document.createElement('span');
             spaceSpan.classList.add('character'); // Space is also a character for tracking
-            spaceSpan.textContent = '';
+            spaceSpan.textContent = ' ';
             wordSpan.appendChild(spaceSpan); // Append space inside the wordSpan for proper highlighting
         }
     });
@@ -81,7 +82,7 @@ function highlightCurrentCharacter() {
     let charToHighlight = null;
     let charCount = 0;
 
-    for (let i=0; i < currentWordIndex; i++) {
+    for (let i = 0; i < currentWordIndex; i++) {
         charCount += words[i].length + 1; // +1 for the space after each word
     }
     charCount += currentCharIndex;
@@ -92,7 +93,7 @@ function highlightCurrentCharacter() {
 
     if (charToHighlight) {
         charToHighlight.classList.add('current');
-        // Scroll the view to keep current word visible
+        // Scroll the view to keep the current word visible
         scrollWordsDisplay();
     }
 }
@@ -100,17 +101,16 @@ function highlightCurrentCharacter() {
 function scrollWordsDisplay() {
     const currentWordElement = wordsDisplay.querySelectorAll('.word')[currentWordIndex];
     if (currentWordElement) {
-        const wordDisplayRect = wordsDisplay.getBoundingClientRect();
+        const wordsDisplayRect = wordsDisplay.getBoundingClientRect();
         const currentWordRect = currentWordElement.getBoundingClientRect();
 
         // If the current word is below the visible area
         if (currentWordRect.bottom > wordsDisplayRect.bottom) {
-            wordsDisplay.scrollTop += currentWordRect.bottom - wordsDisplay.bottom + 20; // +20 for some padding
+            wordsDisplay.scrollTop += currentWordRect.bottom - wordsDisplayRect.bottom + 20; // +20 for some padding
         }
         // If the current word is above the visible area (less likely in typing tests)
-        else if (currentWordRect.top < wordsDisplayRect.Top) {
-            wordsDisplay.scrollTop += wordsDisplayRect.top - currentWordRect.top + 20; 
+        else if (currentWordRect.top < wordsDisplayRect.top) {
+            wordsDisplay.scrollTop -= wordsDisplayRect.top - currentWordRect.top + 20;
         }
     }
 }
-
