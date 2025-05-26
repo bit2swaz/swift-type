@@ -26,7 +26,7 @@ body {
     width: 100%;
     max-width: 800px;
     position: relative;
-    overflow: hidden; /* Keep this for transitions, we'll manage height better */
+    overflow: hidden; /* Keep this for results screen transition, manage height carefully */
     min-height: 500px; /* Base min-height for larger screens */
     display: flex;
     flex-direction: column;
@@ -49,7 +49,7 @@ h1 {
     padding: 15px 20px;
     box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 15px; /* Gap between settings-group and mode-and-options */
     transition: opacity 0.5s ease-in-out;
 }
 
@@ -179,8 +179,14 @@ h1 {
     opacity: 0;
     pointer-events: none;
     visibility: hidden;
-    transform: scale(0.95);
+    /* For hidden elements, ensure they don't take up space in flex layouts */
+    height: 0;
+    padding: 0;
+    margin: 0;
+    border: none; /* remove borders from hidden elements */
+    flex-basis: 0; /* Important for flex items */
 }
+
 
 /* Elements that transition their display properties */
 .settings-panel, .test-area, .results, .restart-btn {
@@ -440,14 +446,17 @@ h1 {
     letter-spacing: 0.5px;
 }
 
-.mode-and-options {
-    display: flex;
-    flex-direction: column; /* Stack children (mode-selector and options-group) vertically */
-    gap: 15px; /* Default vertical gap between mode selector and options */
-    width: 100%; /* Ensure it takes full available width */
-}
 
 /* --- Responsive Adjustments --- */
+
+/* NEW: Styles for the mode-and-options wrapper */
+.mode-and-options {
+    display: flex;
+    flex-direction: column; /* Stack mode-selector and options-group vertically */
+    gap: 15px; /* Default gap between mode-selector and options-group */
+    width: 100%; /* Ensure it takes full width */
+}
+
 
 /* Base adjustments for smaller screens (up to 768px for tablets/laptops in portrait) */
 @media (max-width: 768px) {
@@ -457,8 +466,7 @@ h1 {
 
     .container {
         padding: 20px;
-        /* min-height: 400px; REMOVED or reduced for more flexibility */
-        min-height: auto; /* Allow container to shrink/grow based on content */
+        min-height: auto; /* Allow container to grow with content */
     }
 
     h1 {
@@ -468,7 +476,14 @@ h1 {
 
     .settings-panel {
         padding: 10px 15px;
-        gap: 10px;
+        gap: 10px; /* Gap between settings-group and mode-and-options */
+        margin-bottom: 20px;
+    }
+
+    .settings-group {
+        margin: 0;
+        width: 100%; /* Ensure settings group takes full width when stacked */
+        justify-content: center;
     }
 
     .checkbox-container {
@@ -479,6 +494,19 @@ h1 {
     .mode-btn, .option-btn {
         padding: 8px 12px;
         font-size: 1em;
+    }
+
+    /* Adjust gap for the new wrapper */
+    .mode-and-options {
+        gap: 10px; /* Specific gap for mode-selector and options-group */
+        width: 100%;
+    }
+
+    /* Ensure mode-selector and options-group take full width within their wrapper */
+    .mode-selector, .options-group {
+        width: 100%;
+        justify-content: center; /* Center buttons horizontally */
+        margin: 0; /* Remove any conflicting margins */
     }
 
     .words-display {
@@ -505,9 +533,9 @@ h1 {
 
     /* Results Screen specific adjustments for 768px and below */
     #results-screen {
-        gap: 15px; /* Reduce gap on results screen */
-        padding: 15px; /* Reduce overall padding as well */
-        justify-content: flex-start; /* Start content from top on smaller screens to maximize space */
+        gap: 15px;
+        padding: 15px;
+        justify-content: flex-start;
     }
 
     #results-screen h2 {
@@ -518,11 +546,11 @@ h1 {
         flex-direction: column;
         align-items: center;
         width: 95%;
-        gap: 10px; /* Reduce gap between main metrics */
+        gap: 10px;
     }
     .main-results-summary .metric-item {
         width: 100%;
-        padding: 12px 15px; /* Reduce padding for main metrics */
+        padding: 12px 15px;
     }
     .main-results-summary .metric-item span:first-child {
         font-size: 3em;
@@ -532,11 +560,11 @@ h1 {
         flex-direction: column;
         align-items: center;
         width: 95%;
-        gap: 8px; /* Reduce gap between detailed metrics */
+        gap: 8px;
     }
     .detailed-results .detail-item {
         width: 100%;
-        padding: 10px 15px; /* Reduce padding for detailed metrics */
+        padding: 10px 15px;
     }
     .detailed-results .detail-value {
         font-size: 1.3em;
@@ -549,15 +577,6 @@ h1 {
         padding: 15px 30px;
         font-size: 1.2em;
     }
-
-    .mode-and-options {
-        gap: 10px; /* Adjust gap for tablets */
-    }
-
-    .mode-selector {
-        width: 100%;
-        justify-content: center;
-    }
 }
 
 
@@ -569,8 +588,7 @@ h1 {
 
     .container {
         padding: 15px;
-        /* min-height: 380px; REMOVED or reduced */
-        min-height: auto; /* Ensure flexibility here too */
+        min-height: auto;
     }
 
     h1 {
@@ -579,7 +597,7 @@ h1 {
 
     .settings-panel {
         flex-direction: column;
-        align-items: stretch;
+        align-items: stretch; /* Stretch to fill width for consistent look */
         gap: 10px;
         padding: 10px;
     }
@@ -588,13 +606,23 @@ h1 {
         flex-wrap: wrap;
         width: 100%;
         gap: 8px;
+        margin: 0;
     }
+
+    /* Adjust gap for the new wrapper for smaller screens */
+    .mode-and-options {
+        gap: 8px;
+        width: 100%;
+    }
+
     .mode-selector, .options-group {
         width: 100%;
         justify-content: center;
+        margin: 0; /* Important: remove any margins here */
     }
+    
     .mode-btn, .option-btn {
-        flex-grow: 1;
+        flex-grow: 1; /* Allow buttons to grow and fill available space */
         padding: 10px 8px;
         font-size: 0.95em;
     }
@@ -649,8 +677,8 @@ h1 {
 
     /* Results screen responsive adjustments (even more aggressive for tiny phones) */
     #results-screen {
-        gap: 10px; /* Further reduce gap for tiny screens */
-        padding: 10px; /* Even less padding */
+        gap: 10px;
+        padding: 10px;
     }
 
     #results-screen h2 {
@@ -660,43 +688,34 @@ h1 {
     .main-results-summary {
         flex-direction: column;
         width: 95%;
-        gap: 8px; /* Further reduce gap between main metrics */
+        gap: 8px;
     }
     .main-results-summary .metric-item {
         width: 100%;
-        padding: 10px 12px; /* Further reduce padding for main metrics */
+        padding: 10px 12px;
         font-size: 0.9em;
     }
     .main-results-summary .metric-item span:first-child {
-        font-size: 2.2em; /* Smaller WPM/Accuracy on results screen */
+        font-size: 2.5em;
     }
     .detailed-results {
         flex-direction: column;
         width: 95%;
-        gap: 6px; /* Further reduce gap between detailed metrics */
+        gap: 6px;
     }
     .detailed-results .detail-item {
         width: 100%;
-        padding: 8px 12px; /* Further reduce padding for detailed metrics */
+        padding: 8px 12px;
     }
     .detailed-results .detail-value {
         font-size: 1.1em;
     }
     .detail-label {
-        font-size: 0.7em;
+        font-size: 0.75em;
     }
 
     #results-restart-btn.new-test-btn {
         padding: 10px 20px;
         font-size: 1em;
-    }
-
-    .mode-and-options {
-        gap: 8px; /* Adjust gap for smaller phones */
-    }
-
-     .mode-selector {
-        width: 100%;
-        justify-content: center;
     }
 }
