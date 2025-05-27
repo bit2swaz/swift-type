@@ -21,10 +21,10 @@
     --accent-color: #e0b300; /* Main yellow accent */
     --accent-color-hover: #ffc900; /* Lighter yellow for accent hover */
 
-    /* Typing Text Colors */
-    --correct-text-color: #98c379; /* Green for correct characters */
-    --incorrect-text-color: #e06c75; /* Red for incorrect characters */
-    --extra-text-color: #e06c75; /* Red for extra characters (same as incorrect, distinction via underline) */
+    /* Typing Text & Result Detail Colors */
+    --correct-text-color: #98c379; /* Green for correct characters and results */
+    --incorrect-text-color: #e06c75; /* Red for incorrect characters and results */
+    --extra-text-color: #e06c75; /* Red for extra characters and results (same as incorrect for minimalism) */
 
     /* Shadow */
     --shadow-color: rgba(0, 0, 0, 0.5); /* General shadow color */
@@ -462,15 +462,15 @@ h1 {
 .detailed-results .detail-value {
     font-size: 1.5em;
     font-weight: bold;
-    color: var(--text-color); /* Changed: All detail values are white */
+    color: var(--correct-text-color); /* Changed: Correct letters count is green */
     margin-bottom: 5px;
 }
 
 .detailed-results .detail-item:nth-child(2) .detail-value {
-    color: var(--text-color); /* Changed: Incorrect letters count is white */
+    color: var(--incorrect-text-color); /* Changed: Incorrect letters count is red */
 }
 .detailed-results .detail-item:nth-child(3) .detail-value {
-    color: var(--text-color); /* Changed: Extra letters count is white */
+    color: var(--extra-text-color); /* Changed: Extra letters count is red */
 }
 
 .detail-label {
