@@ -9,8 +9,8 @@ const elements = {
     restartBtn: document.getElementById('restartButton'),
     
     // Updated: Numbers and Punctuation are now buttons
-    numbersBtn: document.getElementById('numbers-btn'),      // Assuming your HTML has id="numbers-btn"
-    punctuationBtn: document.getElementById('punctuation-btn'), // Assuming your HTML has id="punctuation-btn"
+    numbersBtn: document.getElementById('numbers-btn'), 
+    punctuationBtn: document.getElementById('punctuation-btn'),
 
     modeTimeBtn: document.getElementById('timeModeBtn'),
     modeWordsBtn: document.getElementById('wordsModeBtn'),
@@ -178,6 +178,7 @@ function renderWords() {
     }
 
     if (state.words.length === 0) {
+        elements.caret.style.display = 'none'; 
         return;
     }
 
@@ -199,13 +200,18 @@ function renderWords() {
             wordSpan.appendChild(spaceSpan);
         }
     });
-    updateCaretPosition();
+
+    // CRITICAL FIX: Ensure words are rendered and laid out BEFORE attempting to position caret
+    // We'll use a small timeout combined with requestAnimationFrame for robustness.
+    // This gives the browser a moment to complete the layout.
+    setTimeout(() => {
+        requestAnimationFrame(() => {
+            updateCaretPosition();
+        });
+    }, 50); // A small delay to ensure rendering completes
 }
 
-// Add this variable at the top of your script.js, near other global constants
 let cachedLineHeight = 0;
-
-// ... (rest of your script.js code) ...
 
 function updateCaretPosition() {
     const allWordElements = elements.wordsDisplay.querySelectorAll('.word');
@@ -222,95 +228,99 @@ function updateCaretPosition() {
     let charactersInCurrentWord = Array.from(currentWordElement.children);
 
     if (state.currentCharIndex < charactersInCurrentWord.length) {
-        // Caret is on a character within the word
         targetCharacterSpan = charactersInCurrentWord[state.currentCharIndex];
     } else {
-        // Caret is at the end of the current word (on the implicit space)
+        // If currentCharIndex is at the end of the word (on the space character)
         const lastCharOfWord = charactersInCurrentWord[charactersInCurrentWord.length - 1];
         if (lastCharOfWord) {
-            targetCharacterSpan = lastCharOfWord;
+            targetCharacterSpan = lastCharOfWord; // Still use last char for reference
+        } else {
+            elements.caret.style.display = 'none';
+            return;
         }
     }
 
-    if (targetCharacterSpan) {
-        // Calculate line height if not already cached. Needs to be done here
-        // as `scrollWordsDisplay` will now directly use `cachedLineHeight`.
-        if (cachedLineHeight === 0) {
-            const sampleElement = wordsDisplay.querySelector('.word') || targetCharacterSpan;
-            if (sampleElement) {
-                cachedLineHeight = parseFloat(getComputedStyle(sampleElement).lineHeight);
-            } else {
-                cachedLineHeight = parseFloat(getComputedStyle(wordsDisplay).lineHeight);
+    // --- IMPORTANT: Calculate and cache lineHeight if not already done ---
+    if (cachedLineHeight === 0) {
+        const sampleChar = elements.wordsDisplay.querySelector('.character');
+        if (sampleChar) {
+            cachedLineHeight = sampleChar.offsetHeight; // Use offsetHeight for a more reliable height
+            if (cachedLineHeight === 0) { // Fallback if offsetHeight is 0
+                 cachedLineHeight = parseFloat(getComputedStyle(sampleChar).lineHeight);
             }
             if (isNaN(cachedLineHeight) || cachedLineHeight === 0) {
-                const wordsDisplayFontSize = parseFloat(getComputedStyle(wordsDisplay).fontSize);
-                cachedLineHeight = 1.6 * wordsDisplayFontSize; // Fallback based on 1.6em line-height
+                const wordsDisplayFontSize = parseFloat(getComputedStyle(elements.wordsDisplay).fontSize);
+                cachedLineHeight = 1.6 * wordsDisplayFontSize; // Final fallback
+            }
+        } else {
+            cachedLineHeight = parseFloat(getComputedStyle(elements.wordsDisplay).lineHeight);
+            if (isNaN(cachedLineHeight) || cachedLineHeight === 0) {
+                const wordsDisplayFontSize = parseFloat(getComputedStyle(elements.wordsDisplay).fontSize);
+                cachedLineHeight = 1.6 * wordsDisplayFontSize; // Fallback
             }
         }
-
-        // --- NEW ORDER: Call scrollWordsDisplay FIRST ---
-        // Pass the target character's offsetTop and the calculated lineHeight
-        scrollWordsDisplay(targetCharacterSpan.offsetTop, cachedLineHeight);
-
-        // Now, calculate caret position based on potentially updated scroll
-        let caretLeft = targetCharacterSpan.offsetLeft;
-        const caretTop = targetCharacterSpan.offsetTop; // This is the actual Y position within the entire scrollable content
-
-        // Adjust caret position for when it's at the end of a word (on the space)
-        const currentWordText = state.words[state.currentWordIndex];
-        if (state.currentCharIndex === currentWordText.length) {
-            const spaceSpan = currentWordElement.querySelector('.space');
-            if (spaceSpan) {
-                // If there's an explicit .space element, add its width
-                caretLeft += spaceSpan.getBoundingClientRect().width;
-            } else {
-                // Otherwise, approximate space width (e.g., half a char width)
-                const rect = targetCharacterSpan.getBoundingClientRect();
-                caretLeft += (rect.width * 0.5);
-            }
-        }
-        
-        // --- FINAL CARET POSITIONING ---
-        // We translate the caret by its absolute position (caretTop) MINUS
-        // how much the wordsDisplay container has scrolled (elements.wordsDisplay.scrollTop).
-        // This ensures the caret's Y position is relative to the *visible viewport* of wordsDisplay.
-        elements.caret.style.transform = `translate(${caretLeft}px, ${caretTop - elements.wordsDisplay.scrollTop}px)`;
     }
+
+    // --- Calculate caretLeft ---
+    let caretLeft;
+    const currentWordText = state.words[state.currentWordIndex];
+
+    if (state.currentCharIndex === currentWordText.length) {
+        // Caret is at the end of the current word (on the space)
+        // Position it at the right edge of the last character of the word,
+        // then add a small buffer.
+        const lastCharRect = targetCharacterSpan.getBoundingClientRect();
+        const wordsDisplayRect = elements.wordsDisplay.getBoundingClientRect();
+        caretLeft = (lastCharRect.right - wordsDisplayRect.left); 
+        
+        // Add a small buffer for the visual space, estimated as a percentage of line height
+        const spaceWidth = cachedLineHeight * 0.4; 
+        caretLeft += spaceWidth; 
+
+    } else {
+        // Caret is inside a word, use its direct offsetLeft
+        caretLeft = targetCharacterSpan.offsetLeft;
+    }
+
+    // --- Calculate caretTop (Y position) relative to the wordsDisplay container ---
+    // The caret's Y position should be relative to its *parent* (wordsDisplay).
+    // targetCharacterSpan.offsetTop is already relative to its parent (wordsDisplay).
+    // So, we use targetCharacterSpan.offsetTop directly for the Y position.
+    const caretTop = targetCharacterSpan.offsetTop;
+
+    // --- Adjust scroll first, then position caret ---
+    scrollWordsDisplay(caretTop);
+
+    // --- Apply caret position ---
+    elements.caret.style.transform = `translate(${caretLeft}px, ${caretTop}px)`;
+    elements.caret.style.opacity = '1';
 }
 
-// Modify your existing scrollWordsDisplay function to accept offsetTop and lineHeight
-function scrollWordsDisplay(targetOffsetTop, lineHeight) {
-    const wordsDisplayVisibleHeight = elements.wordsDisplay.clientHeight; // The actual visible height of the container
-    const currentScrollTop = elements.wordsDisplay.scrollTop; // Current scroll position
+function scrollWordsDisplay(targetCaretTop) { 
+    const wordsDisplayVisibleHeight = elements.wordsDisplay.clientHeight;
+    const currentScrollTop = elements.wordsDisplay.scrollTop;
 
-    // The top and bottom of the line the caret is on, relative to the *scrollable content's start*.
-    const caretLineTop = targetOffsetTop;
-    const caretLineBottom = targetOffsetTop + lineHeight;
+    // Determine the line number the caret is on
+    const caretLineNumber = Math.floor((targetCaretTop + (cachedLineHeight / 2)) / cachedLineHeight); 
+    // Add half lineHeight to ensure it rounds to the correct line, not just if it's slightly above the line top
 
-    // Define a buffer (e.g., half a line height) for smoother scrolling.
-    // This ensures the caret doesn't hit the very edge before scrolling.
-    const scrollBuffer = lineHeight * 0.5; 
+    // Calculate the absolute top of the line the caret is on
+    const lineAbsoluteTop = caretLineNumber * cachedLineHeight;
 
-    // If the caret's line goes below the visible bottom edge (plus buffer)
-    // `caretLineBottom` is its position relative to the content start.
-    // `currentScrollTop + wordsDisplayVisibleHeight` is the bottom of the *visible* area.
-    if (caretLineBottom > currentScrollTop + wordsDisplayVisibleHeight - scrollBuffer) {
-        // Calculate the new scrollTop: position the bottom of the current line
-        // at the bottom of the visible area, with the buffer.
-        elements.wordsDisplay.scrollTop = caretLineBottom - (wordsDisplayVisibleHeight - scrollBuffer);
-    }
-    // If the caret's line goes above the visible top edge (plus buffer, for backspacing)
-    // `caretLineTop` is its position relative to the content start.
-    // `currentScrollTop` is the top of the *visible* area.
-    else if (caretLineTop < currentScrollTop + scrollBuffer) {
-        // Calculate the new scrollTop: position the top of the current line
-        // at the top of the visible area, with the buffer.
-        elements.wordsDisplay.scrollTop = caretLineTop - scrollBuffer;
-    }
+    // Calculate the absolute bottom of the line the caret is on
+    const lineAbsoluteBottom = lineAbsoluteTop + cachedLineHeight;
 
-    // Ensure scrollTop doesn't go below 0 (prevents overscrolling upwards, which can cause visual glitches)
-    if (elements.wordsDisplay.scrollTop < 0) {
-        elements.wordsDisplay.scrollTop = 0;
+    // Where the visible viewport top should be to show this line
+    const idealScrollTopForLine = lineAbsoluteTop;
+    const idealScrollBottomForLine = lineAbsoluteBottom;
+
+    // If the line is above the current visible area
+    if (lineAbsoluteTop < currentScrollTop) {
+        elements.wordsDisplay.scrollTop = idealScrollTopForLine;
+    } 
+    // If the line is below the current visible area (or goes off screen)
+    else if (lineAbsoluteBottom > (currentScrollTop + wordsDisplayVisibleHeight)) {
+        elements.wordsDisplay.scrollTop = lineAbsoluteBottom - wordsDisplayVisibleHeight;
     }
 }
 
@@ -350,7 +360,7 @@ function endTest() {
     state.testFinished = true;
     elements.textInput.disabled = true;
     elements.textInput.blur();
-    elements.caret.style.display = 'none';
+    elements.caret.style.display = 'none'; // Hide caret when test ends
 
     calculateFinalMetrics();
     showResultsScreen();
@@ -360,12 +370,18 @@ function resetGame() {
     stopTimer();
     state.currentWordIndex = 0;
     state.currentCharIndex = 0;
-    state.totalCharactersTyped = 0;
+    state.totalCharactersTyped = 0; 
     state.rawCorrectCharacters = 0;
     state.rawIncorrectCharacters = 0;
     state.rawExtraCharacters = 0;
     state.testStarted = false;
     state.testFinished = false;
+
+    // --- FIX: Ensure caret is visible and opaque at start of new test ---
+    elements.caret.style.display = 'block'; 
+    elements.caret.style.opacity = '1'; 
+    // Reset cachedLineHeight on reset to ensure it's re-calculated accurately
+    cachedLineHeight = 0; 
 
     if (elements.timerDisplay) {
         elements.timerDisplay.textContent = `Time: ${state.currentTestMode === 'time' ? state.currentTestDuration : 0}s`;
@@ -379,13 +395,13 @@ function resetGame() {
     
     elements.textInput.value = '';
     elements.textInput.disabled = false;
-    elements.wordsDisplay.scrollTop = 0;
+    elements.wordsDisplay.scrollTop = 0; // Crucial: Reset scroll position
 
     hideResultsScreen();
-    showTypingInterface();
+    showTypingInterface(); // This now handles focusing and clearing input
 
     generateWords();
-    renderWords();
+    renderWords(); // renderWords will now ensure a layout pass before updateCaretPosition
 }
 
 function calculateMetrics() {
@@ -407,6 +423,7 @@ function calculateMetrics() {
         const targetChar = targetWord[i];
 
         if (typedChar === undefined) {
+            // Typed text is shorter than target word, no extra chars for this part
         } else if (targetChar === undefined) {
             currentWordExtraChars++;
         } else if (typedChar === targetChar) {
@@ -473,13 +490,9 @@ function showTypingInterface() {
         if (elements.liveMetricsPanel) elements.liveMetricsPanel.classList.remove('hidden'); 
         if (elements.restartBtn) elements.restartBtn.classList.remove('hidden'); 
         
-        elements.textInput.disabled = true;
-        elements.textInput.focus();
-        setTimeout(() => {
-            elements.textInput.disabled = false;
-            elements.textInput.focus();
-            elements.textInput.value = '';
-        }, 100);
+        elements.textInput.disabled = false; // Enable before focusing
+        elements.textInput.value = ''; // Clear value first
+        elements.textInput.focus(); // Then focus
     }, 500);
 }
 
@@ -603,8 +616,7 @@ function setupEventListeners() {
         elements.modeTimeBtn.addEventListener('click', () => {
             if (state.currentTestMode === 'words') {
                 state.currentTestMode = 'time';
-                updateSettingsUI(); // Update UI for mode change and options visibility
-                // Ensure an option is active after switching mode, in case user didn't select one
+                updateSettingsUI(); 
                 if (!elements.timeOptionsDiv.querySelector('.option-btn.active')) {
                     elements.timeOptionsDiv.querySelector(`.option-btn[data-value="${state.currentTestDuration}"]`).classList.add('active');
                 }
@@ -619,8 +631,7 @@ function setupEventListeners() {
         elements.modeWordsBtn.addEventListener('click', () => {
             if (state.currentTestMode === 'time') {
                 state.currentTestMode = 'words';
-                updateSettingsUI(); // Update UI for mode change and options visibility
-                // Ensure an option is active after switching mode
+                updateSettingsUI(); 
                 if (!elements.wordsOptionsDiv.querySelector('.option-btn.active')) {
                     elements.wordsOptionsDiv.querySelector(`.option-btn[data-value="${state.currentWordCount}"]`).classList.add('active');
                 }
@@ -664,7 +675,7 @@ function setupEventListeners() {
             }
 
             if (e.key === ' ' && elements.textInput.value.length === 0) {
-                e.preventDefault();
+                e.preventDefault(); 
                 return;
             }
 
@@ -697,9 +708,10 @@ function setupEventListeners() {
                 const typedChar = typedText[i];
                 const charSpan = currentWordElement.children[i];
 
-                charSpan.classList.remove('correct', 'incorrect');
+                charSpan.classList.remove('correct', 'incorrect'); 
 
                 if (typedChar === undefined) {
+                    // No action needed for untyped chars, they default to original style
                 } else if (typedChar === targetChar) {
                     charSpan.classList.add('correct');
                 } else {
@@ -715,27 +727,10 @@ function setupEventListeners() {
                     currentWordElement.appendChild(extraCharSpan);
                 }
             }
-
-            if (state.currentTestMode === 'words' && 
-                state.currentWordIndex === state.words.length - 1 &&
-                typedText.length === targetWordLength &&
-                e.inputType !== 'deleteContentBackward'
-            ) {
-                for (let i = 0; i < targetWordLength; i++) {
-                    const targetChar = targetWord[i];
-                    const typedChar = typedText[i];
-                    if (typedChar === targetChar) {
-                        state.rawCorrectCharacters++;
-                    } else {
-                        state.rawIncorrectCharacters++;
-                    }
-                }
-                endTest();
-                return;
-            }
-
+            
+            // Handle space key press - this is where word completion happens
             if (e.inputType === 'insertText' && typedText.endsWith(' ')) {
-                e.preventDefault();
+                e.preventDefault(); 
 
                 const finalTypedWordForCurrentWord = typedText.trim();
                 const currentTargetWord = state.words[state.currentWordIndex];
@@ -745,6 +740,7 @@ function setupEventListeners() {
                     const targetChar = currentTargetWord[i];
 
                     if (typedChar === undefined) {
+                        // If typed is shorter than target, these are just missing chars from correct count
                     } else if (targetChar === undefined) {
                         state.rawExtraCharacters++;
                     } else if (typedChar === targetChar) {
@@ -756,17 +752,19 @@ function setupEventListeners() {
                 
                 state.currentWordIndex++;
                 state.currentCharIndex = 0;
-                elements.textInput.value = '';
+                elements.textInput.value = ''; 
 
                 if (state.currentTestMode === 'words' && state.currentWordIndex >= state.words.length) {
                     endTest();
                 } else if (state.currentWordIndex < state.words.length) {
+                    // Update caret position for the next word
                     updateCaretPosition();
                 }
             } else {
+                // If not a space, just update current character index and caret
                 state.currentCharIndex = typedText.length;
                 updateCaretPosition();
-                calculateMetrics();
+                calculateMetrics(); 
             }
         });
     }
@@ -781,7 +779,7 @@ function setupEventListeners() {
         const isClickInsideResults = elements.resultsScreen.contains(e.target);
         const isClickInsideWordsDisplay = elements.wordsDisplay.contains(e.target);
         
-        if (!isClickInsideInput && !isClickInsideAnyButton && !isClickInsideSettings && !isClickInsideResults && !isClickInsideWordsDisplay) {
+        if (!isClickInsideInput && !isClickInsideAnyButton && !isClickInsideSettings && !isClickInsideResults) {
             elements.textInput.focus();
         }
     });
@@ -796,6 +794,6 @@ function setupEventListeners() {
 // --- Initialize the game on load ---
 function init() {
     loadSettings(); 
-    setupEventListeners(); // Set up all event listeners after elements are referenced
-    resetGame(); // Start with a fresh game state
+    setupEventListeners(); 
+    resetGame(); 
 }
