@@ -1,63 +1,98 @@
+/* Import Google Fonts - Roboto Mono for a clean, monospace look */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap');
+
+/* AuraCalc Dark Mode Color Palette - Refined for Typing Test */
+:root {
+    /* Main Backgrounds & Text */
+    --body-bg: #1a1a1a; /* Overall background (almost black) */
+    --main-panel-bg: #222222; /* Background for main container, settings, live metrics */
+    --display-bg: #0d0d0d; /* Darker background for text input/display areas */
+    --text-color: #ffffff; /* Primary white text for most elements */
+    --subtle-text-color: #bbbbbb; /* Lighter grey for secondary text/labels */
+    --untyped-text-color: #777777; /* Dull gray for untyped words */
+
+    /* Button Colors */
+    --button-bg: #444444; /* Default button background */
+    --button-hover-bg: #555555; /* Default button hover */
+    --button-border-color: #4b5263; /* Border color for segmented buttons */
+    --active-button-text-color: #1a1a1a; /* Dark text for active yellow buttons (for contrast) */
+
+    /* Accent Colors (Yellow from AuraCalc) */
+    --accent-color: #e0b300; /* Main yellow accent */
+    --accent-color-hover: #ffc900; /* Lighter yellow for accent hover */
+
+    /* Typing Text Colors */
+    --correct-text-color: #98c379; /* Green for correct characters */
+    --incorrect-text-color: #e06c75; /* Red for incorrect characters */
+    --extra-text-color: #e06c75; /* Red for extra characters (same as incorrect, distinction via underline) */
+
+    /* Shadow */
+    --shadow-color: rgba(0, 0, 0, 0.5); /* General shadow color */
+}
+
 /* Ensure proper box model for easier layout calculations */
 *, *::before, *::after {
     box-sizing: border-box;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #282c34; /* Dark background */
-    color: #abb2bf; /* Light text */
+    font-family: 'Roboto Mono', monospace; /* Applied the chosen font */
+    background-color: var(--body-bg); /* Use new background variable */
+    color: var(--text-color); /* Use new text color variable */
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* Ensure body takes full viewport height */
+    min-height: 100vh;
     margin: 0;
-    padding: 20px; /* Base padding for edges of the viewport */
-    padding-bottom: 80px; /* Increased padding-bottom for future footer space */
+    padding: 20px;
+    padding-bottom: 80px; /* Space for future footer */
     box-sizing: border-box;
     position: relative;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions for theme changes */
 }
 
 .container {
-    background-color: #3e4451;
+    background-color: var(--main-panel-bg); /* Use new panel background variable */
     border-radius: 8px;
-    padding: 40px; /* Increased padding inside the container for height from both ends */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+    box-shadow: 0 4px 15px var(--shadow-color); /* Use new shadow variable */
     text-align: center;
     width: 100%;
-    max-width: 950px; /* Increased max-width significantly for wider look */
+    max-width: 950px;
     position: relative;
-    overflow: hidden; /* Keep this for results screen transition */
-    min-height: 650px; /* Increased min-height to make it taller */
+    overflow: hidden;
+    min-height: 650px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Distribute space evenly among its direct children */
+    justify-content: space-between;
+    transition: background-color 0.3s ease; /* Smooth transition for container */
 }
 
 h1 {
-    color: #61afef;
-    margin-bottom: 35px; /* Slightly more margin below heading */
-    font-size: 2.8em; /* Slightly larger main heading */
-    font-weight: bold; /* Added font-weight for consistency */
+    color: var(--accent-color); /* Use accent color for main heading */
+    margin-bottom: 35px;
+    font-size: 2.8em;
+    font-weight: bold;
 }
 
 .settings-panel {
     display: flex;
-    justify-content: center; /* Center content, space-between would spread too much */
+    justify-content: center;
     align-items: center;
-    background-color: #21252b;
+    background-color: var(--main-panel-bg); /* Use new panel background variable */
     border-radius: 8px;
     padding: 15px 25px;
     margin-bottom: 30px;
-    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 5px var(--shadow-color); /* Use new shadow variable */
     flex-wrap: wrap;
-    gap: 30px; /* Gap between major setting groups */
+    gap: 30px;
+    transition: background-color 0.3s ease; /* Smooth transition for settings panel */
 }
 
 .settings-group {
-    position: relative; /* Added this rule */
-    display: flex; /* Ensure it's a flex container */
-    align-items: center; /* Align items vertically */
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
 /* Mode Selector Buttons (Numbers/Punctuation, Time/Words) */
@@ -65,27 +100,28 @@ h1 {
     display: flex;
     border-radius: 5px;
     overflow: hidden;
-    border: 1px solid #4b5263; /* Added border for segmented look */
+    border: 1px solid var(--button-border-color); /* Use new border color variable */
 }
 
 .mode-btn {
-    background-color: #3e4451;
-    color: #abb2bf;
+    background-color: var(--button-bg); /* Use new button background variable */
+    color: var(--text-color); /* Default button text color */
     border: none;
     padding: 10px 15px;
     font-size: 1.1em;
     cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
-    user-select: none; /* Prevent text selection */
+    transition: background-color 0.2s ease, color 0.2s ease;
+    user-select: none;
+    font-family: 'Roboto Mono', monospace; /* Apply font to buttons */
 }
 
 .mode-btn:hover {
-    background-color: #4b5263;
+    background-color: var(--button-hover-bg); /* Use new button hover variable */
 }
 
 .mode-btn.active {
-    background-color: #61afef;
-    color: white;
+    background-color: var(--accent-color); /* Use accent color for active state */
+    color: var(--active-button-text-color); /* Changed: Dark text for active buttons */
     font-weight: bold;
 }
 
@@ -94,54 +130,49 @@ h1 {
     display: flex;
     border-radius: 5px;
     overflow: hidden;
-    border: 1px solid #4b5263; /* Added border for segmented look */
+    border: 1px solid var(--button-border-color); /* Use new border color variable */
 }
 
 .option-btn {
-    background-color: #3e4451;
-    color: #abb2bf;
+    background-color: var(--button-bg); /* Use new button background variable */
+    color: var(--text-color); /* Default button text color */
     border: none;
     padding: 10px 15px;
     font-size: 1.1em;
     cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
-    user-select: none; /* Prevent text selection */
+    transition: background-color 0.2s ease, color 0.2s ease;
+    user-select: none;
+    font-family: 'Roboto Mono', monospace; /* Apply font to buttons */
 }
 
 .option-btn:hover {
-    background-color: #4b5263;
+    background-color: var(--button-hover-bg); /* Use new button hover variable */
 }
 
 .option-btn.active {
-    background-color: #c678dd; /* Purple for quantity active state */
-    color: white;
+    background-color: var(--accent-color); /* Use accent color for active state */
+    color: var(--active-button-text-color); /* Changed: Dark text for active buttons */
     font-weight: bold;
 }
 
 .mode-and-options {
     display: flex;
     align-items: center;
-    gap: 20px; /* Gap between the Mode Selector and the Options Group */
+    gap: 20px;
     flex-wrap: wrap;
 }
 
 /* Dividers between groups */
-.settings-panel > .settings-group + .settings-group {
-    position: relative;
-    /* Add a pseudo-element for the vertical line divider */
-}
-
 .settings-panel > .settings-group + .settings-group::before {
     content: '';
     position: absolute;
-    left: -15px; /* Adjust based on half of the gap you want */
+    left: -15px;
     top: 50%;
     transform: translateY(-50%);
-    width: 1px; /* Thickness of the line */
-    height: 70%; /* Height of the line relative to the group */
-    background-color: #4b5263; /* Color of the line */
+    width: 1px;
+    height: 70%;
+    background-color: var(--button-border-color); /* Use border color for divider */
 }
-
 
 /* Utility Class for hiding elements */
 .hidden {
@@ -167,36 +198,41 @@ h1 {
     display: flex;
     justify-content: space-around;
     margin-bottom: 25px;
-    background-color: #21252b;
+    background-color: var(--main-panel-bg); /* Use new panel background variable */
     border-radius: 8px;
     padding: 15px 20px;
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
-    gap: 10px; /* Space between metric items */
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, visibility 0.5s;
+    box-shadow: inset 0 2px 5px var(--shadow-color); /* Use new shadow variable */
+    gap: 10px;
+    flex-wrap: wrap;
+    transition: background-color 0.3s ease, opacity 0.5s ease-in-out, transform 0.5s ease-in-out, visibility 0.5s; /* Added background transition */
 }
 
 .live-metrics .metric {
-    background-color: #4b5263;
+    background-color: var(--button-bg); /* Use button background for metric items */
     padding: 10px 20px;
     border-radius: 5px;
     font-size: 1.2em;
     font-weight: bold;
-    color: #a9b9d3;
-    flex-grow: 1; /* Allow metrics to grow to fill space */
+    color: var(--text-color); /* Use primary text color */
+    flex-grow: 1;
     text-align: center;
-    min-width: 120px; /* Minimum width before wrapping */
+    min-width: 120px;
+    font-family: 'Roboto Mono', monospace; /* Apply font */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Added transitions */
 }
 
 
 .test-area {
     margin-bottom: 30px;
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, visibility 0.5s;
+    background-color: var(--main-panel-bg); /* Use new panel background variable */
+    border-radius: 8px;
+    padding: 20px;
+    transition: background-color 0.3s ease, opacity 0.5s ease-in-out, transform 0.5s ease-in-out, visibility 0.5s; /* Added background transition */
 }
 
 .words-display {
-    background-color: #21252b;
-    border: 1px solid #4b5263;
+    background-color: var(--display-bg); /* Use new display background variable */
+    border: 1px solid var(--button-border-color); /* Use new border color variable */
     border-radius: 5px;
     padding: 20px;
     margin-bottom: 20px;
@@ -207,6 +243,9 @@ h1 {
     position: relative;
     text-align: left;
     user-select: none;
+    color: var(--untyped-text-color); /* Changed: Dull gray for untyped words */
+    font-family: 'Roboto Mono', monospace; /* Apply font */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Added transitions */
 }
 
 .word {
@@ -218,20 +257,22 @@ h1 {
 .character {
     display: inline-block;
     padding: 1px 0;
-    transition: background-color 0.1s ease, color 0.1s ease;
+    transition: color 0.1s ease; /* Only color transition needed */
 }
 
 .character.correct {
-    color: #98c379;
+    color: var(--correct-text-color); /* Changed: Green for correct characters */
 }
 
 .character.incorrect {
-    color: #e06c75;
+    color: var(--incorrect-text-color); /* Changed: Red for incorrect */
+    /* No background-color or underline by default for incorrect, only for extra */
 }
 
 .character.extra {
-    color: #e06c75;
-    text-decoration: underline wavy #e06c75 1px;
+    color: var(--extra-text-color); /* Changed: Red for extra */
+    text-decoration: underline wavy var(--extra-text-color) 1px; /* Prominent red underline */
+    /* Optional: background-color: rgba(231, 76, 60, 0.2); if you want a subtle background */
 }
 
 /* Hide the actual text input field visually */
@@ -252,7 +293,7 @@ h1 {
     position: absolute;
     height: 1.6em;
     width: 2px;
-    background-color: #61afef;
+    background-color: var(--accent-color); /* Use accent color for caret */
     animation: blink 1s infinite;
     top: 0;
     left: 0;
@@ -267,26 +308,27 @@ h1 {
 }
 
 .restart-btn {
-    background-color: #c678dd;
-    color: white;
+    background-color: var(--accent-color); /* Use accent color for restart button */
+    color: var(--active-button-text-color); /* Changed: Dark text for restart button */
     border: none;
     padding: 15px 30px;
     border-radius: 5px;
     font-size: 1.2em;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Added shadow */
-    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease; /* Added shadow transition */
+    box-shadow: 0 4px 10px var(--shadow-color);
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease, color 0.2s ease; /* Added color transition */
+    font-family: 'Roboto Mono', monospace; /* Apply font */
 }
 
 .restart-btn:hover {
-    background-color: #9f60b6;
-    transform: translateY(-2px); /* Lift on hover */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+    background-color: var(--accent-color-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px var(--shadow-color);
 }
 
 .restart-btn:active {
-    transform: translateY(0); /* Press down on active */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Reduced shadow on active */
+    transform: translateY(0);
+    box-shadow: 0 2px 5px var(--shadow-color);
 }
 
 
@@ -296,16 +338,16 @@ h1 {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%; /* Height is 100% of parent .container */
-    background-color: #3e4451;
+    height: 100%;
+    background-color: var(--main-panel-bg); /* Use main panel background */
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Center content vertically */
+    justify-content: center;
     align-items: center;
-    gap: 25px; /* Gap between major sections on results screen */
-    padding: 20px; /* Original top/side padding */
-    padding-bottom: 40px; /* INCREASED BOTTOM PADDING HERE TO MATCH TOP VISUALLY */
+    gap: 25px;
+    padding: 20px;
+    padding-bottom: 40px;
     box-sizing: border-box;
     z-index: 50;
     
@@ -313,7 +355,7 @@ h1 {
     pointer-events: none;
     visibility: hidden;
     transform: scale(0.95);
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, visibility 0.5s;
+    transition: background-color 0.3s ease, opacity 0.5s ease-in-out, transform 0.5s ease-in-out, visibility 0.5s; /* Added background transition */
 }
 
 #results-screen.show {
@@ -324,111 +366,116 @@ h1 {
 }
 
 #results-screen h2 {
-    color: #61afef;
-    margin-bottom: 15px; /* This margin controls the space below the heading */
+    color: var(--accent-color); /* Use accent color for results heading */
+    margin-bottom: 15px;
     font-size: 2.5em;
     font-weight: bold;
 }
 
 .main-results-summary {
     display: flex;
-    justify-content: space-around; /* This was key to the previous layout */
+    justify-content: space-around;
     width: 90%;
     max-width: 700px;
     margin-bottom: 20px;
-    gap: 20px; /* Reverted gap */
-    flex-wrap: wrap; /* Allow wrapping of items */
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
 .main-results-summary .metric-item {
-    background-color: #21252b;
-    padding: 20px 30px; /* Reverted padding */
+    background-color: var(--display-bg); /* Use display background for result items */
+    padding: 20px 30px;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
     flex-grow: 1;
-    min-width: 150px; /* Reverted min-width */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    min-width: 150px;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    font-family: 'Roboto Mono', monospace; /* Apply font */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Added transitions */
 }
 
 .main-results-summary .metric-item span:first-child {
     font-size: 3.5em;
     font-weight: bold;
-    color: #a9b9d3;
+    color: var(--text-color); /* Primary text color for values */
     margin-bottom: 5px;
 }
 
 .main-results-summary .metric-label {
     font-size: 0.9em;
-    color: #7f848e;
+    color: var(--history-text-color); /* Subtle text color for labels */
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
 #results-restart-btn.new-test-btn {
-    background-color: #61afef;
-    color: white;
+    background-color: var(--accent-color); /* Use accent color for results restart button */
+    color: var(--active-button-text-color); /* Changed: Dark text for new test button */
     border: none;
     padding: 18px 40px;
     font-size: 1.4em;
     border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 10px var(--shadow-color);
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease, color 0.2s ease; /* Added color transition */
+    font-family: 'Roboto Mono', monospace; /* Apply font */
 }
 
 #results-restart-btn.new-test-btn:hover {
-    background-color: #4f96e4;
+    background-color: var(--accent-color-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 12px var(--shadow-color);
 }
 
 #results-restart-btn.new-test-btn:active {
     transform: translateY(0);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 5px var(--shadow-color);
 }
 
 
 .detailed-results {
     display: flex;
-    justify-content: space-around; /* This was key to the previous layout */
+    justify-content: space-around;
     width: 80%;
     max-width: 600px;
     margin-top: 20px;
-    gap: 15px; /* Reverted gap */
-    flex-wrap: wrap; /* Allow wrapping of items */
+    gap: 15px;
+    flex-wrap: wrap;
 }
 
 .detailed-results .detail-item {
-    background-color: #21252b;
+    background-color: var(--display-bg); /* Use display background for detailed items */
     padding: 15px 20px;
     border-radius: 5px;
     display: flex;
     flex-direction: column;
     align-items: center;
     flex-grow: 1;
-    min-width: 120px; /* Reverted min-width */
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    min-width: 120px;
+    box-shadow: inset 0 1px 3px var(--shadow-color);
+    font-family: 'Roboto Mono', monospace; /* Apply font */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Added transitions */
 }
 
 .detailed-results .detail-value {
     font-size: 1.5em;
     font-weight: bold;
-    color: #98c379;
+    color: var(--text-color); /* Changed: All detail values are white */
     margin-bottom: 5px;
 }
 
 .detailed-results .detail-item:nth-child(2) .detail-value {
-    color: #e06c75;
+    color: var(--text-color); /* Changed: Incorrect letters count is white */
 }
 .detailed-results .detail-item:nth-child(3) .detail-value {
-    color: #c678dd;
+    color: var(--text-color); /* Changed: Extra letters count is white */
 }
 
 .detail-label {
     font-size: 0.85em;
-    color: #7f848e;
+    color: var(--history-text-color); /* Subtle text color for labels */
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -438,26 +485,26 @@ h1 {
 @media (max-width: 600px) {
     body {
         padding: 10px;
-        padding-bottom: 60px; /* Adjusted footer space for mobile */
+        padding-bottom: 60px;
     }
 
     .container {
-        padding: 20px; /* Adjusted padding for mobile */
-        min-height: auto; /* Allow container to shrink as needed on small screens */
-        max-width: 100%; /* Ensure it doesn't try to be too wide on mobile */
+        padding: 20px;
+        min-height: auto;
+        max-width: 100%;
     }
 
     h1 {
-        font-size: 2em; /* Smaller h1 for mobile */
+        font-size: 2em;
         margin-bottom: 20px;
     }
 
     .settings-panel {
-        flex-direction: column; /* Stack items vertically */
-        align-items: stretch; /* Stretch to fill width */
-        gap: 15px; /* Adjusted gap for mobile stacking */
-        padding: 10px 15px; /* Adjusted padding for mobile */
-        margin-bottom: 20px; /* Adjusted margin */
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+        padding: 10px 15px;
+        margin-bottom: 20px;
     }
 
     .settings-group {
@@ -465,36 +512,36 @@ h1 {
         flex-wrap: wrap;
     }
 
-    /* Mobile divider adjustment: hide it or make it horizontal if stacked */
+    /* Mobile divider adjustment: hide it when stacking */
     .settings-panel > .settings-group + .settings-group::before {
-        content: none; /* Hide vertical divider when stacking */
+        content: none;
     }
 
     .mode-and-options {
-        flex-direction: column; /* Stack mode selector and options */
+        flex-direction: column;
         gap: 8px;
-        width: 100%; /* Ensure it takes full width when stacked */
+        width: 100%;
     }
     
     .mode-selector, .options-group {
-        width: 100%; /* Make them take full width within their column */
-        justify-content: center; /* Center buttons horizontally */
+        width: 100%;
+        justify-content: center;
     }
     
     .mode-btn, .option-btn {
-        flex-grow: 1; /* Allow buttons to grow and fill available space */
+        flex-grow: 1;
         padding: 10px 8px;
         font-size: 0.95em;
     }
 
     .live-metrics {
-        flex-direction: column; /* Stack metrics vertically on small screens */
+        flex-direction: column;
         gap: 8px;
         padding: 10px;
     }
     .live-metrics .metric {
-        min-width: auto; /* Remove minimum width constraint */
-        width: 100%; /* Take full width when stacked */
+        min-width: auto;
+        width: 100%;
     }
 
     .words-display {
@@ -519,8 +566,8 @@ h1 {
     /* Results screen responsive adjustments */
     #results-screen {
         gap: 10px;
-        padding: 10px; /* Original top/side padding for mobile */
-        padding-bottom: 25px; /* Adjusted bottom padding for mobile */
+        padding: 10px;
+        padding-bottom: 25px;
     }
 
     #results-screen h2 {
