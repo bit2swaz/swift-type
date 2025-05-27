@@ -12,7 +12,8 @@ body {
     align-items: center;
     min-height: 100vh; /* Ensure body takes full viewport height */
     margin: 0;
-    padding: 20px; /* Base padding */
+    padding: 20px; /* Base padding for edges of the viewport */
+    padding-bottom: 80px; /* Increased padding-bottom for future footer space */
     box-sizing: border-box;
     position: relative;
 }
@@ -20,23 +21,23 @@ body {
 .container {
     background-color: #3e4451;
     border-radius: 8px;
-    padding: 30px; /* Base padding */
+    padding: 40px; /* Increased padding inside the container for height from both ends */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     text-align: center;
     width: 100%;
-    max-width: 800px; /* Original max-width */
+    max-width: 950px; /* Increased max-width significantly for wider look */
     position: relative;
     overflow: hidden; /* Keep this for results screen transition */
-    min-height: 550px; /* Increased min-height to accommodate more content */
+    min-height: 650px; /* Increased min-height to make it taller */
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Distribute space, changed from flex-start if it was */
+    justify-content: space-between; /* Distribute space evenly among its direct children */
 }
 
 h1 {
     color: #61afef;
-    margin-bottom: 30px;
-    font-size: 2.5em;
+    margin-bottom: 35px; /* Slightly more margin below heading */
+    font-size: 2.8em; /* Slightly larger main heading */
 }
 
 .settings-panel {
@@ -478,15 +479,18 @@ h1 {
 @media (max-width: 600px) {
     body {
         padding: 10px;
+        padding-bottom: 60px; /* Adjusted footer space for mobile */
     }
 
     .container {
-        padding: 15px;
-        min-height: auto;
+        padding: 20px; /* Adjusted padding for mobile */
+        min-height: auto; /* Allow container to shrink as needed on small screens */
+        max-width: 100%; /* Ensure it doesn't try to be too wide on mobile */
     }
 
     h1 {
-        font-size: 1.8em;
+        font-size: 2em; /* Smaller h1 for mobile */
+        margin-bottom: 20px;
     }
 
     .settings-panel {
