@@ -10,7 +10,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    min-height: 100vh; /* Ensure body takes full viewport height */
     margin: 0;
     padding: 20px; /* Base padding */
     box-sizing: border-box;
@@ -20,17 +20,17 @@ body {
 .container {
     background-color: #3e4451;
     border-radius: 8px;
-    padding: 30px;
+    padding: 30px; /* Base padding */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     text-align: center;
     width: 100%;
-    max-width: 800px;
+    max-width: 800px; /* Original max-width */
     position: relative;
     overflow: hidden; /* Keep this for results screen transition */
-    min-height: 500px; /* Base min-height */
+    min-height: 550px; /* Increased min-height to accommodate more content */
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Distribute space */
+    justify-content: space-between; /* Distribute space, changed from flex-start if it was */
 }
 
 h1 {
@@ -341,8 +341,9 @@ h1 {
     flex-direction: column;
     justify-content: center; /* Center content vertically */
     align-items: center;
-    gap: 25px;
-    padding: 20px;
+    gap: 25px; /* Reverted gap back to a good default */
+    padding: 20px; /* Original top/side padding */
+    padding-bottom: 40px; /* INCREASED BOTTOM PADDING HERE TO MATCH TOP VISUALLY */
     box-sizing: border-box;
     z-index: 50;
     
@@ -362,42 +363,43 @@ h1 {
 
 #results-screen h2 {
     color: #61afef;
-    margin-bottom: 15px;
+    margin-bottom: 15px; /* This margin controls the space below the heading */
     font-size: 2.5em;
     font-weight: bold;
 }
 
 .main-results-summary {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-around; /* This was key to the previous layout */
     width: 90%;
     max-width: 700px;
     margin-bottom: 20px;
-    gap: 20px;
+    gap: 20px; /* Reverted gap */
     flex-wrap: wrap; /* Allow wrapping of items */
 }
 
 .main-results-summary .metric-item {
     background-color: #21252b;
-    padding: 20px 30px;
+    padding: 20px 30px; /* Reverted padding */
     border-radius: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
     flex-grow: 1;
-    min-width: 150px;
+    min-width: 150px; /* Reverted min-width */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    /* Removed flex-basis and max-width from previous attempts to restore original spread */
 }
 
 .main-results-summary .metric-item span:first-child {
-    font-size: 3.5em;
+    font-size: 3.5em; /* Reverted font size */
     font-weight: bold;
     color: #a9b9d3;
     margin-bottom: 5px;
 }
 
 .main-results-summary .metric-label {
-    font-size: 0.9em;
+    font-size: 0.9em; /* Reverted font size */
     color: #7f848e;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -406,46 +408,53 @@ h1 {
 #results-restart-btn.new-test-btn {
     background-color: #61afef;
     color: white;
-    padding: 18px 40px;
-    font-size: 1.4em;
+    border: none;
+    padding: 18px 40px; /* Reverted padding */
+    font-size: 1.4em; /* Reverted font size */
     border-radius: 8px;
+    cursor: pointer;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    /* Removed margin-bottom here, will add padding to parent results-screen */
 }
 
 #results-restart-btn.new-test-btn:hover {
     background-color: #4f96e4;
     transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 #results-restart-btn.new-test-btn:active {
     transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 
 .detailed-results {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-around; /* This was key to the previous layout */
     width: 80%;
     max-width: 600px;
-    margin-top: 20px;
-    gap: 15px;
+    margin-top: 20px; /* Reverted margin-top */
+    gap: 15px; /* Reverted gap */
     flex-wrap: wrap; /* Allow wrapping of items */
 }
 
 .detailed-results .detail-item {
     background-color: #21252b;
-    padding: 15px 20px;
+    padding: 15px 20px; /* Reverted padding */
     border-radius: 5px;
     display: flex;
     flex-direction: column;
     align-items: center;
     flex-grow: 1;
-    min-width: 120px;
+    min-width: 120px; /* Reverted min-width */
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    /* Removed flex-basis and max-width from previous attempts to restore original spread */
 }
 
 .detailed-results .detail-value {
-    font-size: 1.5em;
+    font-size: 1.5em; /* Reverted font size */
     font-weight: bold;
     color: #98c379;
     margin-bottom: 5px;
@@ -458,17 +467,14 @@ h1 {
     color: #c678dd;
 }
 
-
 .detail-label {
-    font-size: 0.85em;
+    font-size: 0.85em; /* Reverted font size */
     color: #7f848e;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-
-/* --- Minimal Responsive Adjustments for very small screens (phones) --- */
-/* This will only apply if the screen is 600px or less, keeping desktop untouched */
+/* --- Responsive Adjustments for very small screens (phones) --- */
 @media (max-width: 600px) {
     body {
         padding: 10px;
@@ -561,7 +567,8 @@ h1 {
     /* Results screen responsive adjustments */
     #results-screen {
         gap: 10px;
-        padding: 10px;
+        padding: 10px; /* Original top/side padding for mobile */
+        padding-bottom: 25px; /* Adjusted bottom padding for mobile */
     }
 
     #results-screen h2 {
