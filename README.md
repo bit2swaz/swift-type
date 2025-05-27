@@ -3,6 +3,7 @@
 A sleek, responsive, and performance-focused typing test application, heavily inspired by MonkeyType, and built entirely with **HTML, CSS, and Vanilla JavaScript**. SwiftType provides an engaging platform for users to improve their typing speed and accuracy, featuring a highly customizable experience.
 
 ## Live Demo
+[SwiftType Live Demo](https://bit2swaz.github.io/swift-type/)
 ---
 
 ## Features
