@@ -3,8 +3,6 @@
 A sleek, responsive, and performance-focused typing test application, heavily inspired by MonkeyType, and built entirely with **HTML, CSS, and Vanilla JavaScript**. SwiftType provides an engaging platform for users to improve their typing speed and accuracy, featuring a highly customizable experience.
 
 ## Live Demo
-<!-- [Live Demo - Coming Soon!] *(You'll update this link once you deploy it!)* -->
-
 ---
 
 ## Features
@@ -16,7 +14,7 @@ A sleek, responsive, and performance-focused typing test application, heavily in
 - **Smooth Caret:** A precise, blinking caret indicates the current typing position, adapting seamlessly to text flow and word wrapping.
 - **"Tab" Key Restart:** Quickly reset the test at any point, even mid-typing or from the results screen, for rapid iteration.
 - **Responsive Design:** Ensures optimal usability and visual appeal across desktops, tablets, and mobile devices.
-- **Dynamic Theme Toggle (Your Iconic Theme):** Seamlessly switch between a custom dark mode and a clean light mode, reflecting your unique design preferences.
+- **Iconic Dark Theme:** Features a unique, custom dark mode aesthetic, reflecting your personalized design preferences.
 - **Persistent Theme Preference:** User's selected theme is saved in local storage, providing a consistent experience across sessions.
 - **Keyboard-Focused Interaction:** Primary interaction is through the keyboard, mirroring the efficiency of professional typing test applications.
 - **Clean and Maintainable Codebase:** Structured HTML, well-organized CSS using custom properties for theming, and modular JavaScript for readability and extensibility.
@@ -28,7 +26,7 @@ A sleek, responsive, and performance-focused typing test application, heavily in
 - **CSS3:** For modern styling, responsiveness, and dynamic theme management using CSS Custom Properties (`:root`, `--var`, `var()`).
 - **JavaScript (Vanilla):** For all interactive logic, DOM manipulation, test generation, and performance calculation.
 - **Google Fonts:** For typography (`Roboto Mono`).
-- **Font Awesome:** (Potentially for icons, if added in the future).
+- **Font Awesome:** Utilized for iconic elements like the footer's heart.
 
 ---
 
@@ -46,7 +44,7 @@ A sleek, responsive, and performance-focused typing test application, heavily in
 
 ## How to Run Locally
 ```bash
-git clone https://github.com/bit2swaz/swift-type.git
+git clone [https://github.com/bit2swaz/swift-type.git](https://github.com/bit2swaz/swift-type.git)
 cd SwiftType
 open index.html
 ```
@@ -59,13 +57,11 @@ Made with ❤️ by [bit2swaz](https://www.github.com/bit2swaz)
 ---
 
 ## What's Next
-- Implement my iconic custom footer design.
-- Fully integrate my signature light and dark themes with refined color palettes.
+- Integrate a signature light theme with refined color palettes.
 - Add more test configuration options (e.g., custom text, word count modes).
 - Introduce a high-score tracking system using local storage.
 - Implement advanced error handling and visual feedback for missed characters.
 - Further refine the user interface and animations for a smoother experience.
-
 
 ---
 
