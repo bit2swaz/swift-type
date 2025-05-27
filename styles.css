@@ -40,12 +40,13 @@ body {
     background-color: var(--body-bg); /* Use new background variable */
     color: var(--text-color); /* Use new text color variable */
     display: flex;
-    justify-content: center;
+    flex-direction: column; /* Changed to column to stack container and footer */
+    justify-content: space-between; /* Space out content and footer */
     align-items: center;
     min-height: 100vh;
     margin: 0;
     padding: 20px;
-    padding-bottom: 80px; /* Space for future footer */
+    padding-bottom: 80px; /* Space for footer height */
     box-sizing: border-box;
     position: relative;
     transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions for theme changes */
@@ -66,6 +67,7 @@ body {
     flex-direction: column;
     justify-content: space-between;
     transition: background-color 0.3s ease; /* Smooth transition for container */
+    margin-bottom: 20px; /* Space between container and footer */
 }
 
 h1 {
@@ -121,7 +123,7 @@ h1 {
 
 .mode-btn.active {
     background-color: var(--accent-color); /* Use accent color for active state */
-    color: var(--active-button-text-color); /* Changed: Dark text for active buttons */
+    color: var(--active-button-text-color); /* Dark text for active buttons */
     font-weight: bold;
 }
 
@@ -151,7 +153,7 @@ h1 {
 
 .option-btn.active {
     background-color: var(--accent-color); /* Use accent color for active state */
-    color: var(--active-button-text-color); /* Changed: Dark text for active buttons */
+    color: var(--active-button-text-color); /* Dark text for active buttons */
     font-weight: bold;
 }
 
@@ -243,7 +245,7 @@ h1 {
     position: relative;
     text-align: left;
     user-select: none;
-    color: var(--untyped-text-color); /* Changed: Dull gray for untyped words */
+    color: var(--untyped-text-color); /* Dull gray for untyped words */
     font-family: 'Roboto Mono', monospace; /* Apply font */
     transition: background-color 0.3s ease, color 0.3s ease; /* Added transitions */
 }
@@ -261,16 +263,16 @@ h1 {
 }
 
 .character.correct {
-    color: var(--correct-text-color); /* Changed: Green for correct characters */
+    color: var(--correct-text-color); /* Green for correct characters */
 }
 
 .character.incorrect {
-    color: var(--incorrect-text-color); /* Changed: Red for incorrect */
+    color: var(--incorrect-text-color); /* Red for incorrect */
     /* No background-color or underline by default for incorrect, only for extra */
 }
 
 .character.extra {
-    color: var(--extra-text-color); /* Changed: Red for extra */
+    color: var(--extra-text-color); /* Red for extra */
     text-decoration: underline wavy var(--extra-text-color) 1px; /* Prominent red underline */
     /* Optional: background-color: rgba(231, 76, 60, 0.2); if you want a subtle background */
 }
@@ -309,7 +311,7 @@ h1 {
 
 .restart-btn {
     background-color: var(--accent-color); /* Use accent color for restart button */
-    color: var(--active-button-text-color); /* Changed: Dark text for restart button */
+    color: var(--active-button-text-color); /* Dark text for restart button */
     border: none;
     padding: 15px 30px;
     border-radius: 5px;
@@ -405,14 +407,14 @@ h1 {
 
 .main-results-summary .metric-label {
     font-size: 0.9em;
-    color: var(--history-text-color); /* Subtle text color for labels */
+    color: var(--subtle-text-color); /* Subtle text color for labels, ensuring consistency */
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
 #results-restart-btn.new-test-btn {
     background-color: var(--accent-color); /* Use accent color for results restart button */
-    color: var(--active-button-text-color); /* Changed: Dark text for new test button */
+    color: var(--active-button-text-color); /* Dark text for new test button */
     border: none;
     padding: 18px 40px;
     font-size: 1.4em;
@@ -459,25 +461,57 @@ h1 {
     transition: background-color 0.3s ease, color 0.3s ease; /* Added transitions */
 }
 
-.detailed-results .detail-value {
-    font-size: 1.5em;
-    font-weight: bold;
-    color: var(--correct-text-color); /* Changed: Correct letters count is green */
-    margin-bottom: 5px;
+/* Specific colors for detailed results numbering */
+.detailed-results .detail-item:nth-child(1) .detail-value { /* Correct Letters */
+    color: var(--correct-text-color); /* Green */
 }
-
-.detailed-results .detail-item:nth-child(2) .detail-value {
-    color: var(--incorrect-text-color); /* Changed: Incorrect letters count is red */
+.detailed-results .detail-item:nth-child(2) .detail-value { /* Incorrect Letters */
+    color: var(--incorrect-text-color); /* Red */
 }
-.detailed-results .detail-item:nth-child(3) .detail-value {
-    color: var(--extra-text-color); /* Changed: Extra letters count is red */
+.detailed-results .detail-item:nth-child(3) .detail-value { /* Extra Letters */
+    color: var(--extra-text-color); /* Red (same as incorrect for minimalism) */
 }
 
 .detail-label {
     font-size: 0.85em;
-    color: var(--history-text-color); /* Subtle text color for labels */
+    color: var(--subtle-text-color); /* Subtle text color for labels, ensuring consistency */
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+
+/* Footer Styles (Integrated from AuraCalc's implied design) */
+footer {
+    width: 100%;
+    max-width: 950px; /* Match container width for alignment */
+    padding: 25px 0; /* Proper vertical padding */
+    background-color: var(--display-bg); /* Darker background for "different section" look */
+    color: var(--subtle-text-color); /* Subtle text color for the main footer text */
+    text-align: center;
+    font-size: 0.9em;
+    /* Removed absolute/fixed positioning, let it flow after the container */
+    /* Position the body to be a flex container that spaces items */
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3); /* Subtle shadow above footer */
+    font-family: 'Roboto Mono', monospace; /* Apply font */
+    z-index: 100; /* Ensure it's above other elements if necessary */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Consistent transitions */
+    border-radius: 8px; /* Match container border-radius */
+}
+
+footer a {
+    color: var(--accent-color); /* Accent color for links */
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease; /* Smooth transition for hover */
+    display: inline-block; /* For transform to work */
+}
+
+footer a:hover {
+    color: var(--accent-color-hover); /* Lighter accent on hover */
+    transform: translateY(-2px); /* Slight lift on hover */
+}
+
+footer a:active {
+    transform: translateY(0); /* Press effect */
 }
 
 
@@ -485,13 +519,14 @@ h1 {
 @media (max-width: 600px) {
     body {
         padding: 10px;
-        padding-bottom: 60px;
+        padding-bottom: 60px; /* Adjust padding for footer */
     }
 
     .container {
         padding: 20px;
         min-height: auto;
         max-width: 100%;
+        margin-bottom: 15px; /* Adjust margin */
     }
 
     h1 {
@@ -606,5 +641,10 @@ h1 {
     #results-restart-btn.new-test-btn {
         padding: 10px 20px;
         font-size: 1em;
+    }
+
+    footer {
+        max-width: 100%; /* Adjust footer width for mobile */
+        padding: 15px 0;
     }
 }
