@@ -202,6 +202,11 @@ function renderWords() {
     updateCaretPosition();
 }
 
+// Add this variable at the top of your script.js, near other global constants
+let cachedLineHeight = 0;
+
+// ... (rest of your script.js code) ...
+
 function updateCaretPosition() {
     const allWordElements = elements.wordsDisplay.querySelectorAll('.word');
     const currentWordElement = allWordElements[state.currentWordIndex];
@@ -217,8 +222,10 @@ function updateCaretPosition() {
     let charactersInCurrentWord = Array.from(currentWordElement.children);
 
     if (state.currentCharIndex < charactersInCurrentWord.length) {
+        // Caret is on a character within the word
         targetCharacterSpan = charactersInCurrentWord[state.currentCharIndex];
     } else {
+        // Caret is at the end of the current word (on the implicit space)
         const lastCharOfWord = charactersInCurrentWord[charactersInCurrentWord.length - 1];
         if (lastCharOfWord) {
             targetCharacterSpan = lastCharOfWord;
@@ -226,41 +233,84 @@ function updateCaretPosition() {
     }
 
     if (targetCharacterSpan) {
-        const rect = targetCharacterSpan.getBoundingClientRect();
-        const displayRect = elements.wordsDisplay.getBoundingClientRect();
+        // Calculate line height if not already cached. Needs to be done here
+        // as `scrollWordsDisplay` will now directly use `cachedLineHeight`.
+        if (cachedLineHeight === 0) {
+            const sampleElement = wordsDisplay.querySelector('.word') || targetCharacterSpan;
+            if (sampleElement) {
+                cachedLineHeight = parseFloat(getComputedStyle(sampleElement).lineHeight);
+            } else {
+                cachedLineHeight = parseFloat(getComputedStyle(wordsDisplay).lineHeight);
+            }
+            if (isNaN(cachedLineHeight) || cachedLineHeight === 0) {
+                const wordsDisplayFontSize = parseFloat(getComputedStyle(wordsDisplay).fontSize);
+                cachedLineHeight = 1.6 * wordsDisplayFontSize; // Fallback based on 1.6em line-height
+            }
+        }
 
-        let caretLeft = rect.left - displayRect.left + elements.wordsDisplay.scrollLeft;
-        const caretTop = rect.top - displayRect.top + elements.wordsDisplay.scrollTop;
+        // --- NEW ORDER: Call scrollWordsDisplay FIRST ---
+        // Pass the target character's offsetTop and the calculated lineHeight
+        scrollWordsDisplay(targetCharacterSpan.offsetTop, cachedLineHeight);
+
+        // Now, calculate caret position based on potentially updated scroll
+        let caretLeft = targetCharacterSpan.offsetLeft;
+        const caretTop = targetCharacterSpan.offsetTop; // This is the actual Y position within the entire scrollable content
 
         // Adjust caret position for when it's at the end of a word (on the space)
         const currentWordText = state.words[state.currentWordIndex];
         if (state.currentCharIndex === currentWordText.length) {
             const spaceSpan = currentWordElement.querySelector('.space');
             if (spaceSpan) {
+                // If there's an explicit .space element, add its width
                 caretLeft += spaceSpan.getBoundingClientRect().width;
             } else {
+                // Otherwise, approximate space width (e.g., half a char width)
+                const rect = targetCharacterSpan.getBoundingClientRect();
                 caretLeft += (rect.width * 0.5);
             }
         }
         
-        elements.caret.style.transform = `translate(${caretLeft}px, ${caretTop}px)`;
-        scrollWordsDisplay(rect.top, rect.height);
+        // --- FINAL CARET POSITIONING ---
+        // We translate the caret by its absolute position (caretTop) MINUS
+        // how much the wordsDisplay container has scrolled (elements.wordsDisplay.scrollTop).
+        // This ensures the caret's Y position is relative to the *visible viewport* of wordsDisplay.
+        elements.caret.style.transform = `translate(${caretLeft}px, ${caretTop - elements.wordsDisplay.scrollTop}px)`;
     }
 }
 
-function scrollWordsDisplay(charTop, charHeight) {
-    const wordsDisplayRect = elements.wordsDisplay.getBoundingClientRect();
-    const wordsDisplayScrollTop = elements.wordsDisplay.scrollTop;
+// Modify your existing scrollWordsDisplay function to accept offsetTop and lineHeight
+function scrollWordsDisplay(targetOffsetTop, lineHeight) {
+    const wordsDisplayVisibleHeight = elements.wordsDisplay.clientHeight; // The actual visible height of the container
+    const currentScrollTop = elements.wordsDisplay.scrollTop; // Current scroll position
 
-    const relativeCharTop = charTop - wordsDisplayRect.top;
+    // The top and bottom of the line the caret is on, relative to the *scrollable content's start*.
+    const caretLineTop = targetOffsetTop;
+    const caretLineBottom = targetOffsetTop + lineHeight;
 
-    const scrollBuffer = 30;
+    // Define a buffer (e.g., half a line height) for smoother scrolling.
+    // This ensures the caret doesn't hit the very edge before scrolling.
+    const scrollBuffer = lineHeight * 0.5; 
 
-    if (relativeCharTop < scrollBuffer) {
-        elements.wordsDisplay.scrollTop = wordsDisplayScrollTop + relativeCharTop - scrollBuffer;
+    // If the caret's line goes below the visible bottom edge (plus buffer)
+    // `caretLineBottom` is its position relative to the content start.
+    // `currentScrollTop + wordsDisplayVisibleHeight` is the bottom of the *visible* area.
+    if (caretLineBottom > currentScrollTop + wordsDisplayVisibleHeight - scrollBuffer) {
+        // Calculate the new scrollTop: position the bottom of the current line
+        // at the bottom of the visible area, with the buffer.
+        elements.wordsDisplay.scrollTop = caretLineBottom - (wordsDisplayVisibleHeight - scrollBuffer);
     }
-    else if (relativeCharTop + charHeight > wordsDisplayRect.height - scrollBuffer) {
-        elements.wordsDisplay.scrollTop = wordsDisplayScrollTop + (relativeCharTop + charHeight - (wordsDisplayRect.height - scrollBuffer));
+    // If the caret's line goes above the visible top edge (plus buffer, for backspacing)
+    // `caretLineTop` is its position relative to the content start.
+    // `currentScrollTop` is the top of the *visible* area.
+    else if (caretLineTop < currentScrollTop + scrollBuffer) {
+        // Calculate the new scrollTop: position the top of the current line
+        // at the top of the visible area, with the buffer.
+        elements.wordsDisplay.scrollTop = caretLineTop - scrollBuffer;
+    }
+
+    // Ensure scrollTop doesn't go below 0 (prevents overscrolling upwards, which can cause visual glitches)
+    if (elements.wordsDisplay.scrollTop < 0) {
+        elements.wordsDisplay.scrollTop = 0;
     }
 }
 
